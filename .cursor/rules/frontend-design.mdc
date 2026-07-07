@@ -1,0 +1,61 @@
+---
+description: Compact professional UI — Catalyst components and Tailwind CSS only
+globs: resources/js/**/*.{tsx,ts},resources/css/**/*.css
+alwaysApply: false
+---
+
+# Frontend Design Pattern
+
+This project uses **Catalyst UI Kit** (Tailwind Plus) + **Tailwind CSS v4**. No shadcn, Radix, or other UI libraries.
+
+## Component sources (in order)
+
+1. **Catalyst** — `@/components/catalyst/*` (Button, Input, Field, Dialog, Sidebar, etc.)
+2. **App components** — `@/components/*` (layouts, nav, app-specific wrappers)
+3. **Tailwind utilities** — for layout, spacing, and one-off styling only
+
+```tsx
+// ✅ GOOD
+import { Button } from '@/components/catalyst/button'
+import { Field, Label, ErrorMessage } from '@/components/catalyst/fieldset'
+import { Input } from '@/components/catalyst/input'
+
+// ❌ BAD — do not add shadcn, Radix, MUI, or copy-paste custom primitives
+import { Button } from '@/components/ui/button'
+```
+
+## Design principles — compact & professional
+
+- **Density**: prefer `gap-4`–`gap-6`, `p-4`–`p-6`; avoid oversized padding (`p-12`, `gap-16`).
+- **Palette**: Catalyst zinc scale — `text-zinc-950`, `text-zinc-500`, `bg-zinc-50`, `dark:text-white`, `dark:bg-zinc-900`.
+- **Typography**: use Catalyst `Heading`, `Subheading`, `Text` — not raw `<h1>` with ad-hoc classes.
+- **Forms**: wrap fields in `Field` + `Label` + `Input`; show errors with `ErrorMessage`.
+- **Icons**: `@heroicons/react/16/solid` (buttons/menus) or `/20/solid` (sidebar/nav). Add `data-slot="icon"` on sidebar icons.
+- **Links**: `@/components/catalyst/link` (Inertia-aware) or `TextLink` from `@/components/catalyst/text`.
+- **Layouts**: `SidebarLayout` (app), `AuthLayout` (auth), Catalyst `Dialog` for modals.
+
+## Structure
+
+```
+resources/js/components/catalyst/   # Catalyst kit — customize link.tsx only
+resources/js/components/            # App-specific (nav, logo, layouts)
+resources/js/pages/                 # Inertia pages — compose Catalyst + app components
+resources/css/app.css               # Tailwind v4 theme (@theme, dark variant)
+```
+
+## Do / Don't
+
+| Do | Don't |
+|----|-------|
+| Reuse existing Catalyst components | Build custom buttons/inputs from scratch |
+| `clsx` for conditional classes | Inline `style={{}}` or custom CSS files |
+| `max-w-xl` / `max-w-6xl` content widths | Full-bleed forms with no max-width |
+| `Button color="dark/zinc"` or `outline` | Random color hex values |
+| Dark mode via `dark:` utilities | Separate theme systems |
+
+## New page checklist
+
+1. Use existing layout (`AppLayout`, `AuthLayout`, `SettingsLayout`)
+2. Import Catalyst form/feedback components
+3. Keep page markup flat — `grid gap-6` or `space-y-6`
+4. Match spacing and type scale of existing auth/settings pages
