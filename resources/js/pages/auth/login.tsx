@@ -1,12 +1,14 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
+import { FormField } from '@/components/form/form-field';
 import { Spinner } from '@/components/spinner';
 import { Button } from '@/components/catalyst/button';
 import { Checkbox, CheckboxField } from '@/components/catalyst/checkbox';
-import { ErrorMessage, Field, Label } from '@/components/catalyst/fieldset';
+import { Label } from '@/components/catalyst/fieldset';
 import { Input } from '@/components/catalyst/input';
 import { Text, TextLink } from '@/components/catalyst/text';
+import { useValidatedForm } from '@/hooks/use-validated-form';
 import AuthLayout from '@/layouts/auth-layout';
 
 interface LoginForm {
@@ -21,7 +23,7 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
+    const { data, setData, post, processing, errors, reset } = useValidatedForm<LoginForm>({
         email: '',
         password: '',
         remember: false,
@@ -39,7 +41,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             <Head title="Log in" />
 
             <form className="grid gap-6" onSubmit={submit}>
-                <Field>
+                <FormField error={errors.email}>
                     <Label>Email address</Label>
                     <Input
                         type="email"
@@ -51,10 +53,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         onChange={(e) => setData('email', e.target.value)}
                         placeholder="email@example.com"
                     />
-                    {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
-                </Field>
+                </FormField>
 
-                <Field>
+                <FormField error={errors.password}>
                     <div className="flex items-center justify-between">
                         <Label>Password</Label>
                         {canResetPassword && (
@@ -74,8 +75,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         onChange={(e) => setData('password', e.target.value)}
                         placeholder="Password"
                     />
-                    {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
-                </Field>
+                </FormField>
 
                 <CheckboxField>
                     <Checkbox checked={data.remember} onChange={(checked) => setData('remember', checked)} tabIndex={3} />

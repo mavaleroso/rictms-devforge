@@ -2,49 +2,46 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Resources\EnrollmentResource;
+use App\Repositories\Contracts\EnrollmentRepository;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
-    /**
-     * The root template that's loaded on the first page visit.
-     *
-     * @see https://inertiajs.com/server-side-setup#root-template
-     *
-     * @var string
-     */
+    public function __construct(
+        private readonly EnrollmentRepository $enrollments,
+    ) {}
+
     protected $rootView = 'app';
 
-    /**
-     * Determines the current asset version.
-     *
-     * @see https://inertiajs.com/asset-versioning
-     */
     public function version(Request $request): ?string
     {
         return parent::version($request);
     }
 
-    /**
-     * Define the props that are shared by default.
-     *
-     * @see https://inertiajs.com/shared-data
-     *
-     * @return array<string, mixed>
-     */
     public function share(Request $request): array
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        return array_merge(parent::share($request), [
+        $user = $request->user();
+        $enrollment = $user?->isIntern()
+            ? $this->enrollments->findActiveForUser($user)?->load(['learningPath', 'levelProgress.level'])
+            : null;
+
+        return [
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
+                'roles' => $user?->getRoleNames() ?? [],
             ],
-        ]);
+            'enrollment' => $enrollment ? new EnrollmentResource($enrollment) : null,
+            'flash' => [
+                'quiz_result' => fn () => $request->session()->get('quiz_result'),
+            ],
+        ];
     }
 }

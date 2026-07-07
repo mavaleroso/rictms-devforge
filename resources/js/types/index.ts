@@ -4,6 +4,7 @@ export type IconComponent = React.ComponentType<SVGProps<SVGSVGElement>>;
 
 export interface Auth {
     user: User;
+    roles: string[];
 }
 
 export interface BreadcrumbItem {
@@ -21,6 +22,8 @@ export interface NavItem {
     url: string;
     icon?: IconComponent | null;
     isActive?: boolean;
+    /** Keep nav item highlighted for nested routes (e.g. /admin/paths/1/edit). */
+    matchPrefix?: string;
 }
 
 export interface SharedData {

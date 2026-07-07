@@ -1,10 +1,12 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
+import { FormField } from '@/components/form/form-field';
 import { Spinner } from '@/components/spinner';
 import { Button } from '@/components/catalyst/button';
-import { ErrorMessage, Field, Label } from '@/components/catalyst/fieldset';
+import { Label } from '@/components/catalyst/fieldset';
 import { Input } from '@/components/catalyst/input';
+import { useValidatedForm } from '@/hooks/use-validated-form';
 import AuthLayout from '@/layouts/auth-layout';
 
 interface ResetPasswordProps {
@@ -20,7 +22,7 @@ interface ResetPasswordForm {
 }
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<ResetPasswordForm>({
+    const { data, setData, post, processing, errors, reset } = useValidatedForm<ResetPasswordForm>({
         token: token,
         email: email,
         password: '',
@@ -39,7 +41,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
             <Head title="Reset password" />
 
             <form className="grid gap-6" onSubmit={submit}>
-                <Field>
+                <FormField error={errors.email}>
                     <Label>Email</Label>
                     <Input
                         type="email"
@@ -49,10 +51,9 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         readOnly
                         onChange={(e) => setData('email', e.target.value)}
                     />
-                    {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
-                </Field>
+                </FormField>
 
-                <Field>
+                <FormField error={errors.password}>
                     <Label>Password</Label>
                     <Input
                         type="password"
@@ -63,10 +64,9 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         onChange={(e) => setData('password', e.target.value)}
                         placeholder="Password"
                     />
-                    {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
-                </Field>
+                </FormField>
 
-                <Field>
+                <FormField error={errors.password_confirmation}>
                     <Label>Confirm password</Label>
                     <Input
                         type="password"
@@ -76,8 +76,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         onChange={(e) => setData('password_confirmation', e.target.value)}
                         placeholder="Confirm password"
                     />
-                    {errors.password_confirmation && <ErrorMessage>{errors.password_confirmation}</ErrorMessage>}
-                </Field>
+                </FormField>
 
                 <Button type="submit" className="w-full" disabled={processing}>
                     {processing && <Spinner className="size-4" />}

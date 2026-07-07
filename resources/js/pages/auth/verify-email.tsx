@@ -1,13 +1,14 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 import { Spinner } from '@/components/spinner';
 import { TextLink } from '@/components/catalyst/text';
 import { Button } from '@/components/catalyst/button';
+import { useValidatedForm } from '@/hooks/use-validated-form';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function VerifyEmail({ status }: { status?: string }) {
-    const { post, processing } = useForm({});
+    const { post, processing } = useValidatedForm({});
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();

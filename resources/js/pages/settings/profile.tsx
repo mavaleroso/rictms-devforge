@@ -1,14 +1,16 @@
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 import DeleteUser from '@/components/delete-user';
+import { FormField } from '@/components/form/form-field';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/catalyst/button';
-import { ErrorMessage, Field, Label } from '@/components/catalyst/fieldset';
+import { Label } from '@/components/catalyst/fieldset';
 import { Input } from '@/components/catalyst/input';
 import { Text, TextLink } from '@/components/catalyst/text';
+import { useValidatedForm } from '@/hooks/use-validated-form';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
@@ -22,7 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth } = usePage<SharedData>().props;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
+    const { data, setData, patch, errors, processing, recentlySuccessful } = useValidatedForm({
         name: auth.user.name,
         email: auth.user.email,
     });
@@ -42,7 +44,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                     <HeadingSmall title="Profile information" description="Update your name and email address" />
 
                     <form onSubmit={submit} className="space-y-6">
-                        <Field>
+                        <FormField error={errors.name}>
                             <Label>Name</Label>
                             <Input
                                 value={data.name}
@@ -51,10 +53,9 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 autoComplete="name"
                                 placeholder="Full name"
                             />
-                            {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
-                        </Field>
+                        </FormField>
 
-                        <Field>
+                        <FormField error={errors.email}>
                             <Label>Email address</Label>
                             <Input
                                 type="email"
@@ -64,8 +65,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 autoComplete="username"
                                 placeholder="Email address"
                             />
-                            {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
-                        </Field>
+                        </FormField>
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (
                             <div>

@@ -1,16 +1,18 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
+import { FormField } from '@/components/form/form-field';
 import { Spinner } from '@/components/spinner';
 import { TextLink } from '@/components/catalyst/text';
 import { Button } from '@/components/catalyst/button';
-import { ErrorMessage, Field, Label } from '@/components/catalyst/fieldset';
+import { Label } from '@/components/catalyst/fieldset';
 import { Input } from '@/components/catalyst/input';
 import { Text } from '@/components/catalyst/text';
+import { useValidatedForm } from '@/hooks/use-validated-form';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function ForgotPassword({ status }: { status?: string }) {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useValidatedForm({
         email: '',
     });
 
@@ -27,7 +29,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
             {status && <p className="text-center text-sm font-medium text-green-600">{status}</p>}
 
             <form className="grid gap-6" onSubmit={submit}>
-                <Field>
+                <FormField error={errors.email}>
                     <Label>Email address</Label>
                     <Input
                         type="email"
@@ -38,8 +40,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         onChange={(e) => setData('email', e.target.value)}
                         placeholder="email@example.com"
                     />
-                    {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
-                </Field>
+                </FormField>
 
                 <Button className="w-full" disabled={processing}>
                     {processing && <Spinner className="size-4" />}

@@ -1,61 +1,144 @@
 ---
-description: Compact professional UI — Catalyst components and Tailwind CSS only
+description: Compact professional UI — Catalyst + Headless UI, Tailwind CSS, Laravel validation UX
 globs: resources/js/**/*.{tsx,ts},resources/css/**/*.css
 alwaysApply: false
 ---
 
 # Frontend Design Pattern
 
-This project uses **Catalyst UI Kit** (Tailwind Plus) + **Tailwind CSS v4**. No shadcn, Radix, or other UI libraries.
+This project uses **Catalyst UI Kit** (Tailwind Plus) on top of **Headless UI** (`@headlessui/react`) + **Tailwind CSS v4**. No shadcn, Radix, MUI, or other UI libraries.
+
+Catalyst components are styled wrappers around Headless UI primitives — accessibility, keyboard nav, and focus management come from Headless UI; look-and-feel comes from Catalyst.
 
 ## Component sources (in order)
 
 1. **Catalyst** — `@/components/catalyst/*` (Button, Input, Field, Dialog, Sidebar, etc.)
-2. **App components** — `@/components/*` (layouts, nav, app-specific wrappers)
+2. **App components** — `@/components/*` (layouts, nav, form helpers, toast)
 3. **Tailwind utilities** — for layout, spacing, and one-off styling only
 
 ```tsx
-// ✅ GOOD
+// ✅ GOOD — Catalyst (Headless UI under the hood)
 import { Button } from '@/components/catalyst/button'
-import { Field, Label, ErrorMessage } from '@/components/catalyst/fieldset'
+import { Label } from '@/components/catalyst/fieldset'
 import { Input } from '@/components/catalyst/input'
+import { Listbox, ListboxOption } from '@/components/catalyst/listbox'
+import { FormField } from '@/components/form/form-field'
+import { useValidatedForm } from '@/hooks/use-validated-form'
 
 // ❌ BAD — do not add shadcn, Radix, MUI, or copy-paste custom primitives
 import { Button } from '@/components/ui/button'
+
+// ❌ BAD — do not import Headless UI directly in pages (use Catalyst wrappers)
+import { Listbox } from '@headlessui/react'
 ```
+
+## Headless UI — advanced components
+
+Use **Catalyst** exports for interactive UI. They wrap Headless UI and match the design system.
+
+| Need | Catalyst component | Notes |
+|------|-------------------|--------|
+| Native-style dropdown | `Select` | Simple `<select>` replacement; supports `invalid` via `FormField` |
+| Custom styled picker | `Listbox` + `ListboxOption` | Button + options panel; best for short fixed lists |
+| Searchable picker | `Combobox` + `ComboboxOption` | Typeahead / filter; users, tags, long lists |
+| Menu / actions | `Dropdown` + `DropdownItem` | Row actions, kebab menus |
+| Modal | `Dialog` + `DialogTitle` + `DialogBody` | Confirmations, forms in overlay |
+| Toggle | `Switch` + `SwitchField` | Boolean settings |
+| Single / multi choice | `Radio` / `Checkbox` | With `Fieldset` + `Label` |
+| Tabs / disclosure | Prefer existing page patterns | Add Catalyst kit components if needed |
+
+```tsx
+// Listbox inside FormField (validation outline + error below)
+<FormField error={errors.role}>
+  <Label>Role</Label>
+  <Listbox value={data.role} onChange={(v) => setData('role', v)}>
+    <ListboxOption value="intern">Intern</ListboxOption>
+    <ListboxOption value="mentor">Mentor</ListboxOption>
+  </Listbox>
+</FormField>
+```
+
+### Headless UI rules
+
+- **Pages & app components**: import from `@/components/catalyst/*` only.
+- **`catalyst/` folder**: may import `@headlessui/react` when adding or customizing kit components.
+- Pass **`invalid`** only on form **controls** (`Input`, `Textarea`, `Select`, `Listbox`, `Combobox`) — never on `Field` (it renders a `div`).
+- Advanced pickers use `data-slot="control"` — always pair with `Label` inside `Field` or `FormField`.
+- Use **`'use client'`** only inside Catalyst files that need it (Listbox, Combobox, Dialog); pages stay standard Inertia components.
 
 ## Design principles — compact & professional
 
 - **Density**: prefer `gap-4`–`gap-6`, `p-4`–`p-6`; avoid oversized padding (`p-12`, `gap-16`).
 - **Palette**: Catalyst zinc scale — `text-zinc-950`, `text-zinc-500`, `bg-zinc-50`, `dark:text-white`, `dark:bg-zinc-900`.
 - **Typography**: use Catalyst `Heading`, `Subheading`, `Text` — not raw `<h1>` with ad-hoc classes.
-- **Forms**: wrap fields in `Field` + `Label` + `Input`; show errors with `ErrorMessage`.
 - **Icons**: `@heroicons/react/16/solid` (buttons/menus) or `/20/solid` (sidebar/nav). Add `data-slot="icon"` on sidebar icons.
 - **Links**: `@/components/catalyst/link` (Inertia-aware) or `TextLink` from `@/components/catalyst/text`.
 - **Layouts**: `SidebarLayout` (app), `AuthLayout` (auth), Catalyst `Dialog` for modals.
 
+## Validation (Laravel Form Requests)
+
+Validation messages **must come from Laravel** — never hard-code client-side error strings for server rules.
+
+### Backend
+
+- All mutating endpoints use **Form Requests** with `rules()` and optional custom `messages()`.
+- Inertia shares validation errors automatically via page `errors` props.
+
+### Frontend forms
+
+1. Use **`useValidatedForm`** instead of `useForm` — shows a toast on `onError` with Laravel messages.
+2. Wrap each input in **`FormField`** — red outline + error label below the control.
+3. Pass the matching key from `errors`: `error={errors.email}`.
+
+```tsx
+const { data, setData, post, processing, errors } = useValidatedForm({ email: '' })
+
+<FormField error={errors.email}>
+  <Label>Email address</Label>
+  <Input
+    type="email"
+    value={data.email}
+    onChange={(e) => setData('email', e.target.value)}
+  />
+</FormField>
+```
+
+### What FormField does
+
+- Sets `invalid` on the control (`Input`, `Textarea`, `Select`, `Listbox`, `Combobox`) — not on Catalyst `Field` (it renders a `div`).
+- Catalyst applies **red border** via `data-invalid` styles on controls.
+- Renders **`ErrorMessage`** directly below the control with the Laravel message.
+
+### Toast alerts
+
+- `ToastProvider` + `ValidationToastListener` are mounted in `app.tsx`.
+- On validation failure, a **red toast** appears **top-center** with the first Laravel error (or a summary when multiple fields fail).
+- Field-level errors still show inline — toast is supplementary, not a replacement.
+
+### Do / Don't
+
+| Do | Don't |
+|----|-------|
+| `useValidatedForm` + `FormField` | Raw `useForm` without toast wiring |
+| `errors.field` from Inertia | Custom `if (!value) setError('Required')` for server rules |
+| Laravel custom messages in Form Requests | Generic "Invalid input" strings in React |
+| Inline `ErrorMessage` via `FormField` | Toasts only, with no per-field feedback |
+
 ## Structure
 
 ```
-resources/js/components/catalyst/   # Catalyst kit — customize link.tsx only
-resources/js/components/            # App-specific (nav, logo, layouts)
+resources/js/components/catalyst/   # Catalyst kit (Headless UI + Tailwind) — customize link.tsx only
+resources/js/components/form/       # FormField and form helpers
+resources/js/components/toast/      # ToastProvider, validation listener
+resources/js/hooks/                 # useValidatedForm, use-appearance
 resources/js/pages/                 # Inertia pages — compose Catalyst + app components
 resources/css/app.css               # Tailwind v4 theme (@theme, dark variant)
 ```
 
-## Do / Don't
-
-| Do | Don't |
-|----|-------|
-| Reuse existing Catalyst components | Build custom buttons/inputs from scratch |
-| `clsx` for conditional classes | Inline `style={{}}` or custom CSS files |
-| `max-w-xl` / `max-w-6xl` content widths | Full-bleed forms with no max-width |
-| `Button color="dark/zinc"` or `outline` | Random color hex values |
-| Dark mode via `dark:` utilities | Separate theme systems |
-
 ## New page checklist
 
 1. Use existing layout (`AppLayout`, `AuthLayout`, `SettingsLayout`)
-2. Import Catalyst form/feedback components
-3. Keep page markup flat — `grid gap-6` or `space-y-6`
-4. Match spacing and type scale of existing auth/settings pages
+2. Import Catalyst form components + `FormField`; use `Listbox` / `Combobox` / `Select` for pickers
+3. Use `useValidatedForm` for any form that posts to Laravel
+4. Keep page markup flat — `grid gap-6` or `space-y-6`
+5. Match spacing and type scale of existing auth/settings pages

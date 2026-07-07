@@ -3,20 +3,19 @@
 namespace App\Actions\Settings;
 
 use App\Models\User;
+use App\Repositories\Contracts\UserRepository;
 
 final class UpdateUserProfile
 {
+    public function __construct(
+        private readonly UserRepository $users,
+    ) {}
+
     /**
      * @param  array{name: string, email: string}  $attributes
      */
     public function execute(User $user, array $attributes): void
     {
-        $user->fill($attributes);
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
-
-        $user->save();
+        $this->users->updateProfile($user, $attributes);
     }
 }

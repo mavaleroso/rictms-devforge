@@ -1,11 +1,13 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
+import { FormField } from '@/components/form/form-field';
 import { Spinner } from '@/components/spinner';
 import { Button } from '@/components/catalyst/button';
-import { ErrorMessage, Field, Label } from '@/components/catalyst/fieldset';
+import { Label } from '@/components/catalyst/fieldset';
 import { Input } from '@/components/catalyst/input';
 import { Text, TextLink } from '@/components/catalyst/text';
+import { useValidatedForm } from '@/hooks/use-validated-form';
 import AuthLayout from '@/layouts/auth-layout';
 
 interface RegisterForm {
@@ -16,7 +18,7 @@ interface RegisterForm {
 }
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm<RegisterForm>({
+    const { data, setData, post, processing, errors, reset } = useValidatedForm<RegisterForm>({
         name: '',
         email: '',
         password: '',
@@ -34,7 +36,7 @@ export default function Register() {
         <AuthLayout title="Create an account" description="Enter your details below to create your account">
             <Head title="Register" />
             <form className="grid gap-6" onSubmit={submit}>
-                <Field>
+                <FormField error={errors.name}>
                     <Label>Name</Label>
                     <Input
                         type="text"
@@ -47,10 +49,9 @@ export default function Register() {
                         disabled={processing}
                         placeholder="Full name"
                     />
-                    {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
-                </Field>
+                </FormField>
 
-                <Field>
+                <FormField error={errors.email}>
                     <Label>Email address</Label>
                     <Input
                         type="email"
@@ -62,10 +63,9 @@ export default function Register() {
                         disabled={processing}
                         placeholder="email@example.com"
                     />
-                    {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
-                </Field>
+                </FormField>
 
-                <Field>
+                <FormField error={errors.password}>
                     <Label>Password</Label>
                     <Input
                         type="password"
@@ -77,10 +77,9 @@ export default function Register() {
                         disabled={processing}
                         placeholder="Password"
                     />
-                    {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
-                </Field>
+                </FormField>
 
-                <Field>
+                <FormField error={errors.password_confirmation}>
                     <Label>Confirm password</Label>
                     <Input
                         type="password"
@@ -92,8 +91,7 @@ export default function Register() {
                         disabled={processing}
                         placeholder="Confirm password"
                     />
-                    {errors.password_confirmation && <ErrorMessage>{errors.password_confirmation}</ErrorMessage>}
-                </Field>
+                </FormField>
 
                 <Button type="submit" className="w-full" tabIndex={5} disabled={processing}>
                     {processing && <Spinner className="size-4" />}

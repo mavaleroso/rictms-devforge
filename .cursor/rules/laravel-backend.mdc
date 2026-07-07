@@ -1,5 +1,5 @@
 ---
-description: Laravel backend architecture — Actions, Form Requests, thin controllers
+description: Laravel backend architecture — Actions, Services, Repositories, Form Requests, thin controllers
 globs: app/**/*.php
 alwaysApply: false
 ---
@@ -14,66 +14,200 @@ This project uses a **layered architecture** for all backend code.
 |-------|----------|----------------|
 | **Controller** | `app/Http/Controllers/` | HTTP only: authorize, delegate, return Inertia/redirect |
 | **Form Request** | `app/Http/Requests/` | Validation + `authorize()` |
-| **Action** | `app/Actions/{Domain}/` | Single-purpose business logic |
-| **Model** | `app/Models/` | Eloquent, casts, relationships |
+| **Action** | `app/Actions/{Domain}/` | Single use case — one user intent per class |
+| **Service** | `app/Services/{Domain}/` | Orchestration across repos/actions, transactions, integrations |
+| **Repository** | `app/Repositories/` | Data access — queries and persistence only |
+| **Model** | `app/Models/` | Eloquent entity: casts, relationships, scopes |
+
+## Request flow
+
+```
+HTTP Request
+  → Controller
+  → Form Request (validate + authorize)
+  → Action (use case)
+      → Service (optional — multi-step / cross-domain)
+          → Repository (queries / persistence)
+              → Model (Eloquent)
+```
+
+**Default path:** `Controller → Action → Repository → Model`
+
+**Use a Service** when an Action would need to coordinate multiple repositories, wrap a DB transaction, or call external systems (mail, queues, APIs).
 
 ## Rules
 
-1. **Controllers stay thin** — no `User::create()`, `Hash::make()`, or multi-step business logic.
-2. **One Form Request per mutating endpoint** — never inline `$request->validate()` in controllers.
-3. **One Action per use case** — named as verbs: `RegisterUser`, `UpdateUserProfile`.
-4. **Actions are `final`** with a single `execute()` method.
-5. **Rely on model casts** — `User` hashes `password` automatically; pass plain strings to `create()`/`update()`.
-6. **HTTP concerns stay in controllers** — sessions, redirects, `Auth::login()`, `Inertia::render()`.
-7. **Domain events in Actions** — e.g. `event(new Registered($user))` inside `RegisterUser`.
+### Controllers
+1. **Stay thin** — no `User::create()`, `Hash::make()`, or multi-step business logic.
+2. **HTTP concerns only** — sessions, redirects, `Auth::login()`, `Inertia::render()`.
+3. Inject **Actions** (or Services for read-heavy index endpoints when appropriate); never inject Repositories directly unless the endpoint is a trivial read with no use-case logic.
 
-## File naming
+### Form Requests
+4. **One Form Request per mutating endpoint** — never inline `$request->validate()` in controllers.
+5. Use `authorize()` for simple checks; use **Policies** for role/resource-based access.
+
+### Actions
+6. **One Action per use case** — named as verbs: `RegisterUser`, `EnrollIntern`, `EvaluateLevelProgress`.
+7. Actions are **`final`** with a single `execute()` method.
+8. Actions contain **business rules** for that use case; delegate data access to Repositories.
+9. **Domain events** fire inside Actions — e.g. `event(new Registered($user))`.
+10. Inject Repositories and Services via constructor; do not use facades for domain logic.
+
+### Services
+11. **Services orchestrate** — they do not replace Actions. An Action calls a Service when the workflow is complex.
+12. Name by capability: `EnrollmentService`, `QuizGradingService`, `ProgressEngine`.
+13. Services may call multiple Repositories and Actions, manage `DB::transaction()`, and dispatch jobs.
+14. **No HTTP** in Services — no `Request`, `RedirectResponse`, or `Inertia::render()`.
+15. Prefer **one Service per domain area**, not one Service per endpoint.
+
+### Repositories
+16. **Data access only** — queries, `create`/`update`/`delete`, eager-load composition. No authorization, no redirects.
+17. Define a **contract** (interface) per aggregate in `app/Repositories/Contracts/`; bind in `AppServiceProvider`.
+18. Implement with Eloquent in `app/Repositories/Eloquent/` — e.g. `EloquentEnrollmentRepository`.
+19. Return **Models**, **Collections**, or **DTOs** — never arrays built from raw `DB::` unless performance-critical.
+20. **Skip Repositories** for trivial one-liner queries in simple Actions; add them when queries are reused, complex, or need test doubles.
+
+### Models
+21. **Rely on model casts** — `User` hashes `password` automatically; pass plain strings to `create()`/`update()`.
+22. Keep models focused on relationships, casts, and local scopes — not cross-entity workflows.
+
+## Directory layout
 
 ```
-app/Actions/Settings/UpdateUserProfile.php
-app/Http/Requests/Settings/ProfileUpdateRequest.php
-app/Http/Controllers/Settings/ProfileController.php
+app/
+├── Actions/
+│   ├── Auth/
+│   ├── Learning/
+│   └── Settings/
+├── Services/
+│   ├── Learning/
+│   │   └── ProgressEngine.php
+│   └── Quiz/
+│       └── QuizGradingService.php
+├── Repositories/
+│   ├── Contracts/
+│   │   ├── EnrollmentRepository.php
+│   │   └── LearningPathRepository.php
+│   └── Eloquent/
+│       ├── EloquentEnrollmentRepository.php
+│       └── EloquentLearningPathRepository.php
+├── Http/
+│   ├── Controllers/
+│   └── Requests/
+├── Models/
+└── Policies/
 ```
 
 ## Examples
 
 ```php
 // ✅ Controller — delegate only
-public function update(ProfileUpdateRequest $request, UpdateUserProfile $action): RedirectResponse
-{
-    $action->execute($request->user(), $request->validated());
-    return to_route('profile.edit');
+public function enroll(
+    EnrollPathRequest $request,
+    LearningPath $path,
+    EnrollIntern $enrollIntern,
+): RedirectResponse {
+    $enrollIntern->execute($request->user(), $path);
+
+    return to_route('learn.paths.show', $path);
 }
 
-// ✅ Action — business logic only
-final class UpdateUserProfile
+// ✅ Action — use case, delegates persistence
+final class EnrollIntern
 {
-    public function execute(User $user, array $attributes): void
+    public function __construct(
+        private readonly EnrollmentRepository $enrollments,
+        private readonly LevelRepository $levels,
+    ) {}
+
+    public function execute(User $user, LearningPath $path, ?User $mentor = null): Enrollment
     {
-        $user->fill($attributes);
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
+        if ($existing = $this->enrollments->findActiveForUserAndPath($user, $path)) {
+            return $existing;
         }
-        $user->save();
+
+        return $this->enrollments->createWithLevelProgress($user, $path, $mentor);
     }
 }
 
-// ❌ BAD — logic in controller
-public function update(Request $request): RedirectResponse
+// ✅ Service — orchestrates multiple steps inside a transaction
+final class ProgressEngine
 {
-    $request->validate([...]);
-    $request->user()->update(['password' => Hash::make($request->password)]);
+    public function __construct(
+        private readonly EnrollmentRepository $enrollments,
+        private readonly LevelProgressRepository $progress,
+    ) {}
+
+    public function completeLevel(Enrollment $enrollment, Level $level): bool
+    {
+        return DB::transaction(function () use ($enrollment, $level) {
+            $this->progress->markCompleted($enrollment, $level);
+            $this->progress->unlockNext($enrollment, $level);
+
+            if ($level->number >= 20) {
+                $this->enrollments->markCompleted($enrollment);
+            }
+
+            return true;
+        });
+    }
+}
+
+// ✅ Repository — queries only
+final class EloquentEnrollmentRepository implements EnrollmentRepository
+{
+    public function findActiveForUserAndPath(User $user, LearningPath $path): ?Enrollment
+    {
+        return Enrollment::query()
+            ->where('user_id', $user->id)
+            ->where('learning_path_id', $path->id)
+            ->where('status', EnrollmentStatus::Active)
+            ->first();
+    }
+}
+
+// ❌ BAD — Eloquent queries and business rules in controller
+public function enroll(Request $request, LearningPath $path): RedirectResponse
+{
+    $enrollment = Enrollment::create([...]);
+    foreach ($path->levels as $level) { ... }
     return back();
 }
+
+// ❌ BAD — HTTP in Service
+final class EnrollmentService
+{
+    public function enroll(Request $request): RedirectResponse { ... }
+}
+```
+
+## Binding repositories
+
+Register interface → implementation bindings in `AppServiceProvider::register()`:
+
+```php
+$this->app->bind(EnrollmentRepository::class, EloquentEnrollmentRepository::class);
 ```
 
 ## Adding new features
 
-1. Create `FormRequest` in `app/Http/Requests/{Domain}/`
-2. Create `Action` in `app/Actions/{Domain}/`
-3. Inject Action into controller method; call `execute()`
-4. Add Pest feature test under `tests/Feature/`
+1. Create **Form Request** in `app/Http/Requests/{Domain}/`
+2. Add **Repository** methods (or new repo) if data access is non-trivial or reused
+3. Create **Action** in `app/Actions/{Domain}/`; extract a **Service** if orchestration grows
+4. Keep controller to: authorize → `execute()` → response
+5. Add Pest feature test under `tests/Feature/`
+
+## When to use what
+
+| Situation | Use |
+|-----------|-----|
+| Validate input | Form Request |
+| One user action (register, enroll, submit quiz) | Action |
+| Reused or complex queries | Repository |
+| Multi-repo transaction, job dispatch, external API | Service |
+| Role/resource access | Policy + `$this->authorize()` |
+| Simple read list with no rules | Controller → Repository (acceptable) |
 
 ## Authorization
 
-Use Form Request `authorize()` for simple checks. Add `app/Policies/` when role-based access is needed.
+Use Form Request `authorize()` for simple checks. Use `app/Policies/` for role- and resource-based access. Repositories and Services must **never** check roles — authorization happens before they are called.

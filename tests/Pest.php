@@ -1,5 +1,10 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
+use Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,8 +16,8 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -44,4 +49,20 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+function setupRoles(): void
+{
+    foreach (['admin', 'mentor', 'intern'] as $role) {
+        Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
+    }
+}
+
+function userWithRole(string $role): User
+{
+    setupRoles();
+    $user = User::factory()->create();
+    $user->assignRole($role);
+
+    return $user;
 }

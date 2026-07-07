@@ -1,16 +1,17 @@
-import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef, useState } from 'react';
 
+import { FormField } from '@/components/form/form-field';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/catalyst/button';
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/components/catalyst/dialog';
-import { ErrorMessage, Field, Label } from '@/components/catalyst/fieldset';
+import { Label } from '@/components/catalyst/fieldset';
 import { Input } from '@/components/catalyst/input';
+import { useValidatedForm } from '@/hooks/use-validated-form';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const [isOpen, setIsOpen] = useState(false);
-    const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm({ password: '' });
+    const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useValidatedForm({ password: '' });
 
     const deleteUser: FormEventHandler = (e) => {
         e.preventDefault();
@@ -50,7 +51,7 @@ export default function DeleteUser() {
                     </DialogDescription>
                     <DialogBody>
                         <form className="space-y-6" onSubmit={deleteUser} id="delete-user-form">
-                            <Field>
+                            <FormField error={errors.password}>
                                 <Label className="sr-only">Password</Label>
                                 <Input
                                     ref={passwordInput}
@@ -61,8 +62,7 @@ export default function DeleteUser() {
                                     placeholder="Password"
                                     autoComplete="current-password"
                                 />
-                                {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
-                            </Field>
+                            </FormField>
                         </form>
                     </DialogBody>
                     <DialogActions>

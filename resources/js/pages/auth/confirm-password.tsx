@@ -1,14 +1,16 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
+import { FormField } from '@/components/form/form-field';
 import { Spinner } from '@/components/spinner';
 import { Button } from '@/components/catalyst/button';
-import { ErrorMessage, Field, Label } from '@/components/catalyst/fieldset';
+import { Label } from '@/components/catalyst/fieldset';
 import { Input } from '@/components/catalyst/input';
+import { useValidatedForm } from '@/hooks/use-validated-form';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function ConfirmPassword() {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors, reset } = useValidatedForm({
         password: '',
     });
 
@@ -28,7 +30,7 @@ export default function ConfirmPassword() {
             <Head title="Confirm password" />
 
             <form className="grid gap-6" onSubmit={submit}>
-                <Field>
+                <FormField error={errors.password}>
                     <Label>Password</Label>
                     <Input
                         type="password"
@@ -39,8 +41,7 @@ export default function ConfirmPassword() {
                         autoFocus
                         onChange={(e) => setData('password', e.target.value)}
                     />
-                    {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
-                </Field>
+                </FormField>
 
                 <Button className="w-full" disabled={processing}>
                     {processing && <Spinner className="size-4" />}
