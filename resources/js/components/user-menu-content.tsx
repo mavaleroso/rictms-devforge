@@ -1,40 +1,44 @@
-import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { UserInfo } from '@/components/user-info';
+import { Avatar } from '@/components/catalyst/avatar';
+import { DropdownDivider, DropdownItem, DropdownLabel, DropdownMenu } from '@/components/catalyst/dropdown';
+import { useInitials } from '@/hooks/use-initials';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { type User } from '@/types';
-import { Link } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { router } from '@inertiajs/react';
+import { ArrowRightStartOnRectangleIcon, Cog6ToothIcon } from '@heroicons/react/16/solid';
 
 interface UserMenuContentProps {
     user: User;
+    anchor?: 'top start' | 'bottom end' | 'bottom start';
 }
 
-export function UserMenuContent({ user }: UserMenuContentProps) {
+export function UserMenuContent({ user, anchor = 'bottom end' }: UserMenuContentProps) {
     const cleanup = useMobileNavigation();
+    const getInitials = useInitials();
 
     return (
-        <>
-            <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <UserInfo user={user} showEmail={true} />
-                </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                    <Link className="block w-full" href={route('profile.edit')} as="button" prefetch onClick={cleanup}>
-                        <Settings className="mr-2" />
-                        Settings
-                    </Link>
-                </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-                <Link className="block w-full" method="post" href={route('logout')} as="button" onClick={cleanup}>
-                    <LogOut className="mr-2" />
-                    Log out
-                </Link>
-            </DropdownMenuItem>
-        </>
+        <DropdownMenu className="min-w-64" anchor={anchor}>
+            <DropdownItem className="pointer-events-none">
+                <Avatar slot="icon" src={user.avatar} initials={getInitials(user.name)} alt={user.name} />
+                <DropdownLabel>
+                    <span className="block truncate font-medium">{user.name}</span>
+                    <span className="block truncate text-xs text-zinc-500 dark:text-zinc-400">{user.email}</span>
+                </DropdownLabel>
+            </DropdownItem>
+            <DropdownDivider />
+            <DropdownItem href={route('profile.edit')} onClick={cleanup}>
+                <Cog6ToothIcon />
+                <DropdownLabel>Settings</DropdownLabel>
+            </DropdownItem>
+            <DropdownDivider />
+            <DropdownItem
+                onClick={() => {
+                    cleanup();
+                    router.post(route('logout'));
+                }}
+            >
+                <ArrowRightStartOnRectangleIcon />
+                <DropdownLabel>Log out</DropdownLabel>
+            </DropdownItem>
+        </DropdownMenu>
     );
 }

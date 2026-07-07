@@ -1,17 +1,26 @@
-import { AppContent } from '@/components/app-content';
-import { AppShell } from '@/components/app-shell';
 import { AppSidebar } from '@/components/app-sidebar';
-import { AppSidebarHeader } from '@/components/app-sidebar-header';
+import { Breadcrumbs } from '@/components/breadcrumbs';
+import { Navbar, NavbarSection, NavbarSpacer } from '@/components/catalyst/navbar';
+import { SidebarLayout } from '@/components/catalyst/sidebar-layout';
 import { type BreadcrumbItem } from '@/types';
 
 export default function AppSidebarLayout({ children, breadcrumbs = [] }: { children: React.ReactNode; breadcrumbs?: BreadcrumbItem[] }) {
     return (
-        <AppShell variant="sidebar">
-            <AppSidebar />
-            <AppContent variant="sidebar">
-                <AppSidebarHeader breadcrumbs={breadcrumbs} />
-                {children}
-            </AppContent>
-        </AppShell>
+        <SidebarLayout
+            sidebar={<AppSidebar />}
+            navbar={
+                <Navbar>
+                    <NavbarSpacer />
+                    <NavbarSection />
+                </Navbar>
+            }
+        >
+            {breadcrumbs.length > 0 && (
+                <div className="mb-6">
+                    <Breadcrumbs breadcrumbs={breadcrumbs} />
+                </div>
+            )}
+            {children}
+        </SidebarLayout>
     );
 }

@@ -1,4 +1,3 @@
-import InputError from '@/components/input-error';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
@@ -7,9 +6,10 @@ import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 
 import HeadingSmall from '@/components/heading-small';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/catalyst/button';
+import { ErrorMessage, Field, Label } from '@/components/catalyst/fieldset';
+import { Input } from '@/components/catalyst/input';
+import { Text } from '@/components/catalyst/text';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -50,62 +50,50 @@ export default function Password() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Profile settings" />
+            <Head title="Password settings" />
 
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
 
                     <form onSubmit={updatePassword} className="space-y-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="current_password">Current password</Label>
-
+                        <Field>
+                            <Label>Current password</Label>
                             <Input
-                                id="current_password"
                                 ref={currentPasswordInput}
                                 value={data.current_password}
                                 onChange={(e) => setData('current_password', e.target.value)}
                                 type="password"
-                                className="mt-1 block w-full"
                                 autoComplete="current-password"
                                 placeholder="Current password"
                             />
+                            {errors.current_password && <ErrorMessage>{errors.current_password}</ErrorMessage>}
+                        </Field>
 
-                            <InputError message={errors.current_password} />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">New password</Label>
-
+                        <Field>
+                            <Label>New password</Label>
                             <Input
-                                id="password"
                                 ref={passwordInput}
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
                                 type="password"
-                                className="mt-1 block w-full"
                                 autoComplete="new-password"
                                 placeholder="New password"
                             />
+                            {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
+                        </Field>
 
-                            <InputError message={errors.password} />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">Confirm password</Label>
-
+                        <Field>
+                            <Label>Confirm password</Label>
                             <Input
-                                id="password_confirmation"
                                 value={data.password_confirmation}
                                 onChange={(e) => setData('password_confirmation', e.target.value)}
                                 type="password"
-                                className="mt-1 block w-full"
                                 autoComplete="new-password"
                                 placeholder="Confirm password"
                             />
-
-                            <InputError message={errors.password_confirmation} />
-                        </div>
+                            {errors.password_confirmation && <ErrorMessage>{errors.password_confirmation}</ErrorMessage>}
+                        </Field>
 
                         <div className="flex items-center gap-4">
                             <Button disabled={processing}>Save password</Button>
@@ -117,7 +105,7 @@ export default function Password() {
                                 leave="transition ease-in-out"
                                 leaveTo="opacity-0"
                             >
-                                <p className="text-sm text-neutral-600">Saved</p>
+                                <Text>Saved</Text>
                             </Transition>
                         </div>
                     </form>

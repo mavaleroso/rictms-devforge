@@ -15,6 +15,13 @@ export default defineConfig({
         react(),
         tailwindcss(),
     ],
+    optimizeDeps: {
+        include: [
+            '@heroicons/react/16/solid',
+            '@heroicons/react/20/solid',
+            'motion/react',
+        ],
+    },
     esbuild: {
         jsx: 'automatic',
     },

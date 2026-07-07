@@ -1,13 +1,12 @@
 import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/spinner';
+import { Button } from '@/components/catalyst/button';
+import { Checkbox, CheckboxField } from '@/components/catalyst/checkbox';
+import { ErrorMessage, Field, Label } from '@/components/catalyst/fieldset';
+import { Input } from '@/components/catalyst/input';
+import { Text, TextLink } from '@/components/catalyst/text';
 import AuthLayout from '@/layouts/auth-layout';
 
 interface LoginForm {
@@ -39,66 +38,64 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
             <Head title="Log in" />
 
-            <form className="flex flex-col gap-6" onSubmit={submit}>
-                <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            required
-                            autoFocus
-                            tabIndex={1}
-                            autoComplete="email"
-                            value={data.email}
-                            onChange={(e) => setData('email', e.target.value)}
-                            placeholder="email@example.com"
-                        />
-                        <InputError message={errors.email} />
-                    </div>
+            <form className="grid gap-6" onSubmit={submit}>
+                <Field>
+                    <Label>Email address</Label>
+                    <Input
+                        type="email"
+                        required
+                        autoFocus
+                        tabIndex={1}
+                        autoComplete="email"
+                        value={data.email}
+                        onChange={(e) => setData('email', e.target.value)}
+                        placeholder="email@example.com"
+                    />
+                    {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
+                </Field>
 
-                    <div className="grid gap-2">
-                        <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
-                            {canResetPassword && (
-                                <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
+                <Field>
+                    <div className="flex items-center justify-between">
+                        <Label>Password</Label>
+                        {canResetPassword && (
+                            <Text>
+                                <TextLink href={route('password.request')} tabIndex={5}>
                                     Forgot password?
                                 </TextLink>
-                            )}
-                        </div>
-                        <Input
-                            id="password"
-                            type="password"
-                            required
-                            tabIndex={2}
-                            autoComplete="current-password"
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
-                            placeholder="Password"
-                        />
-                        <InputError message={errors.password} />
+                            </Text>
+                        )}
                     </div>
+                    <Input
+                        type="password"
+                        required
+                        tabIndex={2}
+                        autoComplete="current-password"
+                        value={data.password}
+                        onChange={(e) => setData('password', e.target.value)}
+                        placeholder="Password"
+                    />
+                    {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
+                </Field>
 
-                    <div className="flex items-center space-x-3">
-                        <Checkbox id="remember" name="remember" tabIndex={3} />
-                        <Label htmlFor="remember">Remember me</Label>
-                    </div>
+                <CheckboxField>
+                    <Checkbox checked={data.remember} onChange={(checked) => setData('remember', checked)} tabIndex={3} />
+                    <Label>Remember me</Label>
+                </CheckboxField>
 
-                    <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Log in
-                    </Button>
-                </div>
+                <Button type="submit" className="w-full" tabIndex={4} disabled={processing}>
+                    {processing && <Spinner className="size-4" />}
+                    Log in
+                </Button>
 
-                <div className="text-muted-foreground text-center text-sm">
-                    Don't have an account?{' '}
+                <Text className="text-center">
+                    Don&apos;t have an account?{' '}
                     <TextLink href={route('register')} tabIndex={5}>
                         Sign up
                     </TextLink>
-                </div>
+                </Text>
             </form>
 
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
+            {status && <p className="text-center text-sm font-medium text-green-600">{status}</p>}
         </AuthLayout>
     );
 }

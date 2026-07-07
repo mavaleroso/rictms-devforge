@@ -6,6 +6,15 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "nextjs-tailwind-assistant": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@smithery/cli",
+                "run",
+                "@caullenomdahl/nextjs-react-tailwind-assistant"
+            ]
         }
     }
 }

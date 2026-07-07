@@ -1,0 +1,79 @@
+---
+description: Laravel backend architecture — Actions, Form Requests, thin controllers
+globs: app/**/*.php
+alwaysApply: false
+---
+
+# Laravel Backend Pattern
+
+This project uses a **layered architecture** for all backend code.
+
+## Layer responsibilities
+
+| Layer | Location | Responsibility |
+|-------|----------|----------------|
+| **Controller** | `app/Http/Controllers/` | HTTP only: authorize, delegate, return Inertia/redirect |
+| **Form Request** | `app/Http/Requests/` | Validation + `authorize()` |
+| **Action** | `app/Actions/{Domain}/` | Single-purpose business logic |
+| **Model** | `app/Models/` | Eloquent, casts, relationships |
+
+## Rules
+
+1. **Controllers stay thin** — no `User::create()`, `Hash::make()`, or multi-step business logic.
+2. **One Form Request per mutating endpoint** — never inline `$request->validate()` in controllers.
+3. **One Action per use case** — named as verbs: `RegisterUser`, `UpdateUserProfile`.
+4. **Actions are `final`** with a single `execute()` method.
+5. **Rely on model casts** — `User` hashes `password` automatically; pass plain strings to `create()`/`update()`.
+6. **HTTP concerns stay in controllers** — sessions, redirects, `Auth::login()`, `Inertia::render()`.
+7. **Domain events in Actions** — e.g. `event(new Registered($user))` inside `RegisterUser`.
+
+## File naming
+
+```
+app/Actions/Settings/UpdateUserProfile.php
+app/Http/Requests/Settings/ProfileUpdateRequest.php
+app/Http/Controllers/Settings/ProfileController.php
+```
+
+## Examples
+
+```php
+// ✅ Controller — delegate only
+public function update(ProfileUpdateRequest $request, UpdateUserProfile $action): RedirectResponse
+{
+    $action->execute($request->user(), $request->validated());
+    return to_route('profile.edit');
+}
+
+// ✅ Action — business logic only
+final class UpdateUserProfile
+{
+    public function execute(User $user, array $attributes): void
+    {
+        $user->fill($attributes);
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+        $user->save();
+    }
+}
+
+// ❌ BAD — logic in controller
+public function update(Request $request): RedirectResponse
+{
+    $request->validate([...]);
+    $request->user()->update(['password' => Hash::make($request->password)]);
+    return back();
+}
+```
+
+## Adding new features
+
+1. Create `FormRequest` in `app/Http/Requests/{Domain}/`
+2. Create `Action` in `app/Actions/{Domain}/`
+3. Inject Action into controller method; call `execute()`
+4. Add Pest feature test under `tests/Feature/`
+
+## Authorization
+
+Use Form Request `authorize()` for simple checks. Add `app/Policies/` when role-based access is needed.

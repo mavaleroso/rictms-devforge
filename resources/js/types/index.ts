@@ -1,4 +1,6 @@
-import { LucideIcon } from 'lucide-react';
+import type { SVGProps } from 'react';
+
+export type IconComponent = React.ComponentType<SVGProps<SVGSVGElement>>;
 
 export interface Auth {
     user: User;
@@ -17,7 +19,7 @@ export interface NavGroup {
 export interface NavItem {
     title: string;
     url: string;
-    icon?: LucideIcon | null;
+    icon?: IconComponent | null;
     isActive?: boolean;
 }
 
@@ -36,5 +38,5 @@ export interface User {
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }

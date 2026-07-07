@@ -1,10 +1,9 @@
-// Components
 import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/spinner';
+import { TextLink } from '@/components/catalyst/text';
+import { Button } from '@/components/catalyst/button';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function VerifyEmail({ status }: { status?: string }) {
@@ -21,18 +20,18 @@ export default function VerifyEmail({ status }: { status?: string }) {
             <Head title="Email verification" />
 
             {status === 'verification-link-sent' && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
+                <p className="text-center text-sm font-medium text-green-600">
                     A new verification link has been sent to the email address you provided during registration.
-                </div>
+                </p>
             )}
 
-            <form onSubmit={submit} className="space-y-6 text-center">
-                <Button disabled={processing} variant="secondary">
-                    {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+            <form onSubmit={submit} className="grid gap-6 text-center">
+                <Button outline disabled={processing}>
+                    {processing && <Spinner className="size-4" />}
                     Resend verification email
                 </Button>
 
-                <TextLink href={route('logout')} method="post" className="mx-auto block text-sm">
+                <TextLink href={route('logout')} method="post" className="mx-auto text-sm">
                     Log out
                 </TextLink>
             </form>

@@ -1,36 +1,33 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
-import { UserInfo } from '@/components/user-info';
 import { UserMenuContent } from '@/components/user-menu-content';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Avatar } from '@/components/catalyst/avatar';
+import { Dropdown, DropdownButton, DropdownMenu } from '@/components/catalyst/dropdown';
+import { SidebarItem } from '@/components/catalyst/sidebar';
+import { useInitials } from '@/hooks/use-initials';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { ChevronsUpDown } from 'lucide-react';
+import { ChevronUpIcon } from '@heroicons/react/16/solid';
 
 export function NavUser() {
     const { auth } = usePage<SharedData>().props;
-    const { state } = useSidebar();
-    const isMobile = useIsMobile();
+    const getInitials = useInitials();
+
+    if (!auth.user) {
+        return null;
+    }
 
     return (
-        <SidebarMenu>
-            <SidebarMenuItem>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton size="lg" className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group">
-                            <UserInfo user={auth.user} />
-                            <ChevronsUpDown className="ml-auto size-4" />
-                        </SidebarMenuButton>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                        align="end"
-                        side={isMobile ? 'bottom' : state === 'collapsed' ? 'left' : 'bottom'}
-                    >
-                        <UserMenuContent user={auth.user} />
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </SidebarMenuItem>
-        </SidebarMenu>
+        <Dropdown>
+            <DropdownButton as={SidebarItem}>
+                <span className="flex min-w-0 items-center gap-3">
+                    <Avatar src={auth.user.avatar} initials={getInitials(auth.user.name)} alt={auth.user.name} className="size-10" square />
+                    <span className="min-w-0">
+                        <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">{auth.user.name}</span>
+                        <span className="block truncate text-xs/5 font-normal text-zinc-500 dark:text-zinc-400">{auth.user.email}</span>
+                    </span>
+                </span>
+                <ChevronUpIcon data-slot="icon" />
+            </DropdownButton>
+            <UserMenuContent user={auth.user} anchor="top start" />
+        </Dropdown>
     );
 }
