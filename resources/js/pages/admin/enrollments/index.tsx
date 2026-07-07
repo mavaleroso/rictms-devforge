@@ -76,7 +76,7 @@ export default function AdminEnrollmentsIndex({ enrollments, interns, mentors, p
             <ConfirmDialog />
             <Heading>Enrollments</Heading>
 
-            <form onSubmit={submit} className="mt-6 grid max-w-4xl gap-4 rounded-lg border border-zinc-200 p-4 sm:grid-cols-4 dark:border-zinc-700">
+            <form onSubmit={submit} className="mt-6 grid gap-4 rounded-lg border border-zinc-200 p-4 sm:grid-cols-4 dark:border-zinc-700">
                 <FormField error={errors.user_id}>
                     <Label>Intern</Label>
                     <Combobox

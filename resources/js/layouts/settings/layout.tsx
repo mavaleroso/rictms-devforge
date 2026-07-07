@@ -54,7 +54,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                 <Divider className="lg:hidden" />
 
                 <div className="min-w-0 flex-1">
-                    <section className="max-w-xl space-y-12">{children}</section>
+                    <section className="space-y-12">{children}</section>
                 </div>
             </div>
         </div>

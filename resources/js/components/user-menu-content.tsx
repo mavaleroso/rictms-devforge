@@ -18,7 +18,7 @@ export function UserMenuContent({ user, anchor = 'bottom end' }: UserMenuContent
     return (
         <DropdownMenu className="min-w-64" anchor={anchor}>
             <DropdownItem className="pointer-events-none">
-                <Avatar slot="icon" src={user.avatar} initials={getInitials(user.name)} alt={user.name} />
+                <Avatar slot="icon" src={user.avatar_url ?? user.avatar} initials={getInitials(user.name)} alt={user.name} />
                 <DropdownLabel>
                     <span className="block truncate font-medium">{user.name}</span>
                     <span className="block truncate text-xs text-zinc-500 dark:text-zinc-400">{user.email}</span>

@@ -1,13 +1,8 @@
+import { completedStepCount, LEVEL_EDITOR_TABS, TAB_META, tabProgress } from '@/components/admin/level-editor/constants';
 import { Badge } from '@/components/catalyst/badge';
 import { Button } from '@/components/catalyst/button';
 import { Subheading } from '@/components/catalyst/heading';
 import { Text } from '@/components/catalyst/text';
-import {
-    completedStepCount,
-    LEVEL_EDITOR_TABS,
-    TAB_META,
-    tabProgress,
-} from '@/components/admin/level-editor/constants';
 import type { LevelEditorTab } from '@/types/learning';
 import { type Level } from '@/types/learning';
 import { ArrowLeftIcon, ArrowRightIcon, CheckCircleIcon } from '@heroicons/react/20/solid';
@@ -51,8 +46,8 @@ export function LevelWorkflowGuide({ activeTab, onTabChange, level, onPrev, onNe
                 </div>
             </div>
 
-            <nav aria-label="Level editor steps" className="relative">
-                <ol className="grid gap-0 sm:grid-cols-4">
+            <nav aria-label="Level editor steps">
+                <ol className="grid gap-3 sm:grid-cols-4 sm:gap-0">
                     {LEVEL_EDITOR_TABS.map((tab, index) => {
                         const meta = TAB_META[tab];
                         const done = progress[tab];
@@ -60,22 +55,26 @@ export function LevelWorkflowGuide({ activeTab, onTabChange, level, onPrev, onNe
                         const isLast = index === LEVEL_EDITOR_TABS.length - 1;
 
                         return (
-                            <li key={tab} className="relative flex">
+                            <li key={tab} className="relative flex justify-center">
                                 {!isLast && (
                                     <span
                                         className={clsx(
-                                            'absolute top-5 left-1/2 hidden h-0.5 w-full sm:block',
+                                            'absolute top-10 left-[calc(50%+1.25rem)] z-0 hidden h-0.5 w-[calc(100%-2.5rem)] sm:block',
                                             done ? 'bg-emerald-400 dark:bg-emerald-600' : 'bg-zinc-200 dark:bg-zinc-700',
                                         )}
                                         aria-hidden
                                     />
                                 )}
+
                                 <button
                                     type="button"
                                     onClick={() => onTabChange(tab)}
+                                    aria-current={active ? 'step' : undefined}
                                     className={clsx(
-                                        'relative z-10 flex w-full flex-col items-center gap-2 rounded-xl px-2 py-3 text-center transition',
-                                        active ? 'bg-white shadow-sm ring-1 ring-zinc-950/10 dark:bg-zinc-900 dark:ring-white/10' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50',
+                                        'relative z-10 flex w-full max-w-[12rem] flex-col items-center gap-2.5 rounded-xl px-5 py-5 text-center transition',
+                                        active
+                                            ? 'bg-white px-6 shadow-sm ring-1 ring-zinc-950/10 dark:bg-zinc-900 dark:ring-white/10'
+                                            : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50',
                                     )}
                                 >
                                     <span
@@ -92,9 +91,7 @@ export function LevelWorkflowGuide({ activeTab, onTabChange, level, onPrev, onNe
                                     </span>
                                     <span className="text-sm font-medium text-zinc-950 dark:text-white">
                                         {meta.shortLabel}
-                                        {meta.optional && (
-                                            <span className="ml-1 text-xs font-normal text-zinc-400">(optional)</span>
-                                        )}
+                                        {meta.optional && <span className="ml-1 text-xs font-normal text-zinc-400">(optional)</span>}
                                     </span>
                                     {active && (
                                         <Badge color="blue" className="text-[10px]">

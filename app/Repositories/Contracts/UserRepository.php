@@ -13,6 +13,8 @@ interface UserRepository
 
     public function updateProfile(User $user, array $attributes): void;
 
+    public function update(User $user, array $attributes): void;
+
     public function updatePassword(User $user, string $password): void;
 
     public function resetPassword(User $user, string $password): void;
@@ -20,6 +22,8 @@ interface UserRepository
     public function delete(User $user): void;
 
     public function assignRole(User $user, string $role): void;
+
+    public function syncRole(User $user, string $role): void;
 
     /** @return Collection<int, User> */
     public function listWithRoles(): Collection;

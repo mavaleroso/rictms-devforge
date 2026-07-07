@@ -27,7 +27,7 @@ export default function LearnQuizzesShow({ path, level, quiz: quizProp }: Props)
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${quiz.title} — ${path.name}`} />
 
-            <div className="mx-auto max-w-3xl">
+            <div className="w-full">
                 <Link
                     href={route('learn.levels.show', [path.id, level.id])}
                     className="text-sm font-medium text-violet-600 hover:text-violet-500 dark:text-violet-400"

@@ -4,7 +4,13 @@ import { Navbar, NavbarSection, NavbarSpacer } from '@/components/catalyst/navba
 import { SidebarLayout } from '@/components/catalyst/sidebar-layout';
 import { type BreadcrumbItem } from '@/types';
 
-export default function AppSidebarLayout({ children, breadcrumbs = [] }: { children: React.ReactNode; breadcrumbs?: BreadcrumbItem[] }) {
+export default function AppSidebarLayout({
+    children,
+    breadcrumbs = [],
+}: {
+    children: React.ReactNode;
+    breadcrumbs?: BreadcrumbItem[];
+}) {
     return (
         <SidebarLayout
             sidebar={<AppSidebar />}

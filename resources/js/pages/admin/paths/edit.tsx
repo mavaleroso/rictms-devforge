@@ -160,7 +160,7 @@ export default function AdminPathsEdit({ path: pathProp }: Props) {
             </div>
 
             {tab === 'details' && (
-                <div className="mt-6 max-w-3xl">
+                <div className="mt-6">
                     <PathForm
                         data={data}
                         errors={errors}
