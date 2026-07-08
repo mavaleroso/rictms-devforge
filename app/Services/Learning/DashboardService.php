@@ -33,11 +33,16 @@ final class DashboardService
     /** @return array<string, mixed> */
     public function mentorData(User $mentor): array
     {
+        $assigned = $this->enrollments->forMentor($mentor->id);
+
         return [
             'role' => 'mentor',
-            'assigned_interns' => EnrollmentResource::collection(
-                $this->enrollments->forMentor($mentor->id)
-            ),
+            'mentor_stats' => [
+                'assigned' => $assigned->count(),
+                'in_progress' => $assigned->where('status', EnrollmentStatus::Active)->count(),
+                'completed' => $assigned->where('status', EnrollmentStatus::Completed)->count(),
+            ],
+            'assigned_interns' => EnrollmentResource::collection($assigned),
             'pending_reviews' => 0,
         ];
     }

@@ -3,6 +3,7 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 interface UserRepository
@@ -27,6 +28,13 @@ interface UserRepository
 
     /** @return Collection<int, User> */
     public function listWithRoles(): Collection;
+
+    public function paginateWithRoles(
+        int $perPage = 15,
+        ?string $search = null,
+        ?string $sort = null,
+        string $direction = 'asc',
+    ): LengthAwarePaginator;
 
     /** @return Collection<int, User> */
     public function byRole(string $role, array $columns = ['*']): Collection;

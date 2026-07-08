@@ -1,17 +1,18 @@
 import { AvatarField } from '@/components/admin/avatar-field';
 import { UserPreviewCard } from '@/components/admin/user-preview-card';
-import { USER_ROLES, UserRoleBadge, roleDetails } from '@/components/admin/user-role-badge';
+import { USER_ROLES, roleDetails } from '@/components/admin/user-role-badge';
 import { FormField } from '@/components/form/form-field';
 import { Button } from '@/components/catalyst/button';
 import { Description, Label } from '@/components/catalyst/fieldset';
+import { Subheading } from '@/components/catalyst/heading';
 import { Input } from '@/components/catalyst/input';
-import { Listbox, ListboxOption } from '@/components/catalyst/listbox';
 import { Select } from '@/components/catalyst/select';
 import { Textarea } from '@/components/catalyst/textarea';
 import { SEX_OPTIONS } from '@/lib/user-profile';
 import type { InertiaFormProps } from '@inertiajs/react';
+import { CheckIcon, KeyIcon } from '@heroicons/react/20/solid';
 import clsx from 'clsx';
-import type { FormEventHandler } from 'react';
+import type { FormEventHandler, ReactNode } from 'react';
 
 export interface UserFormData {
     first_name: string;
@@ -37,84 +38,76 @@ interface UserFormProps {
     submitLabel: string;
     mode: 'create' | 'edit';
     existingAvatarUrl?: string | null;
+    cancelHref?: string;
 }
 
-export function UserForm({ form, onSubmit, submitLabel, mode, existingAvatarUrl }: UserFormProps) {
+function FormSection({ title, description, children }: { title: string; description: string; children: ReactNode }) {
+    return (
+        <section className="rounded-xl border border-zinc-950/10 bg-white p-5 dark:border-white/10 dark:bg-zinc-900 sm:p-6">
+            <Subheading>{title}</Subheading>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{description}</p>
+            <div className="mt-5 space-y-4">{children}</div>
+        </section>
+    );
+}
+
+export function UserForm({ form, onSubmit, submitLabel, mode, existingAvatarUrl, cancelHref }: UserFormProps) {
     const { data, setData, processing, errors } = form;
+    const displayName = [data.first_name, data.last_name].filter(Boolean).join(' ');
 
     return (
         <form onSubmit={onSubmit}>
-            <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_17rem]">
-                <div className="space-y-4">
-                    <section className="rounded-xl border border-zinc-950/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-900 sm:p-5">
-                        <div className="grid gap-4 lg:grid-cols-[9rem_minmax(0,1fr)]">
-                            <AvatarField
-                                compact
-                                error={errors.avatar}
-                                name={[data.first_name, data.last_name].filter(Boolean).join(' ')}
-                                existingUrl={existingAvatarUrl}
-                                file={data.avatar}
-                                removeAvatar={data.remove_avatar}
-                                onFileChange={(file) => setData('avatar', file)}
-                                onRemoveAvatar={(remove) => setData('remove_avatar', remove)}
-                            />
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_19rem]">
+                <div className="space-y-5">
+                    <FormSection title="Personal details" description="Legal name and demographic information for the user profile.">
+                        <AvatarField
+                            error={errors.avatar}
+                            name={displayName}
+                            existingUrl={existingAvatarUrl}
+                            file={data.avatar}
+                            removeAvatar={data.remove_avatar}
+                            onFileChange={(file) => setData('avatar', file)}
+                            onRemoveAvatar={(remove) => setData('remove_avatar', remove)}
+                        />
 
-                            <div className="grid gap-3 sm:grid-cols-3">
-                                <FormField error={errors.first_name}>
-                                    <Label>First name</Label>
-                                    <Input
-                                        value={data.first_name}
-                                        onChange={(e) => setData('first_name', e.target.value)}
-                                        required
-                                        autoComplete="given-name"
-                                    />
-                                </FormField>
-                                <FormField error={errors.middle_name}>
-                                    <Label>Middle name</Label>
-                                    <Input
-                                        value={data.middle_name}
-                                        onChange={(e) => setData('middle_name', e.target.value)}
-                                        autoComplete="additional-name"
-                                    />
-                                </FormField>
-                                <FormField error={errors.last_name}>
-                                    <Label>Last name</Label>
-                                    <Input
-                                        value={data.last_name}
-                                        onChange={(e) => setData('last_name', e.target.value)}
-                                        required
-                                        autoComplete="family-name"
-                                    />
-                                </FormField>
-                            </div>
+                        <div className="grid gap-4 sm:grid-cols-3">
+                            <FormField error={errors.first_name}>
+                                <Label>First name</Label>
+                                <Input
+                                    value={data.first_name}
+                                    onChange={(e) => setData('first_name', e.target.value)}
+                                    required
+                                    autoComplete="given-name"
+                                    placeholder="Jane"
+                                />
+                            </FormField>
+                            <FormField error={errors.middle_name}>
+                                <Label>Middle name</Label>
+                                <Input
+                                    value={data.middle_name}
+                                    onChange={(e) => setData('middle_name', e.target.value)}
+                                    autoComplete="additional-name"
+                                    placeholder="Optional"
+                                />
+                            </FormField>
+                            <FormField error={errors.last_name}>
+                                <Label>Last name</Label>
+                                <Input
+                                    value={data.last_name}
+                                    onChange={(e) => setData('last_name', e.target.value)}
+                                    required
+                                    autoComplete="family-name"
+                                    placeholder="Cooper"
+                                />
+                            </FormField>
                         </div>
 
-                        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                            <FormField error={errors.email}>
-                                <Label>Email</Label>
-                                <Input
-                                    type="email"
-                                    value={data.email}
-                                    onChange={(e) => setData('email', e.target.value)}
-                                    required
-                                    autoComplete="email"
-                                />
-                            </FormField>
-                            <FormField error={errors.phone}>
-                                <Label>Phone</Label>
-                                <Input
-                                    type="tel"
-                                    value={data.phone}
-                                    onChange={(e) => setData('phone', e.target.value)}
-                                    autoComplete="tel"
-                                    placeholder="+63 9XX XXX XXXX"
-                                />
-                            </FormField>
+                        <div className="grid gap-4 sm:grid-cols-2">
                             <FormField error={errors.sex}>
                                 <Label>Sex</Label>
                                 <Select value={data.sex} onChange={(e) => setData('sex', e.target.value)}>
                                     <option value="">Not specified</option>
-                                    {SEX_OPTIONS.filter((option) => option.value).map((option) => (
+                                    {SEX_OPTIONS.map((option) => (
                                         <option key={option.value} value={option.value}>
                                             {option.label}
                                         </option>
@@ -129,42 +122,73 @@ export function UserForm({ form, onSubmit, submitLabel, mode, existingAvatarUrl 
                                     onChange={(e) => setData('birthdate', e.target.value)}
                                 />
                             </FormField>
-                            <FormField error={errors.occupation} className="sm:col-span-2">
-                                <Label>Occupation</Label>
+                        </div>
+                    </FormSection>
+
+                    <FormSection title="Contact & professional info" description="How to reach this user and their role outside the platform.">
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <FormField error={errors.email}>
+                                <Label>Email address</Label>
+                                <Description>Used for sign-in and system notifications.</Description>
                                 <Input
-                                    value={data.occupation}
-                                    onChange={(e) => setData('occupation', e.target.value)}
-                                    placeholder="e.g. Software Engineer"
+                                    type="email"
+                                    value={data.email}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    required
+                                    autoComplete="email"
+                                    placeholder="jane@company.com"
                                 />
                             </FormField>
-                            <FormField error={errors.address} className="sm:col-span-2">
-                                <Label>Address</Label>
-                                <Textarea
-                                    value={data.address}
-                                    onChange={(e) => setData('address', e.target.value)}
-                                    rows={2}
-                                    placeholder="Street, city, province, postal code"
-                                />
-                            </FormField>
-                            <FormField error={errors.bio} className="sm:col-span-2">
-                                <Label>Bio</Label>
-                                <Textarea
-                                    value={data.bio}
-                                    onChange={(e) => setData('bio', e.target.value)}
-                                    rows={2}
-                                    placeholder="Short professional summary"
+                            <FormField error={errors.phone}>
+                                <Label>Phone number</Label>
+                                <Input
+                                    type="tel"
+                                    value={data.phone}
+                                    onChange={(e) => setData('phone', e.target.value)}
+                                    autoComplete="tel"
+                                    placeholder="+63 9XX XXX XXXX"
                                 />
                             </FormField>
                         </div>
-                    </section>
 
-                    <section className="rounded-xl border border-zinc-950/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-900 sm:p-5">
-                        <p className="text-xs font-semibold tracking-wide text-zinc-500 uppercase dark:text-zinc-400">Access</p>
-                        <FormField error={errors.role} className="mt-3">
+                        <FormField error={errors.occupation}>
+                            <Label>Occupation</Label>
+                            <Input
+                                value={data.occupation}
+                                onChange={(e) => setData('occupation', e.target.value)}
+                                placeholder="e.g. Software Engineer"
+                            />
+                        </FormField>
+
+                        <FormField error={errors.address}>
+                            <Label>Address</Label>
+                            <Textarea
+                                value={data.address}
+                                onChange={(e) => setData('address', e.target.value)}
+                                rows={2}
+                                placeholder="Street, city, province, postal code"
+                            />
+                        </FormField>
+
+                        <FormField error={errors.bio}>
+                            <Label>Bio</Label>
+                            <Description>Short summary shown on directory cards and mentor views.</Description>
+                            <Textarea
+                                value={data.bio}
+                                onChange={(e) => setData('bio', e.target.value)}
+                                rows={3}
+                                placeholder="Brief professional background or mentoring focus…"
+                            />
+                        </FormField>
+                    </FormSection>
+
+                    <FormSection title="Platform access" description="Determines which areas of DevForge this account can use.">
+                        <FormField error={errors.role}>
                             <Label>Role</Label>
-                            <div className="mt-2 grid gap-2 sm:grid-cols-3">
+                            <div className="mt-2 grid gap-3 sm:grid-cols-3">
                                 {USER_ROLES.map((role) => {
                                     const details = roleDetails(role);
+                                    const Icon = details.icon;
                                     const selected = data.role === role;
 
                                     return (
@@ -173,26 +197,45 @@ export function UserForm({ form, onSubmit, submitLabel, mode, existingAvatarUrl 
                                             type="button"
                                             onClick={() => setData('role', role)}
                                             className={clsx(
-                                                'rounded-lg border px-3 py-2.5 text-left transition',
+                                                'relative rounded-xl border p-4 text-left transition',
                                                 selected
-                                                    ? 'border-violet-500/40 bg-violet-500/[0.06] ring-1 ring-violet-500/30'
-                                                    : 'border-zinc-950/10 hover:bg-zinc-50 dark:border-white/10 dark:hover:bg-zinc-800/50',
+                                                    ? 'border-violet-500/50 bg-violet-500/[0.05] ring-2 ring-violet-500/25'
+                                                    : 'border-zinc-950/10 hover:border-zinc-950/20 hover:bg-zinc-50 dark:border-white/10 dark:hover:border-white/20 dark:hover:bg-zinc-800/40',
                                             )}
                                         >
-                                            <p className="text-sm font-medium text-zinc-950 dark:text-white">{details.label}</p>
-                                            <p className="mt-0.5 line-clamp-2 text-xs text-zinc-500 dark:text-zinc-400">{details.description}</p>
+                                            {selected && (
+                                                <span className="absolute top-3 right-3 flex size-5 items-center justify-center rounded-full bg-violet-600 text-white">
+                                                    <CheckIcon className="size-3" />
+                                                </span>
+                                            )}
+                                            <span
+                                                className={clsx(
+                                                    'flex size-9 items-center justify-center rounded-lg',
+                                                    selected
+                                                        ? 'bg-violet-500/15 text-violet-600 dark:text-violet-400'
+                                                        : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400',
+                                                )}
+                                            >
+                                                <Icon className="size-5" />
+                                            </span>
+                                            <p className="mt-3 text-sm font-semibold text-zinc-950 dark:text-white">{details.label}</p>
+                                            <p className="mt-1 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">{details.description}</p>
                                         </button>
                                     );
                                 })}
                             </div>
                         </FormField>
-                    </section>
+                    </FormSection>
 
-                    <section className="rounded-xl border border-zinc-950/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-900 sm:p-5">
-                        <p className="text-xs font-semibold tracking-wide text-zinc-500 uppercase dark:text-zinc-400">
-                            {mode === 'create' ? 'Password' : 'Reset password'}
-                        </p>
-                        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <FormSection
+                        title={mode === 'create' ? 'Sign-in credentials' : 'Password reset'}
+                        description={
+                            mode === 'create'
+                                ? 'Set a temporary password. The user can change it after first login.'
+                                : 'Leave blank to keep the current password unchanged.'
+                        }
+                    >
+                        <div className="grid gap-4 sm:grid-cols-2">
                             <FormField error={errors.password}>
                                 <Label>{mode === 'create' ? 'Password' : 'New password'}</Label>
                                 <Input
@@ -201,10 +244,11 @@ export function UserForm({ form, onSubmit, submitLabel, mode, existingAvatarUrl 
                                     onChange={(e) => setData('password', e.target.value)}
                                     required={mode === 'create'}
                                     autoComplete="new-password"
+                                    placeholder={mode === 'edit' ? 'Leave blank to keep current' : undefined}
                                 />
                             </FormField>
                             <FormField error={errors.password_confirmation}>
-                                <Label>Confirm</Label>
+                                <Label>Confirm password</Label>
                                 <Input
                                     type="password"
                                     value={data.password_confirmation}
@@ -214,16 +258,21 @@ export function UserForm({ form, onSubmit, submitLabel, mode, existingAvatarUrl 
                                 />
                             </FormField>
                         </div>
-                    </section>
+                    </FormSection>
 
-                    <div className="flex justify-end xl:hidden">
+                    <div className="flex items-center justify-end gap-3 rounded-xl border border-zinc-950/10 bg-zinc-50/80 px-4 py-3 dark:border-white/10 dark:bg-zinc-800/40 xl:hidden">
+                        {cancelHref && (
+                            <Button href={cancelHref} plain>
+                                Cancel
+                            </Button>
+                        )}
                         <Button type="submit" color="dark/zinc" disabled={processing}>
                             {processing ? 'Saving…' : submitLabel}
                         </Button>
                     </div>
                 </div>
 
-                <aside className="space-y-3 xl:sticky xl:top-6 xl:self-start">
+                <aside className="space-y-4 xl:sticky xl:top-6 xl:self-start">
                     <UserPreviewCard
                         firstName={data.first_name}
                         middleName={data.middle_name}
@@ -241,9 +290,23 @@ export function UserForm({ form, onSubmit, submitLabel, mode, existingAvatarUrl 
                         removeAvatar={data.remove_avatar}
                         mode={mode}
                     />
-                    <Button type="submit" color="dark/zinc" className="hidden w-full xl:inline-flex" disabled={processing}>
-                        {processing ? 'Saving…' : submitLabel}
-                    </Button>
+
+                    <div className="hidden rounded-xl border border-zinc-950/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-900 xl:block">
+                        <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+                            <KeyIcon className="size-4" />
+                            <span>{mode === 'create' ? 'New account setup' : 'Profile update'}</span>
+                        </div>
+                        <div className="mt-4 flex flex-col gap-2">
+                            {cancelHref && (
+                                <Button href={cancelHref} plain className="w-full">
+                                    Cancel
+                                </Button>
+                            )}
+                            <Button type="submit" color="dark/zinc" className="w-full" disabled={processing}>
+                                {processing ? 'Saving…' : submitLabel}
+                            </Button>
+                        </div>
+                    </div>
                 </aside>
             </div>
         </form>

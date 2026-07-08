@@ -31,13 +31,16 @@ const roleConfig: Record<string, { label: string; color: 'violet' | 'blue' | 'li
 interface UserRoleBadgeProps {
     role: string;
     className?: string;
+    withIcon?: boolean;
 }
 
-export function UserRoleBadge({ role, className }: UserRoleBadgeProps) {
-    const config = roleConfig[role] ?? { label: role, color: 'zinc' as const };
+export function UserRoleBadge({ role, className, withIcon = false }: UserRoleBadgeProps) {
+    const config = roleConfig[role] ?? { label: role, color: 'zinc' as const, icon: UserGroupIcon };
+    const Icon = config.icon;
 
     return (
         <Badge color={config.color} className={className}>
+            {withIcon && <Icon className="size-3.5" />}
             {config.label}
         </Badge>
     );

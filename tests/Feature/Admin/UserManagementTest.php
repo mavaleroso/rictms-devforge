@@ -14,7 +14,6 @@ test('admin can list users with stats', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('admin/users/index')
-            ->has('users.data', 3)
             ->has('stats', fn ($stats) => $stats
                 ->where('total', 3)
                 ->where('admins', 1)
@@ -22,6 +21,32 @@ test('admin can list users with stats', function () {
                 ->where('interns', 1)
             )
         );
+});
+
+test('admin can fetch paginated users table data', function () {
+    $admin = userWithRole('admin');
+
+    foreach (range(1, 20) as $index) {
+        userWithRole('intern');
+    }
+
+    $this->actingAs($admin)
+        ->getJson(route('admin.users.table', ['page' => 1, 'per_page' => 10]))
+        ->assertOk()
+        ->assertJsonStructure([
+            'data' => [['id', 'name', 'email', 'roles']],
+            'meta' => ['current_page', 'last_page', 'per_page', 'total', 'from', 'to'],
+        ])
+        ->assertJsonCount(10, 'data')
+        ->assertJsonPath('meta.total', 21)
+        ->assertJsonPath('meta.current_page', 1)
+        ->assertJsonPath('meta.last_page', 3);
+
+    $this->actingAs($admin)
+        ->getJson(route('admin.users.table', ['search' => $admin->email]))
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.email', $admin->email);
 });
 
 test('admin can create a user with avatar', function () {
@@ -52,7 +77,7 @@ test('admin can create a user with avatar', function () {
     $response->assertRedirect(route('admin.users.edit', $user));
 
     expect($user)->not->toBeNull()
-        ->and($user->name)->toBe('New A Mentor')
+        ->and($user->name)->toBe('New A. Mentor')
         ->and($user->first_name)->toBe('New')
         ->and($user->last_name)->toBe('Mentor')
         ->and($user->occupation)->toBe('Software Engineer')
@@ -114,6 +139,46 @@ test('admin cannot delete their own account', function () {
         ->assertForbidden();
 
     $this->assertDatabaseHas('users', ['id' => $admin->id]);
+});
+
+test('admin cannot deactivate their own account', function () {
+    $admin = userWithRole('admin');
+
+    $this->actingAs($admin)
+        ->patchJson(route('admin.users.update-active', $admin), ['is_active' => false])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['is_active']);
+
+    expect($admin->fresh()->is_active)->toBeTrue();
+});
+
+test('admin can toggle another user active status', function () {
+    $admin = userWithRole('admin');
+    $intern = userWithRole('intern');
+
+    $this->actingAs($admin)
+        ->patchJson(route('admin.users.update-active', $intern), ['is_active' => false])
+        ->assertOk()
+        ->assertJsonPath('data.is_active', false);
+
+    expect($intern->fresh()->is_active)->toBeFalse();
+
+    $this->actingAs($admin)
+        ->patchJson(route('admin.users.update-active', $intern), ['is_active' => true])
+        ->assertOk()
+        ->assertJsonPath('data.is_active', true);
+});
+
+test('inactive users cannot log in', function () {
+    $intern = userWithRole('intern');
+    $intern->update(['is_active' => false]);
+
+    $this->post(route('login'), [
+        'email' => $intern->email,
+        'password' => 'password',
+    ])->assertSessionHasErrors('email');
+
+    $this->assertGuest();
 });
 
 test('admin can delete another admin when multiple admins exist', function () {

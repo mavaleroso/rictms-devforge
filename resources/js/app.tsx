@@ -2,6 +2,7 @@ import '../css/app.css';
 
 import { ToastProvider } from '@/components/toast/toast-provider';
 import { ValidationToastListener } from '@/components/toast/validation-toast-listener';
+import { QueryProvider } from '@/providers/query-provider';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { type ComponentType, type ReactNode } from 'react';
@@ -27,16 +28,18 @@ createInertiaApp({
         const InertiaApp = App as InertiaAppComponent;
 
         root.render(
-            <ToastProvider>
-                <InertiaApp {...props}>
-                    {({ Component, props: pageProps, key }) => (
-                        <>
-                            <ValidationToastListener />
-                            <Component key={key} {...pageProps} />
-                        </>
-                    )}
-                </InertiaApp>
-            </ToastProvider>,
+            <QueryProvider>
+                <ToastProvider>
+                    <InertiaApp {...props}>
+                        {({ Component, props: pageProps, key }) => (
+                            <>
+                                <ValidationToastListener />
+                                <Component key={key} {...pageProps} />
+                            </>
+                        )}
+                    </InertiaApp>
+                </ToastProvider>
+            </QueryProvider>,
         );
     },
     progress: {

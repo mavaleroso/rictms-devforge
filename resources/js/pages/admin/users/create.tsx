@@ -62,16 +62,24 @@ export default function AdminUsersCreate() {
             <Head title="Create user" />
             <ConfirmDialog />
 
-            <Button href={route('admin.users.index')} plain className="mb-3">
+            <Button href={route('admin.users.index')} plain className="mb-4">
                 <ArrowLeftIcon data-slot="icon" />
                 All users
             </Button>
 
             <Heading>Create user</Heading>
-            <Text className="mt-1">Add profile details, access role, and sign-in credentials.</Text>
+            <Text className="mt-2 max-w-2xl">
+                Set up a new account with personal details, platform role, and sign-in credentials. Fields update the live preview as you type.
+            </Text>
 
-            <div className="mt-6">
-                <UserForm form={form} onSubmit={submit} submitLabel="Create user" mode="create" />
+            <div className="mt-8">
+                <UserForm
+                    form={form}
+                    onSubmit={submit}
+                    submitLabel="Create user"
+                    mode="create"
+                    cancelHref={route('admin.users.index')}
+                />
             </div>
         </AppLayout>
     );

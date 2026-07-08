@@ -1,14 +1,20 @@
+import { UserActiveToggle } from '@/components/admin/user-active-toggle';
+import { UserIndexStats } from '@/components/admin/user-index-stats';
 import { UserRoleBadge } from '@/components/admin/user-role-badge';
 import { Avatar } from '@/components/catalyst/avatar';
 import { Button } from '@/components/catalyst/button';
 import { Heading } from '@/components/catalyst/heading';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/catalyst/table';
 import { Text } from '@/components/catalyst/text';
+import { DataTableMetaText, ServerDataTable, type DataTableColumnMeta } from '@/components/data-table';
 import { useInitials } from '@/hooks/use-initials';
+import { formatDisplayName } from '@/lib/user-profile';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { PencilSquareIcon, PlusIcon, UserGroupIcon, UserIcon, UsersIcon } from '@heroicons/react/20/solid';
-import { Head } from '@inertiajs/react';
+import { PencilSquareIcon, PlusIcon, UsersIcon } from '@heroicons/react/20/solid';
+import { Head, usePage } from '@inertiajs/react';
+import { type ColumnDef } from '@tanstack/react-table';
+import clsx from 'clsx';
+import { useMemo } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -27,6 +33,7 @@ interface AdminUser {
     avatar_url?: string | null;
     roles: string[];
     role?: string;
+    is_active: boolean;
     email_verified_at?: string | null;
     created_at?: string | null;
     enrollments_count?: number;
@@ -34,7 +41,6 @@ interface AdminUser {
 }
 
 interface Props {
-    users: { data: AdminUser[] };
     stats: {
         total: number;
         admins: number;
@@ -43,138 +49,226 @@ interface Props {
     };
 }
 
-function UserStats({ stats }: { stats: Props['stats'] }) {
-    const items = [
-        { label: 'Total users', value: stats.total, icon: UsersIcon, tone: 'text-zinc-600 dark:text-zinc-300' },
-        { label: 'Admins', value: stats.admins, icon: UserIcon, tone: 'text-violet-600 dark:text-violet-400' },
-        { label: 'Mentors', value: stats.mentors, icon: UserGroupIcon, tone: 'text-blue-600 dark:text-blue-400' },
-        { label: 'Interns', value: stats.interns, icon: UsersIcon, tone: 'text-lime-700 dark:text-lime-400' },
-    ];
+interface PageProps extends Props {
+    auth: {
+        user: {
+            id: number;
+        };
+    };
+}
+
+function formatJoinedDate(value?: string | null): string {
+    if (!value) {
+        return '—';
+    }
+
+    return new Date(value).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+    });
+}
+
+function roleActivityLabel(user: AdminUser, role: string): string | null {
+    if (role === 'mentor' && user.mentored_enrollments_count !== undefined) {
+        const count = user.mentored_enrollments_count;
+        return `${count} active ${count === 1 ? 'mentee' : 'mentees'}`;
+    }
+
+    if (role === 'intern' && user.enrollments_count !== undefined) {
+        const count = user.enrollments_count;
+        return `${count} active ${count === 1 ? 'path' : 'paths'}`;
+    }
+
+    if (role === 'admin') {
+        return 'Platform administrator';
+    }
+
+    return null;
+}
+
+function UserStatusCell({
+    user,
+    currentUserId,
+}: {
+    user: AdminUser;
+    currentUserId: number;
+}) {
+    const isSelf = user.id === currentUserId;
 
     return (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {items.map((item) => (
-                <div
-                    key={item.label}
-                    className="rounded-xl border border-zinc-950/10 bg-white p-5 dark:border-white/10 dark:bg-zinc-900"
-                >
-                    <div className="flex items-center justify-between gap-3">
-                        <div>
-                            <p className="text-xs font-semibold tracking-wide text-zinc-500 uppercase dark:text-zinc-400">{item.label}</p>
-                            <p className="mt-2 text-3xl font-semibold text-zinc-950 dark:text-white">{item.value}</p>
-                        </div>
-                        <span className={`flex size-10 items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-800 ${item.tone}`}>
-                            <item.icon className="size-5" />
-                        </span>
-                    </div>
-                </div>
-            ))}
-        </div>
+        <UserActiveToggle
+            userId={user.id}
+            userName={formatDisplayName(user)}
+            isActive={user.is_active}
+            disabled={isSelf}
+            disabledReason={isSelf ? 'Cannot change your own status' : undefined}
+        />
     );
 }
 
-export default function AdminUsersIndex({ users, stats }: Props) {
+function useUserColumns(getInitials: (name: string) => string, currentUserId: number): ColumnDef<AdminUser, unknown>[] {
+    return useMemo(
+        () => [
+            {
+                id: 'name',
+                accessorKey: 'name',
+                header: 'Member',
+                enableSorting: true,
+                cell: ({ row }) => {
+                    const user = row.original;
+                    const displayName = formatDisplayName(user);
+
+                    return (
+                        <div className={clsx('flex items-center gap-3', !user.is_active && 'opacity-60')}>
+                            <Avatar
+                                src={user.avatar_url}
+                                initials={getInitials(displayName)}
+                                alt={displayName}
+                                className="size-9 ring-1 ring-zinc-950/8 dark:ring-white/10"
+                            />
+                            <DataTableMetaText primary={displayName} secondary={user.email} />
+                        </div>
+                    );
+                },
+            },
+            {
+                id: 'role',
+                header: 'Role',
+                enableSorting: false,
+                cell: ({ row }) => {
+                    const user = row.original;
+                    const role = user.role ?? user.roles[0] ?? 'intern';
+                    const activity = roleActivityLabel(user, role);
+
+                    return (
+                        <div className="space-y-1">
+                            <UserRoleBadge role={role} withIcon className="!px-2 !py-0.5 !text-[11px] !leading-4" />
+                            {activity && <p className="text-[11px] text-zinc-500 dark:text-zinc-400">{activity}</p>}
+                        </div>
+                    );
+                },
+            },
+            {
+                id: 'contact',
+                header: 'Contact',
+                enableSorting: false,
+                cell: ({ row }) => {
+                    const user = row.original;
+
+                    return (
+                        <DataTableMetaText
+                            primary={user.phone || 'No phone on file'}
+                            secondary={user.occupation || 'No occupation listed'}
+                        />
+                    );
+                },
+            },
+            {
+                id: 'status',
+                header: 'Status',
+                enableSorting: false,
+                cell: ({ row }) => <UserStatusCell user={row.original} currentUserId={currentUserId} />,
+            },
+            {
+                id: 'created_at',
+                accessorKey: 'created_at',
+                header: 'Joined',
+                enableSorting: true,
+                meta: { align: 'right', cellClassName: 'tabular-nums' } satisfies DataTableColumnMeta,
+                cell: ({ row }) => (
+                    <span className="text-xs text-zinc-600 dark:text-zinc-300">{formatJoinedDate(row.original.created_at)}</span>
+                ),
+            },
+            {
+                id: 'actions',
+                header: '',
+                enableSorting: false,
+                meta: { align: 'right', headerClassName: 'w-12', cellClassName: 'w-12' } satisfies DataTableColumnMeta,
+                cell: ({ row }) => (
+                    <Button
+                        href={route('admin.users.edit', row.original.id)}
+                        outline
+                        className="!px-2.5 !py-1 !text-xs opacity-70 transition-opacity group-hover:opacity-100 focus:opacity-100"
+                        aria-label={`Edit ${row.original.name}`}
+                    >
+                        <PencilSquareIcon data-slot="icon" />
+                        Edit
+                    </Button>
+                ),
+            },
+        ],
+        [getInitials, currentUserId],
+    );
+}
+
+export default function AdminUsersIndex({ stats }: Props) {
+    const { auth } = usePage<PageProps>().props;
     const getInitials = useInitials();
-    const rows = users.data;
+    const columns = useUserColumns(getInitials, auth.user.id);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                    <Heading>Users</Heading>
-                    <Text className="mt-2 max-w-2xl">
-                        Manage platform accounts, roles, and profile details for admins, mentors, and interns.
-                    </Text>
+            <section className="relative overflow-hidden rounded-2xl border border-zinc-950/10 bg-gradient-to-br from-zinc-50 via-white to-violet-50/50 p-6 shadow-sm sm:p-8 dark:border-white/10 dark:from-zinc-900 dark:via-zinc-900 dark:to-violet-950/30">
+                <div
+                    className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-violet-400/10 blur-3xl dark:bg-violet-500/10"
+                    aria-hidden
+                />
+                <div
+                    className="pointer-events-none absolute -bottom-20 -left-16 size-48 rounded-full bg-blue-400/10 blur-3xl dark:bg-blue-500/10"
+                    aria-hidden
+                />
+
+                <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex items-start gap-4">
+                        <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-600/25">
+                            <UsersIcon className="size-7" />
+                        </div>
+                        <div>
+                            <Heading>User directory</Heading>
+                            <Text className="mt-2 max-w-2xl">
+                                Manage platform accounts, assign roles, and keep profile details up to date for your
+                                team.
+                            </Text>
+                        </div>
+                    </div>
+
+                    <Button href={route('admin.users.create')} className="shrink-0 self-start lg:self-center">
+                        <PlusIcon data-slot="icon" />
+                        Add user
+                    </Button>
                 </div>
-                <Button href={route('admin.users.create')}>
-                    <PlusIcon data-slot="icon" />
-                    Add user
-                </Button>
+            </section>
+
+            <div className="mt-8">
+                <UserIndexStats stats={stats} />
             </div>
 
             <div className="mt-8">
-                <UserStats stats={stats} />
-            </div>
-
-            <div className="mt-8 overflow-hidden rounded-2xl border border-zinc-950/10 bg-white dark:border-white/10 dark:bg-zinc-900">
-                <div className="border-b border-zinc-950/5 px-6 py-4 dark:border-white/5">
-                    <h2 className="font-semibold text-zinc-950 dark:text-white">All accounts</h2>
-                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{rows.length} users in the directory</p>
-                </div>
-
-                {rows.length === 0 ? (
-                    <div className="px-6 py-16 text-center">
-                        <Heading level={2}>No users yet</Heading>
-                        <Text className="mt-2">Create the first account to start managing your team.</Text>
-                        <Button href={route('admin.users.create')} className="mt-6">
-                            <PlusIcon data-slot="icon" />
-                            Add user
-                        </Button>
-                    </div>
-                ) : (
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableHeader>User</TableHeader>
-                                <TableHeader>Role</TableHeader>
-                                <TableHeader>Contact</TableHeader>
-                                <TableHeader>Profile</TableHeader>
-                                <TableHeader>Joined</TableHeader>
-                                <TableHeader className="text-right">Actions</TableHeader>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {rows.map((user) => {
-                                const role = user.role ?? user.roles[0] ?? 'intern';
-
-                                return (
-                                    <TableRow key={user.id}>
-                                        <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <Avatar
-                                                    src={user.avatar_url}
-                                                    initials={getInitials(user.name)}
-                                                    alt={user.name}
-                                                    className="size-11"
-                                                />
-                                                <div className="min-w-0">
-                                                    <p className="font-medium text-zinc-950 dark:text-white">{user.name}</p>
-                                                    <p className="truncate text-sm text-zinc-500 dark:text-zinc-400">{user.email}</p>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <UserRoleBadge role={role} />
-                                        </TableCell>
-                                        <TableCell className="text-sm text-zinc-600 dark:text-zinc-300">
-                                            <p>{user.phone || '—'}</p>
-                                            {user.email_verified_at ? (
-                                                <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">Verified</p>
-                                            ) : (
-                                                <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">Unverified</p>
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="text-sm text-zinc-600 dark:text-zinc-300">
-                                            <p>{user.occupation || '—'}</p>
-                                            {user.bio && <p className="mt-1 line-clamp-1 text-xs text-zinc-500">{user.bio}</p>}
-                                        </TableCell>
-                                        <TableCell className="text-sm text-zinc-500 dark:text-zinc-400">
-                                            {user.created_at ? new Date(user.created_at).toLocaleDateString() : '—'}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <Button href={route('admin.users.edit', user.id)} plain>
-                                                <PencilSquareIcon data-slot="icon" />
-                                                Edit
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                )}
+                <ServerDataTable
+                    columns={columns}
+                    queryKey="admin.users.table"
+                    fetchUrl={route('admin.users.table')}
+                    title="Directory"
+                    description="Search, sort, and manage user accounts from a single workspace view."
+                    searchPlaceholder="Search members..."
+                    emptyTitle="No matching members"
+                    emptyDescription={
+                        stats.total === 0
+                            ? 'Your directory is empty. Add the first user account to begin managing access and roles.'
+                            : 'No users match the current search. Clear the filter or try another name, email, or role-related keyword.'
+                    }
+                    emptyAction={
+                        stats.total === 0 ? (
+                            <Button href={route('admin.users.create')}>
+                                <PlusIcon data-slot="icon" />
+                                Add user
+                            </Button>
+                        ) : undefined
+                    }
+                />
             </div>
         </AppLayout>
     );

@@ -13,8 +13,37 @@ export function formatSex(value?: string | null): string {
     return SEX_OPTIONS.find((option) => option.value === value)?.label ?? value;
 }
 
+export function formatMiddleInitial(middle: string): string {
+    const trimmed = middle.trim();
+
+    if (!trimmed) {
+        return '';
+    }
+
+    const letter = trimmed.replace(/\./g, '').charAt(0);
+
+    return letter ? `${letter.toUpperCase()}.` : '';
+}
+
 export function composeFullName(first: string, middle: string, last: string): string {
-    return [first, middle, last].map((part) => part.trim()).filter(Boolean).join(' ');
+    const middleInitial = formatMiddleInitial(middle);
+
+    return [first, middleInitial, last].map((part) => part.trim()).filter(Boolean).join(' ');
+}
+
+export function formatDisplayName(user: {
+    name: string;
+    first_name?: string | null;
+    middle_name?: string | null;
+    last_name?: string | null;
+}): string {
+    if (user.first_name || user.middle_name || user.last_name) {
+        return composeFullName(user.first_name ?? '', user.middle_name ?? '', user.last_name ?? '');
+    }
+
+    const split = splitFullName(user.name);
+
+    return composeFullName(split.first_name, split.middle_name, split.last_name) || user.name;
 }
 
 export function splitFullName(name: string): { first_name: string; middle_name: string; last_name: string } {

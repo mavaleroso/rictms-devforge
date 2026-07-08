@@ -4,11 +4,11 @@ import { useConfirmDialog } from '@/components/confirm-dialog';
 import { Avatar } from '@/components/catalyst/avatar';
 import { Badge } from '@/components/catalyst/badge';
 import { Button } from '@/components/catalyst/button';
-import { Heading } from '@/components/catalyst/heading';
+import { Heading, Subheading } from '@/components/catalyst/heading';
 import { Text } from '@/components/catalyst/text';
 import { useInitials } from '@/hooks/use-initials';
 import { formHasFileUpload, submitMultipartPatch } from '@/lib/inertia-upload';
-import { composeFullName, formatSex, splitFullName } from '@/lib/user-profile';
+import { composeFullName, formatDisplayName, formatSex, splitFullName } from '@/lib/user-profile';
 import { useValidatedForm } from '@/hooks/use-validated-form';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -46,13 +46,14 @@ export default function AdminUsersEdit({ user: userProp }: Props) {
     const user = userProp.data;
     const role = user.role ?? user.roles[0] ?? 'intern';
     const split = splitFullName(user.name);
+    const displayName = formatDisplayName(user);
     const getInitials = useInitials();
     const { confirm, ConfirmDialog } = useConfirmDialog();
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: '/dashboard' },
         { title: 'Users', href: '/admin/users' },
-        { title: user.name, href: route('admin.users.edit', user.id) },
+        { title: displayName, href: route('admin.users.edit', user.id) },
     ];
 
     const form = useValidatedForm({
@@ -129,20 +130,20 @@ export default function AdminUsersEdit({ user: userProp }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Edit ${user.name}`} />
+            <Head title={`Edit ${displayName}`} />
             <ConfirmDialog />
 
-            <Button href={route('admin.users.index')} plain className="mb-3">
+            <Button href={route('admin.users.index')} plain className="mb-4">
                 <ArrowLeftIcon data-slot="icon" />
                 All users
             </Button>
 
-            <div className="flex flex-col gap-3 rounded-xl border border-zinc-950/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-900 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-3">
-                    <Avatar src={user.avatar_url} initials={getInitials(user.name)} alt={user.name} className="size-12" />
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex items-center gap-4">
+                    <Avatar src={user.avatar_url} initials={getInitials(displayName)} alt={displayName} className="size-14" />
                     <div>
                         <div className="flex flex-wrap items-center gap-2">
-                            <Heading level={2}>{user.name}</Heading>
+                            <Heading level={2}>{displayName}</Heading>
                             <UserRoleBadge role={role} />
                             {user.email_verified_at ? (
                                 <Badge color="green" className="gap-1">
@@ -153,32 +154,42 @@ export default function AdminUsersEdit({ user: userProp }: Props) {
                                 <Badge color="amber">Unverified</Badge>
                             )}
                         </div>
-                        <Text className="mt-0.5 text-sm">{user.email}</Text>
+                        <Text className="mt-1">{user.email}</Text>
+                        <Text className="mt-1 text-sm text-zinc-500">
+                            {[user.occupation, formatSex(user.sex)].filter(Boolean).join(' · ') || 'No occupation set'}
+                            {' · '}
+                            Joined {user.created_at ? new Date(user.created_at).toLocaleDateString() : '—'}
+                        </Text>
                     </div>
-                </div>
-                <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                    <p>{user.occupation || 'No occupation set'}</p>
-                    <p>{formatSex(user.sex)} · Joined {user.created_at ? new Date(user.created_at).toLocaleDateString() : '—'}</p>
                 </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-8">
                 <UserForm
                     form={form}
                     onSubmit={submit}
                     submitLabel="Save changes"
                     mode="edit"
                     existingAvatarUrl={user.avatar_url}
+                    cancelHref={route('admin.users.index')}
                 />
             </div>
 
-            <div className="mt-6 flex flex-col gap-3 rounded-xl border border-red-200/80 bg-red-50/60 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-red-500/20 dark:bg-red-950/20">
-                <Text className="text-sm text-red-800 dark:text-red-300">Permanently delete this account and revoke access.</Text>
-                <Button type="button" color="red" onClick={destroy}>
-                    <TrashIcon data-slot="icon" />
-                    Delete user
-                </Button>
-            </div>
+            <section className="mt-8 overflow-hidden rounded-xl border border-red-200/80 dark:border-red-500/25">
+                <div className="border-b border-red-200/60 bg-red-50/80 px-5 py-4 dark:border-red-500/20 dark:bg-red-950/30">
+                    <Subheading className="text-red-900 dark:text-red-200">Danger zone</Subheading>
+                    <Text className="mt-1 text-sm text-red-800/90 dark:text-red-300/90">
+                        Permanently remove this account. Enrollment history may be affected.
+                    </Text>
+                </div>
+                <div className="flex flex-col gap-3 bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:bg-zinc-900">
+                    <Text className="text-sm text-zinc-600 dark:text-zinc-400">This action cannot be undone.</Text>
+                    <Button type="button" color="red" onClick={destroy}>
+                        <TrashIcon data-slot="icon" />
+                        Delete user
+                    </Button>
+                </div>
+            </section>
         </AppLayout>
     );
 }

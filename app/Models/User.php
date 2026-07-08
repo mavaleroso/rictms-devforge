@@ -23,6 +23,7 @@ class User extends Authenticatable
         'middle_name',
         'last_name',
         'email',
+        'is_active',
         'password',
         'avatar',
         'bio',
@@ -49,6 +50,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'birthdate' => 'date',
             'sex' => Sex::class,
+            'is_active' => 'boolean',
             'password' => 'hashed',
         ];
     }
@@ -98,9 +100,24 @@ class User extends Authenticatable
 
     public static function composeFullName(?string $first, ?string $middle, ?string $last): string
     {
-        return collect([$first, $middle, $last])
+        $middleInitial = self::formatMiddleInitial($middle);
+
+        return collect([$first, $middleInitial, $last])
             ->map(fn (?string $part) => trim($part ?? ''))
             ->filter()
             ->implode(' ');
+    }
+
+    private static function formatMiddleInitial(?string $middle): ?string
+    {
+        $middle = trim($middle ?? '');
+
+        if ($middle === '') {
+            return null;
+        }
+
+        $letter = mb_substr(str_replace('.', '', $middle), 0, 1);
+
+        return $letter !== '' ? mb_strtoupper($letter).'.' : null;
     }
 }

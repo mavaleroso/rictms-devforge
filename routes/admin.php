@@ -32,11 +32,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('questions/{question}', [LevelContentController::class, 'destroyQuestion'])->name('questions.destroy');
 
     Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::get('users/table', [UserController::class, 'table'])->name('users.table');
+    Route::patch('users/{user}/active', [UserController::class, 'updateActive'])->name('users.update-active');
     Route::get('users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('users', [UserController::class, 'store'])->name('users.store');
     Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::patch('users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     Route::get('enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
+    Route::get('enrollments/table', [EnrollmentController::class, 'table'])->name('enrollments.table');
     Route::post('enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
 });

@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\User;
 use App\Repositories\Contracts\UserRepository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -74,6 +75,40 @@ final class EloquentUserRepository implements UserRepository
             ->orderBy('last_name')
             ->orderBy('first_name')
             ->get();
+    }
+
+    public function paginateWithRoles(
+        int $perPage = 15,
+        ?string $search = null,
+        ?string $sort = null,
+        string $direction = 'asc',
+    ): LengthAwarePaginator {
+        $query = User::query()
+            ->with('roles')
+            ->withCount(['enrollments', 'mentoredEnrollments']);
+
+        if ($search !== null && $search !== '') {
+            $term = '%'.addcslashes($search, '%_\\').'%';
+
+            $query->where(function ($builder) use ($term) {
+                $builder->where('name', 'like', $term)
+                    ->orWhere('email', 'like', $term)
+                    ->orWhere('first_name', 'like', $term)
+                    ->orWhere('last_name', 'like', $term)
+                    ->orWhere('phone', 'like', $term)
+                    ->orWhere('occupation', 'like', $term);
+            });
+        }
+
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        match ($sort) {
+            'email' => $query->orderBy('email', $direction),
+            'created_at' => $query->orderBy('created_at', $direction),
+            default => $query->orderBy('last_name', $direction)->orderBy('first_name', $direction),
+        };
+
+        return $query->paginate($perPage);
     }
 
     public function byRole(string $role, array $columns = ['*']): Collection

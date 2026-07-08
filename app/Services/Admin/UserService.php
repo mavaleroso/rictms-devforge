@@ -60,6 +60,25 @@ final class UserService
         return $user->fresh(['roles']);
     }
 
+    public function setActiveStatus(User $user, User $actor, bool $isActive): User
+    {
+        if (! $isActive && $actor->id === $user->id) {
+            throw ValidationException::withMessages([
+                'is_active' => 'You cannot deactivate your own account.',
+            ]);
+        }
+
+        if (! $isActive && $user->isAdmin() && User::role('admin')->where('is_active', true)->count() <= 1) {
+            throw ValidationException::withMessages([
+                'is_active' => 'At least one active admin account must remain in the system.',
+            ]);
+        }
+
+        $this->users->update($user, ['is_active' => $isActive]);
+
+        return $user->fresh(['roles']);
+    }
+
     public function delete(User $user, User $actor): void
     {
         if ($actor->id === $user->id) {

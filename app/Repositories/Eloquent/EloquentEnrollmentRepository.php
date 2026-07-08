@@ -9,6 +9,7 @@ use App\Models\LearningPath;
 use App\Models\Level;
 use App\Models\User;
 use App\Repositories\Contracts\EnrollmentRepository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 final class EloquentEnrollmentRepository implements EnrollmentRepository
@@ -66,6 +67,49 @@ final class EloquentEnrollmentRepository implements EnrollmentRepository
     public function listWithRelations(): Collection
     {
         return Enrollment::with(['user', 'learningPath', 'mentor'])->latest()->get();
+    }
+
+    public function paginateWithRelations(
+        int $perPage = 15,
+        ?string $search = null,
+        ?string $sort = null,
+        string $direction = 'asc',
+    ): LengthAwarePaginator {
+        $query = Enrollment::query()
+            ->with(['user', 'learningPath', 'mentor', 'levelProgress.level']);
+
+        if ($search !== null && $search !== '') {
+            $term = '%'.addcslashes($search, '%_\\').'%';
+
+            $query->where(function ($builder) use ($term) {
+                $builder->whereHas('user', function ($userQuery) use ($term) {
+                    $userQuery->where('name', 'like', $term)
+                        ->orWhere('email', 'like', $term)
+                        ->orWhere('first_name', 'like', $term)
+                        ->orWhere('last_name', 'like', $term);
+                })->orWhereHas('learningPath', function ($pathQuery) use ($term) {
+                    $pathQuery->where('name', 'like', $term);
+                })->orWhereHas('mentor', function ($mentorQuery) use ($term) {
+                    $mentorQuery->where('name', 'like', $term)
+                        ->orWhere('email', 'like', $term);
+                });
+            });
+        }
+
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        match ($sort) {
+            'status' => $query->orderBy('status', $direction),
+            'started_at' => $query->orderBy('started_at', $direction),
+            default => $query->latest('started_at'),
+        };
+
+        return $query->paginate($perPage);
+    }
+
+    public function countWithMentor(): int
+    {
+        return Enrollment::whereNotNull('mentor_id')->count();
     }
 
     public function forMentor(int $mentorId): Collection
