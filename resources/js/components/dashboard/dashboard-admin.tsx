@@ -1,6 +1,7 @@
 import {
     AcademicCapIcon,
     BookOpenIcon,
+    ChartBarIcon,
     CheckCircleIcon,
     PlayCircleIcon,
     UserGroupIcon,
@@ -109,6 +110,13 @@ interface QuickAction {
 
 const adminActions: QuickAction[] = [
     {
+        title: 'Analytics',
+        description: 'Completions and certificates',
+        href: 'admin.analytics.index',
+        icon: ChartBarIcon,
+        accent: 'from-emerald-500 to-teal-600',
+    },
+    {
         title: 'Learning paths',
         description: 'Build and publish curricula',
         href: 'admin.paths.index',
@@ -133,7 +141,7 @@ const adminActions: QuickAction[] = [
 
 export function DashboardQuickActions() {
     return (
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {adminActions.map((action) => (
                 <a
                     key={action.title}

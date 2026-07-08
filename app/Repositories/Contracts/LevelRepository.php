@@ -13,6 +13,8 @@ interface LevelRepository
 
     public function findNext(Level $level): ?Level;
 
+    public function findByPathAndNumber(int $pathId, int $number): ?Level;
+
     public function loadWithContent(Level $level): Level;
 
     public function update(Level $level, array $attributes): void;

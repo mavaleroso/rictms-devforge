@@ -11,7 +11,12 @@ use App\Repositories\Contracts\ContentCompletionRepository;
 use App\Repositories\Contracts\EnrollmentRepository;
 use App\Repositories\Contracts\LevelProgressRepository;
 use App\Repositories\Contracts\LevelRepository;
+use App\Repositories\Contracts\ChallengeSubmissionRepository;
 use App\Repositories\Contracts\QuizAttemptRepository;
+use App\Enums\XpSourceType;
+use App\Library\Gamification\XpRules;
+use App\Services\Certificate\CertificateService;
+use App\Services\Gamification\GamificationService;
 use Illuminate\Support\Facades\DB;
 
 final class ProgressEngine
@@ -19,9 +24,12 @@ final class ProgressEngine
     public function __construct(
         private readonly ContentCompletionRepository $completions,
         private readonly QuizAttemptRepository $quizAttempts,
+        private readonly ChallengeSubmissionRepository $challengeSubmissions,
         private readonly LevelRepository $levels,
         private readonly LevelProgressRepository $levelProgress,
         private readonly EnrollmentRepository $enrollments,
+        private readonly GamificationService $gamification,
+        private readonly CertificateService $certificates,
     ) {}
 
     public function evaluate(Enrollment $enrollment, Level $level): bool
@@ -53,7 +61,15 @@ final class ProgressEngine
             $quizPassed = $this->quizAttempts->hasPassed($userId, $quiz->id);
         }
 
-        if (! ($materialsComplete && $videosComplete && $quizPassed)) {
+        $challengePassed = true;
+        $level->loadMissing('codingChallenge');
+        $challenge = $level->codingChallenge;
+
+        if ($challenge && $challenge->is_active) {
+            $challengePassed = $this->challengeSubmissions->hasPassed($userId, $challenge->id);
+        }
+
+        if (! ($materialsComplete && $videosComplete && $quizPassed && $challengePassed)) {
             return false;
         }
 
@@ -66,6 +82,15 @@ final class ProgressEngine
         return DB::transaction(function () use ($enrollment, $level, $progress) {
             $this->levelProgress->markCompleted($progress);
 
+            $this->gamification->awardXp(
+                $enrollment->user,
+                XpSourceType::LevelComplete,
+                $level->id,
+                XpRules::level($level->difficulty->value),
+                'Level completed: '.$level->title,
+                ['level_number' => $level->number],
+            );
+
             $nextLevel = $this->levels->findNext($level);
 
             if ($nextLevel) {
@@ -75,7 +100,17 @@ final class ProgressEngine
                     $this->levelProgress->unlock($nextProgress);
                 }
             } elseif ($level->number >= 20) {
-                $this->enrollments->markCompleted($enrollment);
+                $this->enrollments->markCompleted($enrollment->fresh());
+
+                $this->gamification->awardXp(
+                    $enrollment->user,
+                    XpSourceType::PathComplete,
+                    $enrollment->learning_path_id,
+                    XpRules::pathComplete(),
+                    'Learning path completed',
+                );
+
+                $this->certificates->issueForEnrollment($enrollment->fresh());
             }
 
             return true;

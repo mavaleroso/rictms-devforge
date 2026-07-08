@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Learn\SubmitQuizRequest;
 use App\Http\Resources\QuizResource;
 use App\Models\Quiz;
+use App\Services\Learning\LearnPlayerContext;
 use App\Services\Learning\LearnPresentationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,7 @@ class QuizController extends Controller
 {
     public function __construct(
         private readonly LearnPresentationService $presentation,
+        private readonly LearnPlayerContext $playerContext,
     ) {}
 
     public function show(Request $request, Quiz $quiz): Response
@@ -26,10 +28,13 @@ class QuizController extends Controller
         $quiz = $this->presentation->quizForPlayer($quiz, $request->user());
         $this->authorize('view', $quiz->level);
 
+        $path = $quiz->level->learningPath;
+        $level = $quiz->level;
+
         return Inertia::render('learn/quizzes/show', [
-            'path' => $quiz->level->learningPath->only(['id', 'name', 'slug']),
-            'level' => $quiz->level->only(['id', 'number', 'title']),
+            ...$this->playerContext->forLevel($path, $level, $request->user()),
             'quiz' => new QuizResource($quiz),
+            'currentTask' => 'quiz-'.$quiz->id,
         ]);
     }
 

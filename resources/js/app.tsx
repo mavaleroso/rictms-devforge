@@ -1,5 +1,7 @@
 import '../css/app.css';
 
+import { CertificateToastListener } from '@/components/certificate/certificate-toast-listener';
+import { GamificationToastListener } from '@/components/gamification/gamification-toast-listener';
 import { ToastProvider } from '@/components/toast/toast-provider';
 import { ValidationToastListener } from '@/components/toast/validation-toast-listener';
 import { QueryProvider } from '@/providers/query-provider';
@@ -34,6 +36,8 @@ createInertiaApp({
                         {({ Component, props: pageProps, key }) => (
                             <>
                                 <ValidationToastListener />
+                                <GamificationToastListener />
+                                <CertificateToastListener />
                                 <Component key={key} {...pageProps} />
                             </>
                         )}

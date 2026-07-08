@@ -24,6 +24,8 @@ export interface NavItem {
     isActive?: boolean;
     /** Keep nav item highlighted for nested routes (e.g. /admin/paths/1/edit). */
     matchPrefix?: string;
+    /** Paths that should not activate this item when using matchPrefix. */
+    excludePrefixes?: string[];
 }
 
 export interface SharedData {

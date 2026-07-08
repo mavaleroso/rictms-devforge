@@ -1,0 +1,131 @@
+<?php
+
+return [
+
+    'xp' => [
+        'material' => 15,
+        'video' => 20,
+        'quiz_base' => 75,
+        'quiz_perfect_bonus' => 25,
+        'quiz_first_attempt_bonus' => 15,
+        'challenge_pass' => 150,
+        'challenge_approved' => 175,
+        'level_base' => 200,
+        'path_complete' => 1000,
+        'daily_streak' => 10,
+    ],
+
+    'difficulty_multipliers' => [
+        'beginner' => 1.0,
+        'intermediate' => 1.25,
+        'advanced' => 1.5,
+        'expert' => 2.0,
+    ],
+
+    'tiers' => [
+        ['slug' => 'explorer', 'label' => 'Explorer', 'min_xp' => 0, 'color' => 'zinc'],
+        ['slug' => 'builder', 'label' => 'Builder', 'min_xp' => 500, 'color' => 'blue'],
+        ['slug' => 'specialist', 'label' => 'Specialist', 'min_xp' => 1500, 'color' => 'violet'],
+        ['slug' => 'architect', 'label' => 'Architect', 'min_xp' => 3500, 'color' => 'amber'],
+        ['slug' => 'master', 'label' => 'Master', 'min_xp' => 7000, 'color' => 'lime'],
+    ],
+
+    'leaderboard' => [
+        'default_limit' => 10,
+        'weekly_days' => 7,
+    ],
+
+    'badges' => [
+        [
+            'slug' => 'first_steps',
+            'name' => 'First Steps',
+            'description' => 'Complete your first lesson or video.',
+            'icon' => 'book-open',
+            'category' => 'milestone',
+            'xp_bonus' => 25,
+            'sort_order' => 1,
+        ],
+        [
+            'slug' => 'quiz_ace',
+            'name' => 'Quiz Ace',
+            'description' => 'Score 100% on any quiz.',
+            'icon' => 'academic-cap',
+            'category' => 'performance',
+            'xp_bonus' => 50,
+            'sort_order' => 2,
+        ],
+        [
+            'slug' => 'code_runner',
+            'name' => 'Code Runner',
+            'description' => 'Pass your first coding challenge.',
+            'icon' => 'code-bracket',
+            'category' => 'milestone',
+            'xp_bonus' => 75,
+            'sort_order' => 3,
+        ],
+        [
+            'slug' => 'streak_week',
+            'name' => 'Week Warrior',
+            'description' => 'Maintain a 7-day learning streak.',
+            'icon' => 'fire',
+            'category' => 'streak',
+            'xp_bonus' => 100,
+            'sort_order' => 4,
+        ],
+        [
+            'slug' => 'streak_month',
+            'name' => 'Consistency Champion',
+            'description' => 'Maintain a 30-day learning streak.',
+            'icon' => 'bolt',
+            'category' => 'streak',
+            'xp_bonus' => 250,
+            'sort_order' => 5,
+        ],
+        [
+            'slug' => 'level_milestone',
+            'name' => 'Rising Star',
+            'description' => 'Complete 5 learning levels.',
+            'icon' => 'star',
+            'category' => 'progress',
+            'xp_bonus' => 150,
+            'sort_order' => 6,
+        ],
+        [
+            'slug' => 'dedicated_learner',
+            'name' => 'Dedicated Learner',
+            'description' => 'Complete 10 lessons or videos.',
+            'icon' => 'check-badge',
+            'category' => 'progress',
+            'xp_bonus' => 100,
+            'sort_order' => 7,
+        ],
+        [
+            'slug' => 'path_graduate',
+            'name' => 'Path Graduate',
+            'description' => 'Finish an entire learning path.',
+            'icon' => 'trophy',
+            'category' => 'milestone',
+            'xp_bonus' => 500,
+            'sort_order' => 8,
+        ],
+        [
+            'slug' => 'xp_builder',
+            'name' => 'Builder Tier',
+            'description' => 'Reach 500 total XP.',
+            'icon' => 'sparkles',
+            'category' => 'milestone',
+            'xp_bonus' => 0,
+            'sort_order' => 9,
+        ],
+        [
+            'slug' => 'xp_specialist',
+            'name' => 'Specialist Tier',
+            'description' => 'Reach 1,500 total XP.',
+            'icon' => 'rocket',
+            'category' => 'milestone',
+            'xp_bonus' => 0,
+            'sort_order' => 10,
+        ],
+    ],
+
+];

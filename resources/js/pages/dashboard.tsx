@@ -23,8 +23,12 @@ interface Props {
     stats?: AdminStats;
     mentor_stats?: DashboardMentorStats;
     assigned_interns?: { data: Enrollment[] };
+    pending_reviews?: number;
+    pending_capstone_reviews?: number;
     enrollment?: Enrollment | { data: Enrollment } | null;
     available_paths?: Pick<LearningPath, 'id' | 'name' | 'slug' | 'description'>[] | null;
+    gamification?: import('@/types/gamification').GamificationProfile | null;
+    recommendations?: import('@/types/integrations').Recommendation[];
 }
 
 function unwrapEnrollment(enrollment: Props['enrollment']): Enrollment | null {
@@ -39,7 +43,7 @@ function unwrapEnrollment(enrollment: Props['enrollment']): Enrollment | null {
     return enrollment;
 }
 
-export default function Dashboard({ role, stats, mentor_stats, assigned_interns, enrollment, available_paths }: Props) {
+export default function Dashboard({ role, stats, mentor_stats, assigned_interns, pending_reviews, pending_capstone_reviews, enrollment, available_paths, gamification, recommendations }: Props) {
     const { auth } = usePage<SharedData>().props;
     const displayName = auth.user ? resolveDisplayName(auth.user) : 'there';
 
@@ -61,13 +65,23 @@ export default function Dashboard({ role, stats, mentor_stats, assigned_interns,
 
             {role === 'mentor' && mentor_stats && assigned_interns && (
                 <div className="mt-8">
-                    <DashboardMentorPanel stats={mentor_stats} assignedInterns={assigned_interns.data} />
+                    <DashboardMentorPanel
+                        stats={mentor_stats}
+                        assignedInterns={assigned_interns.data}
+                        pendingReviews={pending_reviews}
+                        pendingCapstoneReviews={pending_capstone_reviews}
+                    />
                 </div>
             )}
 
             {role === 'intern' && (
                 <div className="mt-8">
-                    <DashboardInternPanel enrollment={unwrapEnrollment(enrollment)} availablePaths={available_paths ?? null} />
+                    <DashboardInternPanel
+                        enrollment={unwrapEnrollment(enrollment)}
+                        availablePaths={available_paths ?? null}
+                        gamification={gamification ?? null}
+                        recommendations={recommendations ?? []}
+                    />
                 </div>
             )}
         </AppLayout>

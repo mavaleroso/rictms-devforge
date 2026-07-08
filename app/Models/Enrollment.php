@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Enrollment extends Model
 {
@@ -49,6 +50,16 @@ class Enrollment extends Model
     public function levelProgress(): HasMany
     {
         return $this->hasMany(LevelProgress::class);
+    }
+
+    public function capstoneProject(): HasOne
+    {
+        return $this->hasOne(CapstoneProject::class);
+    }
+
+    public function certificate(): HasOne
+    {
+        return $this->hasOne(Certificate::class);
     }
 
     public function progressPercentage(): int

@@ -5,9 +5,12 @@ namespace App\Services\Learning;
 use App\Enums\EnrollmentStatus;
 use App\Http\Resources\EnrollmentResource;
 use App\Models\User;
+use App\Repositories\Contracts\CapstoneProjectRepository;
+use App\Repositories\Contracts\ChallengeSubmissionRepository;
 use App\Repositories\Contracts\EnrollmentRepository;
 use App\Repositories\Contracts\LearningPathRepository;
 use App\Repositories\Contracts\UserRepository;
+use App\Services\Gamification\GamificationService;
 
 final class DashboardService
 {
@@ -15,6 +18,10 @@ final class DashboardService
         private readonly UserRepository $users,
         private readonly EnrollmentRepository $enrollments,
         private readonly LearningPathRepository $paths,
+        private readonly ChallengeSubmissionRepository $challengeSubmissions,
+        private readonly CapstoneProjectRepository $capstoneProjects,
+        private readonly GamificationService $gamification,
+        private readonly RecommendationService $recommendations,
     ) {}
 
     /** @return array<string, mixed> */
@@ -43,7 +50,8 @@ final class DashboardService
                 'completed' => $assigned->where('status', EnrollmentStatus::Completed)->count(),
             ],
             'assigned_interns' => EnrollmentResource::collection($assigned),
-            'pending_reviews' => 0,
+            'pending_reviews' => $this->challengeSubmissions->countPendingReviewsForMentor($mentor->id),
+            'pending_capstone_reviews' => $this->capstoneProjects->countPendingReviewsForMentor($mentor->id),
         ];
     }
 
@@ -60,6 +68,8 @@ final class DashboardService
             'role' => 'intern',
             'enrollment' => $enrollment ? new EnrollmentResource($enrollment) : null,
             'available_paths' => $enrollment ? null : $this->paths->activeList(['id', 'name', 'slug', 'description']),
+            'gamification' => $this->gamification->profilePayloadFor($intern),
+            'recommendations' => $this->recommendations->forUser($intern),
         ];
     }
 }

@@ -4,7 +4,7 @@ export type MaterialType = 'markdown' | 'pdf' | 'slides' | 'snippet' | 'standard
 export type VideoProvider = 'youtube' | 'upload';
 export type QuestionType = 'multiple_choice' | 'identification' | 'true_false' | 'essay';
 export type LevelDifficulty = 'beginner' | 'intermediate' | 'advanced';
-export type LevelEditorTab = 'overview' | 'materials' | 'videos' | 'quiz';
+export type LevelEditorTab = 'overview' | 'materials' | 'videos' | 'quiz' | 'challenge';
 
 export interface LearningPath {
     id: number;
@@ -36,7 +36,43 @@ export interface Level {
     materials?: LearningMaterial[];
     videos?: Video[];
     quiz?: Quiz | null;
+    coding_challenge?: CodingChallenge | null;
     progress_status?: ProgressStatus;
+}
+
+export type ChallengeLanguage = 'php' | 'javascript' | 'python';
+
+export interface CodingChallenge {
+    id: number;
+    title: string;
+    description: string;
+    constraints: string | null;
+    examples: { input: string; output: string; explanation?: string }[];
+    language: ChallengeLanguage;
+    entry_point: string;
+    starter_code: string;
+    time_limit_ms: number;
+    memory_limit_mb: number;
+    max_attempts: number;
+    requires_mentor_review: boolean;
+    is_active: boolean;
+    test_cases?: ChallengeTestCase[];
+    test_cases_count?: number;
+    attempts_used?: number;
+    tests_passed?: number;
+    tests_total?: number;
+    passed?: boolean;
+    status?: string | null;
+}
+
+export interface ChallengeTestCase {
+    id: number;
+    label: string | null;
+    input: { args: unknown[] };
+    expected_output?: string;
+    explanation?: string | null;
+    is_sample: boolean;
+    sort_order: number;
 }
 
 export interface LearningMaterial {

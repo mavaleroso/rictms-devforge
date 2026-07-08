@@ -5,7 +5,7 @@ import { DataTableMetaText } from '@/components/data-table';
 import { useInitials } from '@/hooks/use-initials';
 import { formatDisplayName } from '@/lib/user-profile';
 import { type Enrollment, type EnrollmentStatus } from '@/types/learning';
-import { ArrowRightIcon, UserGroupIcon } from '@heroicons/react/20/solid';
+import { ArrowRightIcon, ClipboardDocumentCheckIcon, UserGroupIcon } from '@heroicons/react/20/solid';
 
 interface PersonSummary {
     id: number;
@@ -31,9 +31,11 @@ export interface DashboardMentorStats {
 interface DashboardMentorPanelProps {
     stats: DashboardMentorStats;
     assignedInterns: MentorEnrollment[];
+    pendingReviews?: number;
+    pendingCapstoneReviews?: number;
 }
 
-export function DashboardMentorPanel({ stats, assignedInterns }: DashboardMentorPanelProps) {
+export function DashboardMentorPanel({ stats, assignedInterns, pendingReviews = 0, pendingCapstoneReviews = 0 }: DashboardMentorPanelProps) {
     const getInitials = useInitials();
 
     const statItems = [
@@ -44,6 +46,42 @@ export function DashboardMentorPanel({ stats, assignedInterns }: DashboardMentor
 
     return (
         <div className="space-y-6">
+            {pendingReviews > 0 && (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-500/20 bg-amber-50 px-5 py-4 dark:border-amber-500/30 dark:bg-amber-950/20">
+                    <div className="flex items-center gap-3">
+                        <span className="flex size-9 items-center justify-center rounded-lg bg-amber-500 text-white">
+                            <ClipboardDocumentCheckIcon className="size-4" />
+                        </span>
+                        <div>
+                            <p className="text-sm font-semibold text-zinc-950 dark:text-white">{pendingReviews} code review{pendingReviews === 1 ? '' : 's'} pending</p>
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400">Intern submissions passed tests and need your approval</p>
+                        </div>
+                    </div>
+                    <Button href={route('mentor.reviews.index')} color="dark/zinc" className="!text-xs">
+                        Review queue
+                    </Button>
+                </div>
+            )}
+
+            {pendingCapstoneReviews > 0 && (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-violet-500/20 bg-violet-50 px-5 py-4 dark:border-violet-500/30 dark:bg-violet-950/20">
+                    <div className="flex items-center gap-3">
+                        <span className="flex size-9 items-center justify-center rounded-lg bg-violet-600 text-white">
+                            <ClipboardDocumentCheckIcon className="size-4" />
+                        </span>
+                        <div>
+                            <p className="text-sm font-semibold text-zinc-950 dark:text-white">
+                                {pendingCapstoneReviews} capstone milestone{pendingCapstoneReviews === 1 ? '' : 's'} pending
+                            </p>
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400">Interns submitted milestones for your sign-off</p>
+                        </div>
+                    </div>
+                    <Button href={route('mentor.capstone-reviews.index')} color="dark/zinc" className="!text-xs">
+                        Review milestones
+                    </Button>
+                </div>
+            )}
+
             <div className="grid gap-4 sm:grid-cols-3">
                 {statItems.map((item) => (
                     <div

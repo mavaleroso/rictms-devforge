@@ -18,4 +18,8 @@ Route::middleware('auth')->group(function () {
     Route::get('settings/appearance', function () {
         return Inertia::render('settings/appearance');
     })->name('appearance');
+
+    Route::get('settings/integrations', [\App\Http\Controllers\Settings\IntegrationsController::class, 'edit'])->name('integrations.edit');
+    Route::patch('settings/integrations/github', [\App\Http\Controllers\Settings\IntegrationsController::class, 'updateGitHub'])->name('integrations.github.update');
+    Route::delete('settings/integrations/github', [\App\Http\Controllers\Settings\IntegrationsController::class, 'destroyGitHub'])->name('integrations.github.destroy');
 });

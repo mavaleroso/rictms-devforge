@@ -47,7 +47,7 @@ export function LevelWorkflowGuide({ activeTab, onTabChange, level, onPrev, onNe
             </div>
 
             <nav aria-label="Level editor steps">
-                <ol className="grid gap-3 sm:grid-cols-4 sm:gap-0">
+                <ol className="grid gap-3 sm:grid-cols-5 sm:gap-0">
                     {LEVEL_EDITOR_TABS.map((tab, index) => {
                         const meta = TAB_META[tab];
                         const done = progress[tab];

@@ -1,6 +1,6 @@
 import type { Level, LevelEditorTab } from '@/types/learning';
 
-export const LEVEL_EDITOR_TABS: LevelEditorTab[] = ['overview', 'materials', 'videos', 'quiz'];
+export const LEVEL_EDITOR_TABS: LevelEditorTab[] = ['overview', 'materials', 'videos', 'quiz', 'challenge'];
 
 export const TAB_META: Record<
     LevelEditorTab,
@@ -27,6 +27,11 @@ export const TAB_META: Record<
         shortLabel: 'Quiz',
         description: 'Configure passing rules and define questions with correct answers for auto-grading.',
     },
+    challenge: {
+        label: 'Coding Challenge',
+        shortLabel: 'Challenge',
+        description: 'LeetCode-style problem with test cases, auto-grading, and optional mentor review.',
+    },
 };
 
 export function nextTab(current: LevelEditorTab): LevelEditorTab | null {
@@ -47,6 +52,7 @@ export function tabProgress(level: Level): Record<LevelEditorTab, boolean> {
         materials: (level.materials?.length ?? level.materials_count ?? 0) > 0,
         videos: (level.videos?.length ?? level.videos_count ?? 0) > 0,
         quiz: (level.quiz?.questions?.length ?? level.quiz?.questions_count ?? 0) > 0,
+        challenge: (level.coding_challenge?.test_cases?.length ?? level.coding_challenge?.test_cases_count ?? 0) > 0,
     };
 }
 

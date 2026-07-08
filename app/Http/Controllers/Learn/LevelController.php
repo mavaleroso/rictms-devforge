@@ -32,11 +32,40 @@ class LevelController extends Controller
         $pathWithProgress = $this->presentation->pathWithProgress($path, $request->user());
         $enrollment = $this->presentation->enrollmentForPath($request->user(), $path);
 
+        $firstTask = $this->firstIncompleteTaskRoute($level, $path);
+
         return Inertia::render('learn/levels/show', [
             'path' => new LearningPathResource($pathWithProgress),
             'level' => new LevelResource($level),
             'enrollment' => $enrollment ? new EnrollmentResource($enrollment) : null,
+            'currentTask' => 'overview',
+            'continueHref' => $firstTask,
         ]);
+    }
+
+    private function firstIncompleteTaskRoute(Level $level, LearningPath $path): ?string
+    {
+        foreach ($level->materials ?? [] as $material) {
+            if (! $material->completed) {
+                return route('learn.materials.show', $material);
+            }
+        }
+
+        foreach ($level->videos ?? [] as $video) {
+            if (! $video->completed) {
+                return route('learn.videos.show', $video);
+            }
+        }
+
+        if ($level->quiz && ! $level->quiz->passed) {
+            return route('learn.quizzes.show', $level->quiz);
+        }
+
+        if ($level->codingChallenge?->is_active && ! $level->codingChallenge->passed) {
+            return route('learn.challenges.show', $level->codingChallenge);
+        }
+
+        return null;
     }
 
     public function completeMaterial(Request $request, LearningMaterial $material, CompleteContent $completeContent): RedirectResponse

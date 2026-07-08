@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\Admin\CapstoneTemplateController;
 use App\Http\Controllers\Admin\EnrollmentController;
 use App\Http\Controllers\Admin\LearningPathController;
 use App\Http\Controllers\Admin\LevelContentController;
@@ -31,6 +33,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::patch('questions/{question}', [LevelContentController::class, 'updateQuestion'])->name('questions.update');
     Route::delete('questions/{question}', [LevelContentController::class, 'destroyQuestion'])->name('questions.destroy');
 
+    Route::patch('paths/{path}/levels/{level}/challenge', [\App\Http\Controllers\Admin\ChallengeContentController::class, 'updateChallenge'])->name('challenge.update');
+    Route::post('challenges/{challenge}/test-cases', [\App\Http\Controllers\Admin\ChallengeContentController::class, 'storeTestCase'])->name('challenge-test-cases.store');
+    Route::patch('challenge-test-cases/{testCase}', [\App\Http\Controllers\Admin\ChallengeContentController::class, 'updateTestCase'])->name('challenge-test-cases.update');
+    Route::delete('challenge-test-cases/{testCase}', [\App\Http\Controllers\Admin\ChallengeContentController::class, 'destroyTestCase'])->name('challenge-test-cases.destroy');
+
     Route::get('users', [UserController::class, 'index'])->name('users.index');
     Route::get('users/table', [UserController::class, 'table'])->name('users.table');
     Route::patch('users/{user}/active', [UserController::class, 'updateActive'])->name('users.update-active');
@@ -42,4 +49,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
     Route::get('enrollments/table', [EnrollmentController::class, 'table'])->name('enrollments.table');
     Route::post('enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
+
+    Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+    Route::get('analytics/table', [AnalyticsController::class, 'table'])->name('analytics.table');
+    Route::get('analytics/export', [AnalyticsController::class, 'export'])->name('analytics.export');
+
+    Route::get('capstone-templates', [CapstoneTemplateController::class, 'index'])->name('capstone-templates.index');
+    Route::get('capstone-templates/{template}/edit', [CapstoneTemplateController::class, 'edit'])->name('capstone-templates.edit');
+    Route::patch('capstone-templates/{template}', [CapstoneTemplateController::class, 'update'])->name('capstone-templates.update');
 });

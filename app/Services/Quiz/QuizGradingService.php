@@ -12,6 +12,9 @@ use App\Repositories\Contracts\LevelProgressRepository;
 use App\Repositories\Contracts\QuizAttemptAnswerRepository;
 use App\Repositories\Contracts\QuizAttemptRepository;
 use App\Repositories\Contracts\QuizRepository;
+use App\Services\Gamification\GamificationService;
+use App\Enums\XpSourceType;
+use App\Library\Gamification\XpRules;
 use App\Services\Learning\ProgressEngine;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -25,6 +28,7 @@ final class QuizGradingService
         private readonly EnrollmentRepository $enrollments,
         private readonly LevelProgressRepository $levelProgress,
         private readonly ProgressEngine $progressEngine,
+        private readonly GamificationService $gamification,
     ) {}
 
     /**
@@ -80,6 +84,15 @@ final class QuizGradingService
 
                     $this->progressEngine->evaluate($enrollment, $level);
                 }
+
+                $this->gamification->awardXp(
+                    $user,
+                    XpSourceType::QuizPass,
+                    $quiz->id,
+                    XpRules::quiz($score, $attemptCount + 1),
+                    'Quiz passed',
+                    ['score' => $score, 'attempt' => $attemptCount + 1],
+                );
             }
 
             return $attempt;

@@ -27,9 +27,17 @@ final class EloquentLevelRepository implements LevelRepository
             ->first();
     }
 
+    public function findByPathAndNumber(int $pathId, int $number): ?Level
+    {
+        return Level::query()
+            ->where('learning_path_id', $pathId)
+            ->where('number', $number)
+            ->first();
+    }
+
     public function loadWithContent(Level $level): Level
     {
-        return $level->load(['materials', 'videos', 'quiz.questions.options']);
+        return $level->load(['materials', 'videos', 'quiz.questions.options', 'codingChallenge.testCases']);
     }
 
     public function update(Level $level, array $attributes): void

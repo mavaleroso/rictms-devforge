@@ -23,6 +23,9 @@ class User extends Authenticatable
         'middle_name',
         'last_name',
         'email',
+        'github_id',
+        'github_username',
+        'github_token',
         'is_active',
         'password',
         'avatar',
@@ -38,6 +41,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'avatar',
+        'github_token',
     ];
 
     protected $appends = [

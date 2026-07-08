@@ -62,7 +62,7 @@ export default function AdminLevelsEdit({ path, level: levelProp }: Props) {
                     <Subheading level={3} className="text-zinc-950 dark:text-white">
                         Content editor
                     </Subheading>
-                    <Text className="mt-1">Manage overview, materials, videos, and quiz for this level.</Text>
+                    <Text className="mt-1">Manage overview, materials, videos, quiz, and coding challenge for this level.</Text>
                 </div>
             </div>
 

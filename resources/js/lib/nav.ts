@@ -11,6 +11,17 @@ export function normalizePath(url: string): string {
     return pathname.replace(/\/$/, '');
 }
 
+export function matchesPathPrefix(currentUrl: string, prefix: string): boolean {
+    const currentPath = normalizePath(currentUrl);
+    const normalizedPrefix = normalizePath(prefix);
+
+    return currentPath === normalizedPrefix || currentPath.startsWith(`${normalizedPrefix}/`);
+}
+
+export function isExcludedFromNav(currentUrl: string, excludePrefixes: string[]): boolean {
+    return excludePrefixes.some((prefix) => matchesPathPrefix(currentUrl, prefix));
+}
+
 export function isNavItemActive(item: NavItem, currentUrl: string): boolean {
     if (item.isActive !== undefined) {
         return item.isActive;
@@ -20,9 +31,15 @@ export function isNavItemActive(item: NavItem, currentUrl: string): boolean {
     const itemPath = normalizePath(item.url);
 
     if (item.matchPrefix) {
-        const prefix = normalizePath(item.matchPrefix);
+        if (!matchesPathPrefix(currentUrl, item.matchPrefix)) {
+            return false;
+        }
 
-        return currentPath === prefix || currentPath.startsWith(`${prefix}/`);
+        if (item.excludePrefixes?.length && isExcludedFromNav(currentUrl, item.excludePrefixes)) {
+            return false;
+        }
+
+        return true;
     }
 
     return currentPath === itemPath;

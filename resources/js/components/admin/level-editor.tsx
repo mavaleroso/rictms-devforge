@@ -1,4 +1,5 @@
 import { LevelWorkflowGuide } from '@/components/admin/level-workflow-guide';
+import { ChallengeTab } from '@/components/admin/level-editor/challenge-tab';
 import { MaterialsTab } from '@/components/admin/level-editor/materials-tab';
 import { OverviewTab } from '@/components/admin/level-editor/overview-tab';
 import { QuizTab } from '@/components/admin/level-editor/quiz-tab';
@@ -50,7 +51,10 @@ export function LevelEditor({ path, level }: LevelEditorProps) {
                 <MaterialsTab pathId={path.id} level={level} onPrev={goPrev} onNext={goNext} />
             )}
             {tab === 'videos' && <VideosTab pathId={path.id} level={level} onPrev={goPrev} onNext={goNext} />}
-            {tab === 'quiz' && <QuizTab pathId={path.id} level={level} onPrev={goPrev} curriculumHref={curriculumHref} />}
+            {tab === 'quiz' && <QuizTab pathId={path.id} level={level} onPrev={goPrev} onNext={goNext} />}
+            {tab === 'challenge' && (
+                <ChallengeTab pathId={path.id} level={level} onPrev={goPrev} curriculumHref={curriculumHref} />
+            )}
         </div>
     );
 }

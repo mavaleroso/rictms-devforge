@@ -16,4 +16,6 @@ interface QuizAttemptRepository
     public function create(array $attributes): QuizAttempt;
 
     public function updateScore(QuizAttempt $attempt, int $score, bool $passed): QuizAttempt;
+
+    public function bestScoreForUser(int $userId): int;
 }

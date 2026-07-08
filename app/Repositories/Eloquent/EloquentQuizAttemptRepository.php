@@ -51,4 +51,11 @@ final class EloquentQuizAttemptRepository implements QuizAttemptRepository
 
         return $attempt->fresh(['answers']);
     }
+
+    public function bestScoreForUser(int $userId): int
+    {
+        return (int) (QuizAttempt::query()
+            ->where('user_id', $userId)
+            ->max('score') ?? 0);
+    }
 }
