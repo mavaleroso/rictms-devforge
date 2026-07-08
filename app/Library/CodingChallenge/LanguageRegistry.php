@@ -44,9 +44,9 @@ final class LanguageRegistry
 <?php
 
 function solution(/* args */) {
-    // Write your solution here
+    // Write your solution here and return a value
 }
-PHP,
+PHP
             ),
             ChallengeLanguage::Javascript->value => new LanguageDefinition(
                 id: ChallengeLanguage::Javascript->value,

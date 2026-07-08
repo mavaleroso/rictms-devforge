@@ -64,9 +64,9 @@ export function DashboardAdminStats({ stats }: DashboardAdminStatsProps) {
             value: stats.learning_paths,
             hint: 'Live curricula available',
             icon: BookOpenIcon,
-            accent: 'from-violet-500 to-purple-600',
-            iconWrap: 'bg-violet-500/10 dark:bg-violet-500/15',
-            iconColor: 'text-violet-600 dark:text-violet-400',
+            accent: 'from-brand-500 to-purple-600',
+            iconWrap: 'bg-brand-500/10 dark:bg-brand-500/15',
+            iconColor: 'text-brand-600 dark:text-brand-400',
         },
     ];
 
@@ -121,7 +121,7 @@ const adminActions: QuickAction[] = [
         description: 'Build and publish curricula',
         href: 'admin.paths.index',
         icon: BookOpenIcon,
-        accent: 'from-violet-500 to-indigo-600',
+        accent: 'from-brand-500 to-indigo-600',
     },
     {
         title: 'Enrollments',

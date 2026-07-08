@@ -30,7 +30,7 @@ export const TAB_META: Record<
     challenge: {
         label: 'Coding Challenge',
         shortLabel: 'Challenge',
-        description: 'LeetCode-style problem with test cases, auto-grading, and optional mentor review.',
+        description: 'Hands-on problem with editor, automated test cases, and optional mentor review.',
     },
 };
 

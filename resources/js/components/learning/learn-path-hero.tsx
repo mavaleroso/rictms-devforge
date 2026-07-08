@@ -17,15 +17,15 @@ export function LearnPathHero({ path, enrollment }: LearnPathHeroProps) {
     const duration = path.total_estimated_minutes ?? path.levels?.reduce((sum, l) => sum + l.estimated_minutes, 0) ?? 0;
 
     return (
-        <section className="overflow-hidden rounded-2xl border border-zinc-950/10 bg-zinc-900 text-white dark:border-white/10">
+        <section className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 text-white dark:border-slate-700">
             <div className="relative">
                 {path.cover_image_url ? (
                     <>
                         <img src={path.cover_image_url} alt="" className="h-48 w-full object-cover sm:h-56 lg:h-64" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-zinc-950/20" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-900/25" />
                     </>
                 ) : (
-                    <div className="flex h-48 items-center justify-center bg-gradient-to-br from-violet-900 to-zinc-900 sm:h-56">
+                    <div className="flex h-48 items-center justify-center bg-gradient-to-br from-brand-900 via-brand-800 to-slate-900 sm:h-56">
                         <PathIconBadge icon={path.icon} className="size-20" />
                     </div>
                 )}

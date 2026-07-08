@@ -105,6 +105,7 @@ export interface Quiz {
     attempts_used?: number;
     best_score?: number;
     passed?: boolean;
+    last_answers?: Record<string, string>;
 }
 
 export interface QuizQuestion {

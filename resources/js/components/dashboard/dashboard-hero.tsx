@@ -1,6 +1,8 @@
 import { Heading } from '@/components/catalyst/heading';
 import { Text } from '@/components/catalyst/text';
+import { accent, surfaces } from '@/lib/theme';
 import { formatDisplayName } from '@/lib/user-profile';
+import clsx from 'clsx';
 import type { ReactNode } from 'react';
 
 interface DashboardHeroProps {
@@ -33,14 +35,14 @@ export function DashboardHero({ displayName, role, children }: DashboardHeroProp
     const firstName = displayName.split(' ')[0] || displayName;
 
     return (
-        <section className="relative overflow-hidden rounded-2xl border border-zinc-950/10 bg-gradient-to-br from-zinc-50 via-white to-violet-50/40 p-6 shadow-sm sm:p-8 dark:border-white/10 dark:from-zinc-900 dark:via-zinc-900 dark:to-violet-950/25">
+        <section className={clsx('relative overflow-hidden p-6 sm:p-8', surfaces.hero)}>
             <div
-                className="pointer-events-none absolute -top-20 -right-20 size-56 rounded-full bg-violet-400/10 blur-3xl dark:bg-violet-500/10"
+                className="pointer-events-none absolute -top-20 -right-20 size-56 rounded-full bg-brand-400/10 blur-3xl dark:bg-brand-500/10"
                 aria-hidden
             />
             <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                    <p className="text-sm font-medium text-violet-600 dark:text-violet-400">
+                    <p className={clsx('text-sm font-medium', accent.textSoft)}>
                         {greeting()}, {firstName}
                     </p>
                     <Heading className="mt-1">Dashboard</Heading>

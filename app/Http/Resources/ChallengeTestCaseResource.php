@@ -14,15 +14,16 @@ class ChallengeTestCaseResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $canViewDetails = $request->user()?->isAdmin()
+            || $request->user()?->isMentor()
+            || $this->is_sample;
+
         return [
             'id' => $this->id,
-            'label' => $this->label,
-            'input' => $this->input,
-            'expected_output' => $this->when(
-                $request->user()?->isAdmin() || $this->is_sample,
-                $this->expected_output,
-            ),
-            'explanation' => $this->explanation,
+            'label' => $canViewDetails ? $this->label : 'Hidden test',
+            'input' => $this->when($canViewDetails, $this->input),
+            'expected_output' => $this->when($canViewDetails, $this->expected_output),
+            'explanation' => $this->when($canViewDetails, $this->explanation),
             'is_sample' => $this->is_sample,
             'sort_order' => $this->sort_order,
         ];

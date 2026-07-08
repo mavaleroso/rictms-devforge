@@ -8,6 +8,7 @@ use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use App\Models\Video;
 use App\Services\Admin\LevelContentService;
+use Illuminate\Http\UploadedFile;
 
 final class ManageLevelContent
 {
@@ -30,14 +31,14 @@ final class ManageLevelContent
         $this->content->deleteMaterial($material);
     }
 
-    public function storeVideo(Level $level, array $attributes): Video
+    public function storeVideo(Level $level, array $attributes, ?UploadedFile $file = null): Video
     {
-        return $this->content->storeVideo($level, $attributes);
+        return $this->content->storeVideo($level, $attributes, $file);
     }
 
-    public function updateVideo(Video $video, array $attributes): void
+    public function updateVideo(Video $video, array $attributes, ?UploadedFile $file = null): void
     {
-        $this->content->updateVideo($video, $attributes);
+        $this->content->updateVideo($video, $attributes, $file);
     }
 
     public function deleteVideo(Video $video): void

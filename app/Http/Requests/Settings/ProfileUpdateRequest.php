@@ -2,36 +2,35 @@
 
 namespace App\Http\Requests\Settings;
 
-use App\Models\User;
+use App\Http\Requests\Concerns\UserProfileRules;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends FormRequest
 {
+    use UserProfileRules;
+
     public function authorize(): bool
     {
         return true;
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        return [
-            'name' => ['required', 'string', 'max:255'],
+        return $this->profileRules($this->user()->id) + [
+            'avatar' => ['nullable', 'image', 'max:2048'],
+            'remove_avatar' => ['boolean'],
+        ];
+    }
 
-            'email' => [
-                'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
-            ],
+    public function messages(): array
+    {
+        return $this->profileMessages() + [
+            'avatar.image' => 'The avatar must be a valid image file.',
+            'avatar.max' => 'The avatar may not be larger than 2 MB.',
         ];
     }
 }

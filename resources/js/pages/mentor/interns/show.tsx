@@ -51,7 +51,7 @@ export default function MentorInternsShow({ enrollment: enrollmentProp, level_pr
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={displayName} />
 
-            <Link href={route('mentor.interns.index')} className="text-xs font-medium text-violet-600 dark:text-violet-400">
+            <Link href={route('mentor.interns.index')} className="text-xs font-medium text-brand-600 dark:text-brand-400">
                 ← Back to roster
             </Link>
 
@@ -66,7 +66,7 @@ export default function MentorInternsShow({ enrollment: enrollmentProp, level_pr
                     <div>
                         <h1 className="text-lg font-semibold text-zinc-950 dark:text-white">{displayName}</h1>
                         <p className="text-sm text-zinc-500">{user?.email}</p>
-                        <p className="mt-1 text-xs font-medium text-violet-600 dark:text-violet-400">{enrollment.learning_path?.name}</p>
+                        <p className="mt-1 text-xs font-medium text-brand-600 dark:text-brand-400">{enrollment.learning_path?.name}</p>
                     </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -108,7 +108,7 @@ export default function MentorInternsShow({ enrollment: enrollmentProp, level_pr
                     {capstoneProject ? (
                         <section className="rounded-xl border border-zinc-950/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-900">
                             <div className="flex items-center gap-2">
-                                <RocketLaunchIcon className="size-4 text-violet-600" />
+                                <RocketLaunchIcon className="size-4 text-brand-600" />
                                 <h3 className="text-sm font-semibold text-zinc-950 dark:text-white">Capstone project</h3>
                             </div>
                             <p className="mt-2 font-medium text-zinc-950 dark:text-white">{capstoneProject.title}</p>

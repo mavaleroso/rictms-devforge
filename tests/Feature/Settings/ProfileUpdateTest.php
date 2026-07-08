@@ -18,8 +18,16 @@ test('profile information can be updated', function () {
     $response = $this
         ->actingAs($user)
         ->patch('/settings/profile', [
-            'name' => 'Test User',
+            'first_name' => 'Test',
+            'middle_name' => 'Q',
+            'last_name' => 'User',
             'email' => 'test@example.com',
+            'phone' => '+63 912 345 6789',
+            'sex' => 'male',
+            'birthdate' => '2000-01-15',
+            'address' => '123 Learning St, Manila',
+            'occupation' => 'Intern Developer',
+            'bio' => 'Building skills through DevForge.',
         ]);
 
     $response
@@ -28,18 +36,32 @@ test('profile information can be updated', function () {
 
     $user->refresh();
 
-    expect($user->name)->toBe('Test User');
-    expect($user->email)->toBe('test@example.com');
-    expect($user->email_verified_at)->toBeNull();
+    expect($user->first_name)->toBe('Test')
+        ->and($user->middle_name)->toBe('Q')
+        ->and($user->last_name)->toBe('User')
+        ->and($user->name)->toBe('Test Q. User')
+        ->and($user->email)->toBe('test@example.com')
+        ->and($user->phone)->toBe('+63 912 345 6789')
+        ->and($user->sex?->value)->toBe('male')
+        ->and($user->birthdate?->toDateString())->toBe('2000-01-15')
+        ->and($user->address)->toBe('123 Learning St, Manila')
+        ->and($user->occupation)->toBe('Intern Developer')
+        ->and($user->bio)->toBe('Building skills through DevForge.')
+        ->and($user->email_verified_at)->toBeNull();
 });
 
 test('email verification status is unchanged when the email address is unchanged', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+    ]);
 
     $response = $this
         ->actingAs($user)
         ->patch('/settings/profile', [
-            'name' => 'Test User',
+            'first_name' => 'Jane',
+            'middle_name' => '',
+            'last_name' => 'Cooper',
             'email' => $user->email,
         ]);
 
@@ -50,36 +72,10 @@ test('email verification status is unchanged when the email address is unchanged
     expect($user->refresh()->email_verified_at)->not->toBeNull();
 });
 
-test('user can delete their account', function () {
+test('users cannot delete their account from profile settings', function () {
     $user = User::factory()->create();
 
-    $response = $this
-        ->actingAs($user)
-        ->delete('/settings/profile', [
-            'password' => 'password',
-        ]);
-
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect('/');
-
-    $this->assertGuest();
-    expect($user->fresh())->toBeNull();
-});
-
-test('correct password must be provided to delete account', function () {
-    $user = User::factory()->create();
-
-    $response = $this
-        ->actingAs($user)
-        ->from('/settings/profile')
-        ->delete('/settings/profile', [
-            'password' => 'wrong-password',
-        ]);
-
-    $response
-        ->assertSessionHasErrors('password')
-        ->assertRedirect('/settings/profile');
-
-    expect($user->fresh())->not->toBeNull();
+    $this->actingAs($user)
+        ->delete('/settings/profile')
+        ->assertMethodNotAllowed();
 });

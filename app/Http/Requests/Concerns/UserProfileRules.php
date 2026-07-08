@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Admin\Concerns;
+namespace App\Http\Requests\Concerns;
 
 use App\Enums\Sex;
 use Illuminate\Validation\Rule;
@@ -38,8 +38,8 @@ trait UserProfileRules
     protected function profileMessages(): array
     {
         return [
-            'first_name.required' => 'Please enter the first name.',
-            'last_name.required' => 'Please enter the last name.',
+            'first_name.required' => 'Please enter your first name.',
+            'last_name.required' => 'Please enter your last name.',
             'email.required' => 'An email address is required.',
             'email.unique' => 'This email address is already registered.',
             'sex.in' => 'Please select a valid sex value.',

@@ -41,7 +41,7 @@ export default function AdminCapstoneTemplatesEdit({ template: templateProp }: P
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit ${template.name}`} />
 
-            <Link href={route('admin.capstone-templates.index')} className="text-xs font-medium text-violet-600 dark:text-violet-400">
+            <Link href={route('admin.capstone-templates.index')} className="text-xs font-medium text-brand-600 dark:text-brand-400">
                 ← Back to templates
             </Link>
 

@@ -136,8 +136,12 @@ const styles = {
       '[--btn-icon:var(--color-blue-400)] data-active:[--btn-icon:var(--color-blue-300)] data-hover:[--btn-icon:var(--color-blue-300)]',
     ],
     violet: [
-      'text-white [--btn-hover-overlay:var(--color-white)]/10 [--btn-bg:var(--color-violet-500)] [--btn-border:var(--color-violet-600)]/90',
-      '[--btn-icon:var(--color-violet-300)] data-active:[--btn-icon:var(--color-violet-200)] data-hover:[--btn-icon:var(--color-violet-200)]',
+      'text-white [--btn-hover-overlay:var(--color-white)]/10 [--btn-bg:var(--color-brand-600)] [--btn-border:var(--color-brand-700)]/90',
+      '[--btn-icon:var(--color-brand-200)] data-active:[--btn-icon:var(--color-brand-100)] data-hover:[--btn-icon:var(--color-brand-100)]',
+    ],
+    brand: [
+      'text-white [--btn-hover-overlay:var(--color-white)]/10 [--btn-bg:var(--color-brand-600)] [--btn-border:var(--color-brand-700)]/90',
+      '[--btn-icon:var(--color-brand-200)] data-active:[--btn-icon:var(--color-brand-100)] data-hover:[--btn-icon:var(--color-brand-100)]',
     ],
     purple: [
       'text-white [--btn-hover-overlay:var(--color-white)]/10 [--btn-bg:var(--color-purple-500)] [--btn-border:var(--color-purple-600)]/90',

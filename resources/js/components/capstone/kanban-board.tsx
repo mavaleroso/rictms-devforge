@@ -12,7 +12,7 @@ const columnAccent: Record<CapstoneTaskStatus, string> = {
     backlog: 'border-t-zinc-400',
     todo: 'border-t-blue-500',
     in_progress: 'border-t-amber-500',
-    in_review: 'border-t-violet-500',
+    in_review: 'border-t-brand-500',
     done: 'border-t-lime-500',
 };
 

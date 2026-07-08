@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\Admin\CreateLearningPath;
 use App\Actions\Admin\CreateLevel;
+use App\Actions\Admin\DeleteLearningPath;
 use App\Actions\Admin\UpdateLearningPath;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreLearningPathRequest;
@@ -77,5 +78,15 @@ class LearningPathController extends Controller
         $path->refresh();
 
         return to_route('admin.paths.edit', $path);
+    }
+
+    public function destroy(LearningPath $path, DeleteLearningPath $deleteLearningPath): RedirectResponse
+    {
+        $this->authorize('delete', $path);
+
+        $name = $path->name;
+        $deleteLearningPath->execute($path);
+
+        return to_route('admin.paths.index')->with('success', "Learning path \"{$name}\" and all related content were deleted.");
     }
 }

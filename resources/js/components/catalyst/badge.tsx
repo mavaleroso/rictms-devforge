@@ -24,7 +24,9 @@ const colors = {
   indigo:
     'bg-indigo-500/15 text-indigo-700 group-data-hover:bg-indigo-500/25 dark:text-indigo-400 dark:group-data-hover:bg-indigo-500/20',
   violet:
-    'bg-violet-500/15 text-violet-700 group-data-hover:bg-violet-500/25 dark:text-violet-400 dark:group-data-hover:bg-violet-500/20',
+    'bg-brand-500/15 text-brand-700 group-data-hover:bg-brand-500/25 dark:text-brand-300 dark:group-data-hover:bg-brand-500/20',
+  brand:
+    'bg-brand-500/15 text-brand-700 group-data-hover:bg-brand-500/25 dark:bg-brand-500/10 dark:text-brand-300 dark:group-data-hover:bg-brand-500/20',
   purple:
     'bg-purple-500/15 text-purple-700 group-data-hover:bg-purple-500/25 dark:text-purple-400 dark:group-data-hover:bg-purple-500/20',
   fuchsia:

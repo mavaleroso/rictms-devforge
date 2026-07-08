@@ -60,4 +60,9 @@ final class EloquentLearningPathRepository implements LearningPathRepository
     {
         return LearningPath::findOrFail($id);
     }
+
+    public function delete(LearningPath $path): void
+    {
+        $path->delete();
+    }
 }

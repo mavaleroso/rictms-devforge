@@ -1,21 +1,22 @@
-import { PathIconBadge } from '@/components/admin/path-icon';
-import { PathForm } from '@/components/admin/path-form';
 import { AddLevelForm } from '@/components/admin/add-level-form';
 import { PathCurriculum, PathStatsGrid } from '@/components/admin/path-curriculum';
-import { useConfirmDialog } from '@/components/confirm-dialog';
+import { PathForm } from '@/components/admin/path-form';
+import { PathIconBadge } from '@/components/admin/path-icon';
 import { Badge } from '@/components/catalyst/badge';
 import { Button } from '@/components/catalyst/button';
 import { Heading, Subheading } from '@/components/catalyst/heading';
 import { Text } from '@/components/catalyst/text';
-import AppLayout from '@/layouts/app-layout';
+import { useConfirmDialog } from '@/components/confirm-dialog';
+import { useToast } from '@/components/toast/toast-provider';
 import { useCoverImagePreview } from '@/hooks/use-cover-image-preview';
+import { useValidatedForm } from '@/hooks/use-validated-form';
+import AppLayout from '@/layouts/app-layout';
 import { formHasFileUpload, submitMultipartPatch } from '@/lib/inertia-upload';
 import { slugifyName } from '@/lib/path-icons';
 import { type BreadcrumbItem } from '@/types';
 import { type LearningPath } from '@/types/learning';
-import { ArrowLeftIcon } from '@heroicons/react/20/solid';
-import { Head } from '@inertiajs/react';
-import { useValidatedForm } from '@/hooks/use-validated-form';
+import { ArrowLeftIcon, TrashIcon } from '@heroicons/react/20/solid';
+import { Head, router } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 interface Props {
@@ -30,6 +31,7 @@ export default function AdminPathsEdit({ path: pathProp }: Props) {
     const [slugTouched, setSlugTouched] = useState(false);
     const [showAddLevel, setShowAddLevel] = useState(false);
     const { confirm, ConfirmDialog } = useConfirmDialog();
+    const { showSuccess } = useToast();
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: '/dashboard' },
@@ -103,6 +105,23 @@ export default function AdminPathsEdit({ path: pathProp }: Props) {
         }
     };
 
+    const deletePath = async () => {
+        const confirmed = await confirm({
+            title: `Delete "${path.name}"?`,
+            description: `This permanently removes the path, all ${levelsCount} level(s), curriculum content, ${enrollmentsCount} enrollment(s), certificates, and learner progress. This cannot be undone.`,
+            confirmLabel: 'Delete path',
+            variant: 'danger',
+        });
+
+        if (confirmed) {
+            router.delete(route('admin.paths.destroy', path.id), {
+                onSuccess: () => {
+                    showSuccess('Learning path deleted', `"${path.name}" and all related content were permanently removed.`);
+                },
+            });
+        }
+    };
+
     const levelsCount = path.levels?.length ?? path.levels_count ?? 0;
     const enrollmentsCount = path.enrollments_count ?? 0;
     const totalMinutes = path.total_estimated_minutes ?? path.levels?.reduce((sum, level) => sum + level.estimated_minutes, 0) ?? 0;
@@ -136,22 +155,20 @@ export default function AdminPathsEdit({ path: pathProp }: Props) {
                         <Text className="mt-1">
                             <code className="text-zinc-600 dark:text-zinc-300">{data.slug || path.slug}</code>
                         </Text>
-                        {(data.description || path.description) && (
-                            <Text className="mt-2 max-w-2xl">{data.description || path.description}</Text>
-                        )}
+                        {(data.description || path.description) && <Text className="mt-2 max-w-2xl">{data.description || path.description}</Text>}
                     </div>
                 </div>
 
-                <PathStatsGrid
-                    levelsCount={levelsCount}
-                    enrollmentsCount={enrollmentsCount}
-                    totalMinutes={totalMinutes}
-                    isActive={path.is_active}
-                />
+                <PathStatsGrid levelsCount={levelsCount} enrollmentsCount={enrollmentsCount} totalMinutes={totalMinutes} isActive={path.is_active} />
             </div>
 
             <div className="mt-8 flex flex-wrap gap-2 border-b border-zinc-200 pb-3 dark:border-zinc-700">
-                <Button type="button" color={tab === 'curriculum' ? 'dark/zinc' : undefined} plain={tab !== 'curriculum'} onClick={() => setTab('curriculum')}>
+                <Button
+                    type="button"
+                    color={tab === 'curriculum' ? 'dark/zinc' : undefined}
+                    plain={tab !== 'curriculum'}
+                    onClick={() => setTab('curriculum')}
+                >
                     Curriculum
                 </Button>
                 <Button type="button" color={tab === 'details' ? 'dark/zinc' : undefined} plain={tab !== 'details'} onClick={() => setTab('details')}>
@@ -160,7 +177,7 @@ export default function AdminPathsEdit({ path: pathProp }: Props) {
             </div>
 
             {tab === 'details' && (
-                <div className="mt-6">
+                <div className="mt-6 space-y-6">
                     <PathForm
                         data={data}
                         errors={errors}
@@ -172,6 +189,20 @@ export default function AdminPathsEdit({ path: pathProp }: Props) {
                         setData={setData}
                         existingCoverUrl={path.cover_image_url}
                     />
+
+                    <section className="rounded-xl border border-red-200/80 bg-red-50/50 p-5 dark:border-red-900/50 dark:bg-red-950/20">
+                        <Subheading level={3} className="text-red-900 dark:text-red-200">
+                            Danger zone
+                        </Subheading>
+                        <Text className="mt-2 max-w-2xl text-red-800/90 dark:text-red-200/80">
+                            Permanently delete this learning path and everything tied to it—levels, materials, videos,
+                            quizzes, challenges, enrollments, certificates, and intern progress.
+                        </Text>
+                        <Button type="button" color="red" className="mt-4" onClick={deletePath}>
+                            <TrashIcon data-slot="icon" />
+                            Delete learning path
+                        </Button>
+                    </section>
                 </div>
             )}
 

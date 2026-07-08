@@ -46,7 +46,7 @@ export default function AdminCapstoneTemplatesIndex({ templates, stats }: Props)
                         className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-950/10 bg-white px-4 py-3 dark:border-white/10 dark:bg-zinc-900"
                     >
                         <div className="flex items-center gap-3">
-                            <span className="flex size-9 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600">
+                            <span className="flex size-9 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
                                 <RocketLaunchIcon className="size-4" />
                             </span>
                             <div>

@@ -118,6 +118,7 @@ final class LearnPresentationService
         $quiz->attempts_used = $stats['attempts_used'];
         $quiz->best_score = $stats['best_score'];
         $quiz->passed = $stats['passed'];
+        $quiz->last_answers = $this->quizAttempts->latestAnswersForUserAndQuiz($user->id, $quiz->id);
 
         return $quiz;
     }

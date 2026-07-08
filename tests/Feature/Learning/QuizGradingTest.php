@@ -112,3 +112,58 @@ test('essay questions are not auto-graded as correct', function () {
     expect($attempt->score)->toBe(0)
         ->and($attempt->passed)->toBeFalse();
 });
+
+test('quiz show restores answers from the latest attempt', function () {
+    $intern = userWithRole('intern');
+
+    $path = LearningPath::create(['name' => 'Restore Path', 'slug' => 'restore-path', 'is_active' => true]);
+    $level = Level::create([
+        'learning_path_id' => $path->id,
+        'number' => 1,
+        'title' => 'L1',
+        'estimated_minutes' => 30,
+        'difficulty' => 'beginner',
+    ]);
+
+    $quiz = Quiz::create([
+        'level_id' => $level->id,
+        'title' => 'Restore Quiz',
+        'passing_score' => 50,
+        'max_attempts' => 3,
+    ]);
+
+    $question = QuizQuestion::create([
+        'quiz_id' => $quiz->id,
+        'type' => QuestionType::Identification,
+        'question' => 'Name the framework',
+        'points' => 1,
+        'correct_answer' => 'Laravel',
+    ]);
+
+    \App\Models\Enrollment::create([
+        'user_id' => $intern->id,
+        'learning_path_id' => $path->id,
+        'status' => 'active',
+        'started_at' => now(),
+    ]);
+
+    \App\Models\LevelProgress::create([
+        'enrollment_id' => $intern->enrollments()->first()->id,
+        'level_id' => $level->id,
+        'status' => 'in_progress',
+    ]);
+
+    app(GradeQuizAttempt::class)->execute($intern, $quiz, [
+        $question->id => 'Symfony',
+    ]);
+
+    $response = $this->actingAs($intern)
+        ->get(route('learn.quizzes.show', $quiz));
+
+    $response->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('learn/quizzes/show')
+            ->where('quiz.data.passed', false)
+            ->where('quiz.data.last_answers.'.(string) $question->id, 'Symfony')
+        );
+});

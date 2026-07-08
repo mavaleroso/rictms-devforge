@@ -34,7 +34,7 @@ export function LeaderboardTable({
                         key={entry.user_id}
                         className={clsx(
                             'flex items-center gap-3 px-4 py-3',
-                            isViewer && 'bg-violet-50/80 dark:bg-violet-950/25',
+                            isViewer && 'bg-brand-50/80 dark:bg-brand-950/25',
                         )}
                     >
                         <span
@@ -50,7 +50,7 @@ export function LeaderboardTable({
                             <p className="truncate text-sm font-semibold text-zinc-950 dark:text-white">
                                 {entry.name}
                                 {isViewer && (
-                                    <span className="ml-2 text-[10px] font-medium text-violet-600 dark:text-violet-400">
+                                    <span className="ml-2 text-[10px] font-medium text-brand-600 dark:text-brand-400">
                                         You
                                     </span>
                                 )}

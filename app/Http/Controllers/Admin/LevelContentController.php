@@ -61,7 +61,7 @@ class LevelContentController extends Controller
     ): RedirectResponse {
         abort_unless($level->learning_path_id === $path->id, 404);
 
-        $manageLevelContent->storeVideo($level, $request->validated());
+        $manageLevelContent->storeVideo($level, $request->safe()->except('file'), $request->file('file'));
 
         return back();
     }
@@ -71,7 +71,7 @@ class LevelContentController extends Controller
         Video $video,
         ManageLevelContent $manageLevelContent,
     ): RedirectResponse {
-        $manageLevelContent->updateVideo($video, $request->validated());
+        $manageLevelContent->updateVideo($video, $request->safe()->except('file'), $request->file('file'));
 
         return back();
     }

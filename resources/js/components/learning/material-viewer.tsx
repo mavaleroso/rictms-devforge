@@ -47,7 +47,7 @@ export function MaterialViewer({ material, canComplete = true, compact = false }
         >
             <div className="flex items-center justify-between gap-3 border-b border-zinc-950/5 px-4 py-3 dark:border-white/5 sm:px-5">
                 <div className="flex min-w-0 items-center gap-3">
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600 dark:text-brand-400">
                         <BookOpenIcon className="size-5" />
                     </span>
                     <div className="min-w-0">

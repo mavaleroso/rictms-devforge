@@ -2,6 +2,7 @@
 
 namespace App\Services\Admin;
 
+use App\Enums\VideoProvider;
 use App\Models\LearningMaterial;
 use App\Models\Level;
 use App\Models\Quiz;
@@ -11,6 +12,8 @@ use App\Repositories\Contracts\LearningMaterialRepository;
 use App\Repositories\Contracts\QuizQuestionRepository;
 use App\Repositories\Contracts\QuizRepository;
 use App\Repositories\Contracts\VideoRepository;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 final class LevelContentService
 {
@@ -36,18 +39,35 @@ final class LevelContentService
         $this->materials->delete($material);
     }
 
-    public function storeVideo(Level $level, array $attributes): Video
+    public function storeVideo(Level $level, array $attributes, ?UploadedFile $file = null): Video
     {
+        $provider = VideoProvider::from($attributes['provider']);
+
+        if ($provider === VideoProvider::Upload) {
+            $attributes['file_path'] = $this->storeVideoFile($level, $file);
+            $attributes['url'] = null;
+        } else {
+            $attributes['file_path'] = null;
+        }
+
         return $this->videos->createForLevel($level, $attributes);
     }
 
-    public function updateVideo(Video $video, array $attributes): void
+    public function updateVideo(Video $video, array $attributes, ?UploadedFile $file = null): void
     {
+        if ($file) {
+            $this->deleteVideoFile($video->file_path);
+            $attributes['file_path'] = $this->storeVideoFile($video->level, $file);
+            $attributes['provider'] = VideoProvider::Upload->value;
+            $attributes['url'] = null;
+        }
+
         $this->videos->update($video, $attributes);
     }
 
     public function deleteVideo(Video $video): void
     {
+        $this->deleteVideoFile($video->file_path);
         $this->videos->delete($video);
     }
 
@@ -71,5 +91,19 @@ final class LevelContentService
     public function deleteQuestion(QuizQuestion $question): void
     {
         $this->questions->delete($question);
+    }
+
+    private function storeVideoFile(Level $level, UploadedFile $file): string
+    {
+        return $file->store("learning-paths/{$level->learning_path_id}/levels/{$level->id}/videos", 'public');
+    }
+
+    private function deleteVideoFile(?string $path): void
+    {
+        if (! $path) {
+            return;
+        }
+
+        Storage::disk('public')->delete($path);
     }
 }

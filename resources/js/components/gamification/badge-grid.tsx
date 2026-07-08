@@ -56,7 +56,7 @@ export function BadgeGrid({ badges, limit }: BadgeGridProps) {
                     className={clsx(
                         'group relative rounded-xl border p-3 transition',
                         badge.earned
-                            ? 'border-violet-200/80 bg-violet-50/50 dark:border-violet-500/25 dark:bg-violet-950/20'
+                            ? 'border-brand-200/80 bg-brand-50/50 dark:border-brand-500/25 dark:bg-brand-950/20'
                             : 'border-zinc-950/5 bg-zinc-50/50 opacity-60 grayscale dark:border-white/5 dark:bg-zinc-900/50',
                     )}
                     title={badge.description}
@@ -65,7 +65,7 @@ export function BadgeGrid({ badges, limit }: BadgeGridProps) {
                         className={clsx(
                             'flex size-10 items-center justify-center rounded-lg',
                             badge.earned
-                                ? 'bg-violet-500/15 text-violet-600 dark:text-violet-400'
+                                ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400'
                                 : 'bg-zinc-200/80 text-zinc-400 dark:bg-zinc-800',
                         )}
                     >
@@ -76,7 +76,7 @@ export function BadgeGrid({ badges, limit }: BadgeGridProps) {
                         {badge.description}
                     </p>
                     {badge.xp_bonus > 0 && (
-                        <p className="mt-1.5 text-[10px] font-medium text-violet-600 dark:text-violet-400">
+                        <p className="mt-1.5 text-[10px] font-medium text-brand-600 dark:text-brand-400">
                             +{badge.xp_bonus} XP bonus
                         </p>
                     )}

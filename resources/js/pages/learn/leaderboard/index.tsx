@@ -29,7 +29,7 @@ export default function LeaderboardIndex({ leaderboard, gamification, enrolled_p
             <Head title="Leaderboard" />
 
             <div className="space-y-8">
-                <section className="relative overflow-hidden rounded-2xl border border-zinc-950/10 bg-gradient-to-br from-amber-50 via-white to-violet-50 p-6 dark:border-white/10 dark:from-amber-950/20 dark:via-zinc-900 dark:to-violet-950/30 sm:p-8">
+                <section className="relative overflow-hidden rounded-2xl border border-zinc-950/10 bg-gradient-to-br from-amber-50 via-white to-brand-50 p-6 dark:border-white/10 dark:from-amber-950/20 dark:via-zinc-900 dark:to-brand-950/30 sm:p-8">
                     <div className="pointer-events-none absolute -right-16 -bottom-16 size-48 rounded-full bg-amber-400/10 blur-3xl" aria-hidden />
                     <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
@@ -66,7 +66,7 @@ export default function LeaderboardIndex({ leaderboard, gamification, enrolled_p
                         <StreakCard summary={gamification} />
                         <div className="rounded-xl border border-zinc-950/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-900">
                             <p className="text-xs font-semibold text-zinc-950 dark:text-white">Your weekly XP</p>
-                            <p className="mt-1 text-2xl font-bold tabular-nums text-violet-600 dark:text-violet-400">
+                            <p className="mt-1 text-2xl font-bold tabular-nums text-brand-600 dark:text-brand-400">
                                 {leaderboard.viewer.weekly_xp.toLocaleString()}
                             </p>
                             <p className="mt-2 flex items-center gap-1 text-[11px] text-zinc-500">

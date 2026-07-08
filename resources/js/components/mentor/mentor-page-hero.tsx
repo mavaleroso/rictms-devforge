@@ -19,7 +19,7 @@ interface MentorPageHeroProps {
 const accentMap = {
     default: 'border-zinc-950/10 bg-white dark:border-white/10 dark:bg-zinc-900',
     amber: 'border-amber-200/80 bg-amber-50/80 dark:border-amber-500/20 dark:bg-amber-950/30',
-    violet: 'border-violet-200/80 bg-violet-50/80 dark:border-violet-500/20 dark:bg-violet-950/30',
+    violet: 'border-brand-200/80 bg-brand-50/80 dark:border-brand-500/20 dark:bg-brand-950/30',
     blue: 'border-blue-200/80 bg-blue-50/80 dark:border-blue-500/20 dark:bg-blue-950/30',
     lime: 'border-lime-200/80 bg-lime-50/80 dark:border-lime-500/20 dark:bg-lime-950/30',
 };

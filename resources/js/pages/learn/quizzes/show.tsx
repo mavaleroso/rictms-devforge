@@ -36,8 +36,8 @@ export default function LearnQuizzesShow({ path: pathProp, level: levelProp, enr
             enrollment={enrollment?.data ?? null}
             currentTask={currentTask}
         >
-            <header className="rounded-xl border border-zinc-950/10 bg-zinc-900 px-5 py-6 text-white dark:border-white/10">
-                <p className="text-xs text-violet-300">
+            <header className="rounded-xl border border-slate-200/80 bg-gradient-to-br from-brand-900 via-brand-800 to-slate-900 px-5 py-6 text-white shadow-sm dark:border-slate-700">
+                <p className="text-xs text-brand-200">
                     {path.name} · Level {level.number}
                 </p>
                 <h1 className="mt-1.5 text-xl font-bold tracking-tight">{quiz.title}</h1>
@@ -57,7 +57,7 @@ export default function LearnQuizzesShow({ path: pathProp, level: levelProp, enr
 
             <div className="mt-4 rounded-xl border border-zinc-950/10 bg-zinc-50 p-3.5 text-sm text-zinc-600 dark:border-white/10 dark:bg-zinc-800/40 dark:text-zinc-300">
                 <p className="flex items-start gap-2">
-                    <AcademicCapIcon className="mt-0.5 size-4 shrink-0 text-violet-500" />
+                    <AcademicCapIcon className="mt-0.5 size-4 shrink-0 text-accent-400" />
                     Answer all questions, then submit once. Your best score counts toward unlocking the next level.
                 </p>
             </div>

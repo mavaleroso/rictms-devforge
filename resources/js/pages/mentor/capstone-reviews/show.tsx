@@ -46,13 +46,13 @@ export default function MentorCapstoneReviewsShow({ milestone: milestoneProp }: 
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Review — ${milestone.title}`} />
 
-            <Link href={route('mentor.capstone-reviews.index')} className="text-xs font-medium text-violet-600 dark:text-violet-400">
+            <Link href={route('mentor.capstone-reviews.index')} className="text-xs font-medium text-brand-600 dark:text-brand-400">
                 ← Back to queue
             </Link>
 
             <header className="mt-3 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-zinc-950/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-900">
                 <div>
-                    <p className="text-[10px] font-semibold tracking-wide text-violet-600 uppercase">Milestone sign-off</p>
+                    <p className="text-[10px] font-semibold tracking-wide text-brand-600 uppercase">Milestone sign-off</p>
                     <h1 className="mt-1 text-lg font-semibold text-zinc-950 dark:text-white">{milestone.title}</h1>
                     <p className="mt-1 text-xs text-zinc-500">
                         {internName} · {milestone.project?.title}

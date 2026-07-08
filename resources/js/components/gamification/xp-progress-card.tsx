@@ -13,14 +13,14 @@ export function XpProgressCard({ summary, compact = false }: XpProgressCardProps
     return (
         <div
             className={clsx(
-                'relative overflow-hidden rounded-2xl border border-zinc-950/10 bg-gradient-to-br from-zinc-900 via-zinc-900 to-violet-950 p-5 text-white shadow-lg dark:border-white/10',
+                'relative overflow-hidden rounded-2xl border border-zinc-950/10 bg-gradient-to-br from-zinc-900 via-zinc-900 to-brand-950 p-5 text-white shadow-lg dark:border-white/10',
                 compact && 'p-4',
             )}
         >
-            <div className="pointer-events-none absolute -top-10 -right-10 size-32 rounded-full bg-violet-500/20 blur-2xl" aria-hidden />
+            <div className="pointer-events-none absolute -top-10 -right-10 size-32 rounded-full bg-brand-500/20 blur-2xl" aria-hidden />
             <div className="relative flex items-start justify-between gap-4">
                 <div>
-                    <p className="text-[11px] font-semibold tracking-wide text-violet-300 uppercase">Your rank</p>
+                    <p className="text-[11px] font-semibold tracking-wide text-brand-300 uppercase">Your rank</p>
                     <p className={clsx('mt-1 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset', tierClass)}>
                         {summary.tier.label}
                     </p>
@@ -42,7 +42,7 @@ export function XpProgressCard({ summary, compact = false }: XpProgressCardProps
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-white/10">
                     <div
-                        className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-400 transition-all duration-700"
+                        className="h-full rounded-full bg-gradient-to-r from-brand-500 to-fuchsia-400 transition-all duration-700"
                         style={{ width: `${summary.tier_progress}%` }}
                     />
                 </div>

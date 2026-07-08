@@ -52,6 +52,24 @@ final class EloquentQuizAttemptRepository implements QuizAttemptRepository
         return $attempt->fresh(['answers']);
     }
 
+    public function latestAnswersForUserAndQuiz(int $userId, int $quizId): array
+    {
+        $attempt = QuizAttempt::query()
+            ->where('user_id', $userId)
+            ->where('quiz_id', $quizId)
+            ->with('answers')
+            ->latest()
+            ->first();
+
+        if (! $attempt) {
+            return [];
+        }
+
+        return $attempt->answers
+            ->mapWithKeys(fn ($answer) => [(string) $answer->quiz_question_id => (string) $answer->answer])
+            ->all();
+    }
+
     public function bestScoreForUser(int $userId): int
     {
         return (int) (QuizAttempt::query()

@@ -9,6 +9,7 @@ import { Input } from '@/components/catalyst/input';
 import { Text, TextLink } from '@/components/catalyst/text';
 import { useValidatedForm } from '@/hooks/use-validated-form';
 import AuthLayout from '@/layouts/auth-layout';
+import { CheckCircleIcon } from '@heroicons/react/20/solid';
 
 interface RegisterForm {
     name: string;
@@ -16,6 +17,12 @@ interface RegisterForm {
     password: string;
     password_confirmation: string;
 }
+
+const signupBenefits = [
+    'Structured paths across four ICT disciplines',
+    'Hands-on labs with editor, compiler, and tester',
+    'Quizzes, challenges, and mentor-reviewed capstones',
+] as const;
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useValidatedForm<RegisterForm>({
@@ -33,11 +40,26 @@ export default function Register() {
     };
 
     return (
-        <AuthLayout title="Create an account" description="Enter your details below to create your account">
+        <AuthLayout
+            variant="register"
+            aside="tracks"
+            title="Create your account"
+            description="Join the academy and start building job-ready skills with guided levels, practical labs, and measurable progress."
+        >
             <Head title="Register" />
-            <form className="grid gap-6" onSubmit={submit}>
+
+            <ul className="mb-4 space-y-2 border-b border-slate-200/80 pb-4 dark:border-slate-800">
+                {signupBenefits.map((benefit) => (
+                    <li key={benefit} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400">
+                        <CheckCircleIcon className="mt-0.5 size-4 shrink-0 text-brand-600 dark:text-brand-400" />
+                        {benefit}
+                    </li>
+                ))}
+            </ul>
+
+            <form className="grid gap-4" onSubmit={submit}>
                 <FormField error={errors.name}>
-                    <Label>Name</Label>
+                    <Label>Full name</Label>
                     <Input
                         type="text"
                         required
@@ -47,7 +69,7 @@ export default function Register() {
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
                         disabled={processing}
-                        placeholder="Full name"
+                        placeholder="Your name"
                     />
                 </FormField>
 
@@ -61,7 +83,7 @@ export default function Register() {
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
                         disabled={processing}
-                        placeholder="email@example.com"
+                        placeholder="you@company.com"
                     />
                 </FormField>
 
@@ -75,7 +97,7 @@ export default function Register() {
                         value={data.password}
                         onChange={(e) => setData('password', e.target.value)}
                         disabled={processing}
-                        placeholder="Password"
+                        placeholder="Create a password"
                     />
                 </FormField>
 
@@ -89,19 +111,19 @@ export default function Register() {
                         value={data.password_confirmation}
                         onChange={(e) => setData('password_confirmation', e.target.value)}
                         disabled={processing}
-                        placeholder="Confirm password"
+                        placeholder="Repeat your password"
                     />
                 </FormField>
 
-                <Button type="submit" className="w-full" tabIndex={5} disabled={processing}>
+                <Button type="submit" color="dark/zinc" className="w-full" tabIndex={5} disabled={processing}>
                     {processing && <Spinner className="size-4" />}
-                    Create account
+                    Create free account
                 </Button>
 
-                <Text className="text-center">
+                <Text className="text-center text-sm">
                     Already have an account?{' '}
                     <TextLink href={route('login')} tabIndex={6}>
-                        Log in
+                        Sign in
                     </TextLink>
                 </Text>
             </form>

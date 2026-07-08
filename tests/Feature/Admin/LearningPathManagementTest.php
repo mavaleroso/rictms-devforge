@@ -150,3 +150,87 @@ test('path edit page includes enrollment count', function () {
             ->component('admin/paths/edit')
             ->where('path.data.enrollments_count', 1));
 });
+
+test('admin can delete a learning path and all related data', function () {
+    Storage::fake('public');
+    Storage::fake('local');
+
+    $admin = userWithRole('admin');
+    $intern = userWithRole('intern');
+
+    $path = LearningPath::create([
+        'name' => 'Delete Me Path',
+        'slug' => 'delete-me-path',
+        'description' => 'To be removed',
+        'is_active' => true,
+    ]);
+
+    $cover = UploadedFile::fake()->image('cover.jpg');
+    $path->update(['cover_image' => $cover->store('learning-paths/covers', 'public')]);
+
+    $level = \App\Models\Level::create([
+        'learning_path_id' => $path->id,
+        'number' => 1,
+        'title' => 'Level 1',
+        'estimated_minutes' => 30,
+        'difficulty' => 'beginner',
+    ]);
+
+    $videoFile = UploadedFile::fake()->create('lesson.mp4', 100, 'video/mp4');
+    $videoPath = $videoFile->store("learning-paths/{$path->id}/levels/{$level->id}/videos", 'public');
+
+    $video = \App\Models\Video::create([
+        'level_id' => $level->id,
+        'title' => 'Lesson',
+        'provider' => \App\Enums\VideoProvider::Upload,
+        'file_path' => $videoPath,
+    ]);
+
+    $enrollment = Enrollment::create([
+        'user_id' => $intern->id,
+        'learning_path_id' => $path->id,
+        'status' => EnrollmentStatus::Active,
+        'started_at' => now(),
+    ]);
+
+    $certificate = \App\Models\Certificate::create([
+        'enrollment_id' => $enrollment->id,
+        'user_id' => $intern->id,
+        'learning_path_id' => $path->id,
+        'certificate_number' => 'DF-TEST-001',
+        'verification_code' => 'verify-code-123',
+        'issued_at' => now(),
+        'pdf_path' => 'certificates/DF-TEST-001.pdf',
+    ]);
+
+    Storage::disk('local')->put($certificate->pdf_path, 'pdf-content');
+
+    $this->actingAs($admin)
+        ->delete(route('admin.paths.destroy', $path))
+        ->assertRedirect(route('admin.paths.index'));
+
+    expect(LearningPath::count())->toBe(0)
+        ->and(\App\Models\Level::count())->toBe(0)
+        ->and(\App\Models\Video::count())->toBe(0)
+        ->and(Enrollment::count())->toBe(0)
+        ->and(\App\Models\Certificate::count())->toBe(0);
+
+    Storage::disk('public')->assertMissing($path->cover_image);
+    Storage::disk('public')->assertMissing($videoPath);
+    Storage::disk('local')->assertMissing($certificate->pdf_path);
+});
+
+test('intern cannot delete a learning path', function () {
+    $intern = userWithRole('intern');
+    $path = LearningPath::create([
+        'name' => 'Protected Path',
+        'slug' => 'protected-path',
+        'is_active' => true,
+    ]);
+
+    $this->actingAs($intern)
+        ->delete(route('admin.paths.destroy', $path))
+        ->assertForbidden();
+
+    expect(LearningPath::count())->toBe(1);
+});

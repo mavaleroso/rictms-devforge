@@ -25,6 +25,7 @@ use App\Repositories\Contracts\QuizRepository;
 use App\Repositories\Contracts\RoleRepository;
 use App\Repositories\Contracts\UserRepository;
 use App\Repositories\Contracts\TutorSessionRepository;
+use App\Repositories\Contracts\VideoRepository;
 use App\Repositories\Contracts\XpTransactionRepository;
 use App\Repositories\Eloquent\EloquentBadgeRepository;
 use App\Repositories\Eloquent\EloquentCertificateRepository;
@@ -49,6 +50,7 @@ use App\Repositories\Eloquent\EloquentQuizRepository;
 use App\Repositories\Eloquent\EloquentRoleRepository;
 use App\Repositories\Eloquent\EloquentUserRepository;
 use App\Repositories\Eloquent\EloquentTutorSessionRepository;
+use App\Repositories\Eloquent\EloquentVideoRepository;
 use App\Repositories\Eloquent\EloquentXpTransactionRepository;
 use Illuminate\Support\ServiceProvider;
 

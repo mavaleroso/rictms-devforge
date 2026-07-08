@@ -1,12 +1,12 @@
 import { CoverImageField } from '@/components/admin/cover-image-field';
-import { FormField } from '@/components/form/form-field';
 import { Button } from '@/components/catalyst/button';
 import { Description, Label } from '@/components/catalyst/fieldset';
+import { Subheading } from '@/components/catalyst/heading';
 import { Input } from '@/components/catalyst/input';
 import { Listbox, ListboxOption } from '@/components/catalyst/listbox';
-import { Subheading } from '@/components/catalyst/heading';
 import { Switch, SwitchField } from '@/components/catalyst/switch';
 import { Textarea } from '@/components/catalyst/textarea';
+import { FormField } from '@/components/form/form-field';
 import { PATH_ICON_OPTIONS } from '@/lib/path-icons';
 import type { ValidationErrors } from '@/lib/validation';
 import type { FormEventHandler, ReactNode } from 'react';
@@ -113,12 +113,7 @@ export function PathForm({
                     <FormField error={errors.sort_order}>
                         <Label>Sort order</Label>
                         <Description>Lower numbers appear first in the path list.</Description>
-                        <Input
-                            type="number"
-                            min={0}
-                            value={data.sort_order}
-                            onChange={(e) => setData('sort_order', Number(e.target.value))}
-                        />
+                        <Input type="number" min={0} value={data.sort_order} onChange={(e) => setData('sort_order', Number(e.target.value))} />
                     </FormField>
                 )}
                 <SwitchField>

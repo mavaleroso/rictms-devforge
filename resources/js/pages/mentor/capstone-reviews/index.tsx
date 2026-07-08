@@ -27,7 +27,7 @@ export default function MentorCapstoneReviewsIndex({ milestones: milestonesProp,
 
             <MentorPageHero
                 icon={RocketLaunchIcon}
-                iconClassName="bg-violet-600"
+                iconClassName="bg-brand-600"
                 title="Capstone milestone sign-offs"
                 description="Interns submit milestone deliverables for approval. Sign off when acceptance criteria are met, or return with revision notes."
                 stats={[
@@ -50,14 +50,14 @@ export default function MentorCapstoneReviewsIndex({ milestones: milestonesProp,
                         <li key={milestone.id}>
                             <Link
                                 href={route('mentor.capstone-reviews.show', milestone.id)}
-                                className="group flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-950/10 bg-white px-4 py-4 shadow-sm transition hover:border-violet-300/60 hover:shadow-md dark:border-white/10 dark:bg-zinc-900 dark:hover:border-violet-500/30"
+                                className="group flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-950/10 bg-white px-4 py-4 shadow-sm transition hover:border-brand-300/60 hover:shadow-md dark:border-white/10 dark:bg-zinc-900 dark:hover:border-brand-500/30"
                             >
                                 <div className="flex min-w-0 items-start gap-3">
-                                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600 dark:text-brand-400">
                                         <ClockIcon className="size-4" />
                                     </span>
                                     <div className="min-w-0">
-                                        <p className="font-semibold text-zinc-950 group-hover:text-violet-700 dark:text-white dark:group-hover:text-violet-300">
+                                        <p className="font-semibold text-zinc-950 group-hover:text-brand-700 dark:text-white dark:group-hover:text-brand-300">
                                             {milestone.title}
                                         </p>
                                         <p className="mt-0.5 text-xs text-zinc-500">

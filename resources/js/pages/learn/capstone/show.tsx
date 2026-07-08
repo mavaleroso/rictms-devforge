@@ -35,7 +35,7 @@ export default function CapstoneShow({ project: projectProp, project_stats, temp
         return (
             <AppLayout breadcrumbs={breadcrumbs}>
                 <Head title="Capstone" />
-                <section className="rounded-2xl border border-zinc-950/10 bg-gradient-to-br from-indigo-50 via-white to-violet-50 p-6 dark:border-white/10 dark:from-indigo-950/20 dark:via-zinc-900 dark:to-violet-950/20 sm:p-8">
+                <section className="rounded-2xl border border-zinc-950/10 bg-gradient-to-br from-indigo-50 via-white to-brand-50 p-6 dark:border-white/10 dark:from-indigo-950/20 dark:via-zinc-900 dark:to-brand-950/20 sm:p-8">
                     <Badge color="violet">Level 20</Badge>
                     <Heading className="mt-3">Capstone project</Heading>
                     <Text className="mt-2 max-w-2xl">
@@ -52,7 +52,7 @@ export default function CapstoneShow({ project: projectProp, project_stats, temp
                                 className="rounded-xl border border-zinc-950/10 bg-white p-5 dark:border-white/10 dark:bg-zinc-900"
                             >
                                 <div className="flex items-start gap-3">
-                                    <span className="flex size-10 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                                    <span className="flex size-10 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600 dark:text-brand-400">
                                         <RocketLaunchIcon className="size-5" />
                                     </span>
                                     <div>

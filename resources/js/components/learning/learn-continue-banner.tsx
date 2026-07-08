@@ -14,10 +14,10 @@ export function LearnContinueBanner({ enrollment }: LearnContinueBannerProps) {
     const coverUrl = path?.cover_image_url;
 
     return (
-        <section className="overflow-hidden rounded-2xl border border-zinc-950/10 bg-gradient-to-br from-violet-950 via-zinc-900 to-zinc-950 text-white shadow-lg dark:border-white/10">
+        <section className="overflow-hidden rounded-2xl border border-zinc-950/10 bg-gradient-to-br from-brand-950 via-zinc-900 to-zinc-950 text-white shadow-lg dark:border-white/10">
             <div className="grid lg:grid-cols-[1fr_minmax(0,22rem)]">
                 <div className="flex flex-col justify-center p-6 sm:p-8">
-                    <p className="text-xs font-semibold tracking-widest text-violet-300 uppercase">Continue learning</p>
+                    <p className="text-xs font-semibold tracking-widest text-brand-300 uppercase">Continue learning</p>
                     <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">{path?.name}</h2>
                     <p className="mt-2 max-w-lg text-sm text-zinc-300">
                         {enrollment.current_level
@@ -43,7 +43,7 @@ export function LearnContinueBanner({ enrollment }: LearnContinueBannerProps) {
                     {coverUrl ? (
                         <img src={coverUrl} alt="" className="absolute inset-0 size-full object-cover opacity-90" />
                     ) : (
-                        <div className="flex size-full items-center justify-center bg-violet-900/40">
+                        <div className="flex size-full items-center justify-center bg-brand-900/40">
                             <PathIconBadge icon={path?.icon} className="size-20" />
                         </div>
                     )}

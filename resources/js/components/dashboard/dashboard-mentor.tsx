@@ -64,9 +64,9 @@ export function DashboardMentorPanel({ stats, assignedInterns, pendingReviews = 
             )}
 
             {pendingCapstoneReviews > 0 && (
-                <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-violet-500/20 bg-violet-50 px-5 py-4 dark:border-violet-500/30 dark:bg-violet-950/20">
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-500/20 bg-brand-50 px-5 py-4 dark:border-brand-500/30 dark:bg-brand-950/20">
                     <div className="flex items-center gap-3">
-                        <span className="flex size-9 items-center justify-center rounded-lg bg-violet-600 text-white">
+                        <span className="flex size-9 items-center justify-center rounded-lg bg-brand-600 text-white">
                             <ClipboardDocumentCheckIcon className="size-4" />
                         </span>
                         <div>

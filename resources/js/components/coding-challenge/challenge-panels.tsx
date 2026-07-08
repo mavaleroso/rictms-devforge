@@ -108,7 +108,7 @@ export function ChallengeResultsPanel({ result, loading, activeTab, onTabChange,
                         className={clsx(
                             'px-3 py-2 text-xs font-medium capitalize transition',
                             activeTab === tab
-                                ? 'border-b-2 border-violet-500 text-violet-600 dark:text-violet-400'
+                                ? 'border-b-2 border-brand-500 text-brand-600 dark:text-brand-400'
                                 : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300',
                         )}
                     >
@@ -134,41 +134,53 @@ export function ChallengeResultsPanel({ result, loading, activeTab, onTabChange,
                                         {result.tests_passed}/{result.tests_total} passed · {formatRuntime(result.runtime_ms)}
                                     </span>
                                 </div>
-                                {result.results.map((test, index) => (
-                                    <div
-                                        key={test.test_case_id}
-                                        className={clsx(
-                                            'rounded-lg border px-3 py-2 text-xs',
-                                            test.passed
-                                                ? 'border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/20'
-                                                : 'border-red-500/20 bg-red-50/50 dark:bg-red-950/20',
-                                        )}
-                                    >
-                                        <div className="flex items-center justify-between gap-2">
-                                            <span className="font-medium text-zinc-950 dark:text-white">
-                                                {test.label ?? `Case ${index + 1}`}
-                                            </span>
-                                            <span className={test.passed ? 'text-emerald-600' : 'text-red-600'}>
-                                                {test.passed ? 'Passed' : 'Failed'}
-                                            </span>
+                                {result.results.map((test, index) => {
+                                    const isHidden = !test.is_sample;
+                                    const title = isHidden
+                                        ? `Hidden test ${index + 1}`
+                                        : (test.label ?? `Sample ${index + 1}`);
+
+                                    return (
+                                        <div
+                                            key={test.test_case_id}
+                                            className={clsx(
+                                                'rounded-lg border px-3 py-2 text-xs',
+                                                test.passed
+                                                    ? 'border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/20'
+                                                    : 'border-red-500/20 bg-red-50/50 dark:bg-red-950/20',
+                                            )}
+                                        >
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="font-medium text-zinc-950 dark:text-white">
+                                                    {title}
+                                                    {isHidden && (
+                                                        <span className="ml-2 text-[10px] font-normal tracking-wide text-zinc-400 uppercase">
+                                                            submit only
+                                                        </span>
+                                                    )}
+                                                </span>
+                                                <span className={test.passed ? 'text-emerald-600' : 'text-red-600'}>
+                                                    {test.passed ? 'Passed' : 'Failed'}
+                                                </span>
+                                            </div>
+                                            {test.error_message && (
+                                                <pre className="mt-2 overflow-x-auto whitespace-pre-wrap font-mono text-red-700 dark:text-red-300">
+                                                    {test.error_message}
+                                                </pre>
+                                            )}
+                                            {!isHidden && test.actual_output != null && (
+                                                <pre className="mt-1 overflow-x-auto font-mono text-zinc-600 dark:text-zinc-400">
+                                                    Output: {test.actual_output}
+                                                </pre>
+                                            )}
+                                            {!isHidden && test.expected_output != null && !test.passed && (
+                                                <pre className="mt-1 overflow-x-auto font-mono text-zinc-500">
+                                                    Expected: {test.expected_output}
+                                                </pre>
+                                            )}
                                         </div>
-                                        {test.error_message && (
-                                            <pre className="mt-2 overflow-x-auto whitespace-pre-wrap font-mono text-red-700 dark:text-red-300">
-                                                {test.error_message}
-                                            </pre>
-                                        )}
-                                        {test.actual_output != null && (
-                                            <pre className="mt-1 overflow-x-auto font-mono text-zinc-600 dark:text-zinc-400">
-                                                Output: {test.actual_output}
-                                            </pre>
-                                        )}
-                                        {test.expected_output != null && !test.passed && (
-                                            <pre className="mt-1 overflow-x-auto font-mono text-zinc-500">
-                                                Expected: {test.expected_output}
-                                            </pre>
-                                        )}
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </>

@@ -54,13 +54,13 @@ export function AvatarField({
                     <button
                         type="button"
                         onClick={() => inputRef.current?.click()}
-                        className="group relative size-24 overflow-hidden rounded-2xl ring-1 ring-zinc-950/10 transition hover:ring-violet-500/40 dark:ring-white/10"
+                        className="group relative size-24 overflow-hidden rounded-2xl ring-1 ring-zinc-950/10 transition hover:ring-brand-500/40 dark:ring-white/10"
                     >
                         {displayUrl ? (
                             <img src={displayUrl} alt="" className="size-full object-cover" />
                         ) : (
-                            <span className="flex size-full items-center justify-center bg-gradient-to-br from-violet-500/10 to-zinc-100 text-xl font-semibold text-violet-700 dark:from-violet-400/10 dark:to-zinc-800 dark:text-violet-300">
-                                {initials || <PhotoIcon className="size-8 text-violet-500/60" />}
+                            <span className="flex size-full items-center justify-center bg-gradient-to-br from-brand-500/10 to-zinc-100 text-xl font-semibold text-brand-700 dark:from-brand-400/10 dark:to-zinc-800 dark:text-brand-300">
+                                {initials || <PhotoIcon className="size-8 text-brand-500/60" />}
                             </span>
                         )}
                         <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1 bg-zinc-950/60 py-1.5 text-[10px] font-medium text-white opacity-0 transition group-hover:opacity-100">
@@ -105,13 +105,13 @@ export function AvatarField({
                 <button
                     type="button"
                     onClick={() => inputRef.current?.click()}
-                    className="group relative size-16 shrink-0 overflow-hidden rounded-xl ring-1 ring-zinc-950/10 transition hover:ring-violet-500/40 dark:ring-white/10"
+                    className="group relative size-16 shrink-0 overflow-hidden rounded-xl ring-1 ring-zinc-950/10 transition hover:ring-brand-500/40 dark:ring-white/10"
                 >
                     {displayUrl ? (
                         <img src={displayUrl} alt="" className="size-full object-cover" />
                     ) : (
-                        <span className="flex size-full items-center justify-center bg-gradient-to-br from-violet-500/10 to-zinc-100 text-base font-semibold text-violet-700 dark:from-violet-400/10 dark:to-zinc-800 dark:text-violet-300">
-                            {initials || <PhotoIcon className="size-6 text-violet-500/60" />}
+                        <span className="flex size-full items-center justify-center bg-gradient-to-br from-brand-500/10 to-zinc-100 text-base font-semibold text-brand-700 dark:from-brand-400/10 dark:to-zinc-800 dark:text-brand-300">
+                            {initials || <PhotoIcon className="size-6 text-brand-500/60" />}
                         </span>
                     )}
                     <span className="absolute inset-0 flex items-center justify-center bg-zinc-950/50 opacity-0 transition group-hover:opacity-100">

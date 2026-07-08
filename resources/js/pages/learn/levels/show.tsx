@@ -59,7 +59,7 @@ export default function LearnLevelsShow({ path: pathProp, level: levelProp, enro
             currentTask="overview"
         >
             <header>
-                <p className="text-xs font-medium text-violet-600 dark:text-violet-400">
+                <p className="text-xs font-medium text-brand-600 dark:text-brand-400">
                     Level {level.number} of {levels.length}
                 </p>
                 <h1 className="mt-1 text-xl font-bold tracking-tight text-zinc-950 dark:text-white sm:text-2xl">{level.title}</h1>
@@ -118,12 +118,12 @@ export default function LearnLevelsShow({ path: pathProp, level: levelProp, enro
                             <li key={task.key}>
                                 <Link
                                     href={task.href}
-                                    className="flex items-center gap-3 rounded-xl border border-zinc-950/10 bg-white px-4 py-3 transition hover:border-violet-500/30 hover:bg-violet-50/50 dark:border-white/10 dark:bg-zinc-900 dark:hover:bg-violet-950/20"
+                                    className="flex items-center gap-3 rounded-xl border border-zinc-950/10 bg-white px-4 py-3 transition hover:border-brand-500/30 hover:bg-brand-50/50 dark:border-white/10 dark:bg-zinc-900 dark:hover:bg-brand-950/20"
                                 >
                                     <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
                                         {task.completed ? <CheckCircleIcon className="size-4 text-emerald-500" /> : task.step}
                                     </span>
-                                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600 dark:text-brand-400">
                                         <Icon className="size-4" />
                                     </span>
                                     <span className="min-w-0 flex-1">

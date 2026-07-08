@@ -176,7 +176,7 @@ export default function AdminEnrollmentsIndex({ stats, interns, mentors, paths }
                     aria-hidden
                 />
                 <div
-                    className="pointer-events-none absolute -bottom-20 -left-16 size-48 rounded-full bg-violet-400/10 blur-3xl dark:bg-violet-500/10"
+                    className="pointer-events-none absolute -bottom-20 -left-16 size-48 rounded-full bg-brand-400/10 blur-3xl dark:bg-brand-500/10"
                     aria-hidden
                 />
 

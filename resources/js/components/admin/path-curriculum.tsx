@@ -6,15 +6,7 @@ import { Text } from '@/components/catalyst/text';
 import { useCoverImagePreview } from '@/hooks/use-cover-image-preview';
 import { formatDuration } from '@/lib/path-icons';
 import { type LearningPath } from '@/types/learning';
-import {
-    AcademicCapIcon,
-    BookOpenIcon,
-    CheckCircleIcon,
-    ClockIcon,
-    FilmIcon,
-    PencilSquareIcon,
-    UsersIcon,
-} from '@heroicons/react/20/solid';
+import { AcademicCapIcon, BookOpenIcon, CheckCircleIcon, ClockIcon, FilmIcon, PencilSquareIcon, UsersIcon } from '@heroicons/react/20/solid';
 import clsx from 'clsx';
 
 interface PathCurriculumProps {
@@ -60,9 +52,7 @@ export function PathCurriculum({ path }: PathCurriculumProps) {
                                 <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-zinc-950 text-sm font-semibold text-white dark:bg-white dark:text-zinc-950">
                                     {level.number}
                                 </div>
-                                {index < levels.length - 1 && (
-                                    <div className="mt-2 w-px flex-1 bg-zinc-200 dark:bg-zinc-700" aria-hidden />
-                                )}
+                                {index < levels.length - 1 && <div className="mt-2 w-px flex-1 bg-zinc-200 dark:bg-zinc-700" aria-hidden />}
                             </div>
 
                             <div className="min-w-0 flex-1">
@@ -77,11 +67,7 @@ export function PathCurriculum({ path }: PathCurriculumProps) {
                                             </span>
                                         </div>
                                     </div>
-                                    <Button
-                                        href={route('admin.levels.edit', [path.id, level.id])}
-                                        outline
-                                        className="shrink-0"
-                                    >
+                                    <Button href={route('admin.levels.edit', [path.id, level.id])} outline className="shrink-0">
                                         <PencilSquareIcon data-slot="icon" />
                                         Edit content
                                     </Button>
@@ -137,9 +123,7 @@ export function PathPreviewCard({ name, description, icon, isActive, levelsCount
                     <p className="mt-2 line-clamp-3 text-sm text-zinc-500 dark:text-zinc-400">
                         {description || 'Add a description to help interns understand what they will learn.'}
                     </p>
-                    {levelsCount !== undefined && (
-                        <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">{levelsCount} levels</p>
-                    )}
+                    {levelsCount !== undefined && <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">{levelsCount} levels</p>}
                 </div>
             </div>
         </div>
@@ -164,10 +148,7 @@ export function PathStatsGrid({ levelsCount, enrollmentsCount, totalMinutes, isA
     return (
         <div className="grid gap-3 sm:grid-cols-2">
             {stats.map((stat) => (
-                <div
-                    key={stat.label}
-                    className="rounded-xl border border-zinc-950/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-900"
-                >
+                <div key={stat.label} className="rounded-xl border border-zinc-950/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-900">
                     <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
                         <stat.icon className="size-4" />
                         <span className="text-xs font-medium">{stat.label}</span>

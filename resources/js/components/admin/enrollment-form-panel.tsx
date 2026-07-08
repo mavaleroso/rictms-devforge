@@ -95,9 +95,9 @@ export function EnrollmentFormPanel({ interns, mentors, paths }: EnrollmentFormP
         <>
             <ConfirmDialog />
             <section className="overflow-hidden rounded-2xl border border-zinc-950/10 bg-white shadow-sm dark:border-white/10 dark:bg-zinc-900">
-                <div className="border-b border-zinc-950/8 bg-gradient-to-r from-violet-50/80 via-white to-blue-50/50 px-5 py-4 dark:border-white/8 dark:from-violet-950/20 dark:via-zinc-900 dark:to-blue-950/20 sm:px-6">
+                <div className="border-b border-zinc-950/8 bg-gradient-to-r from-brand-50/80 via-white to-blue-50/50 px-5 py-4 dark:border-white/8 dark:from-brand-950/20 dark:via-zinc-900 dark:to-blue-950/20 sm:px-6">
                     <div className="flex items-start gap-3">
-                        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-white shadow-sm">
+                        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-sm">
                             <UserPlusIcon className="size-5" />
                         </span>
                         <div>

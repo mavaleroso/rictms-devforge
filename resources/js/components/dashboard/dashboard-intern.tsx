@@ -77,7 +77,7 @@ export function DashboardInternPanel({ enrollment, availablePaths, gamification,
     return (
         <div className="space-y-6">
             <section className="overflow-hidden rounded-2xl border border-dashed border-zinc-300 bg-zinc-50/50 p-8 text-center dark:border-zinc-600 dark:bg-zinc-900/50 sm:p-10">
-                <span className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg">
+                <span className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-600 to-indigo-600 text-white shadow-lg">
                     <AcademicCapIcon className="size-7" />
                 </span>
                 <h2 className="mt-5 text-lg font-semibold text-zinc-950 dark:text-white">Start your learning journey</h2>

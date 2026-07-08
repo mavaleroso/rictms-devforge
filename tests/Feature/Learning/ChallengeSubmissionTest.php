@@ -105,6 +105,110 @@ PHP;
         ->and($submission->tests_passed)->toBeLessThan(2);
 });
 
+test('php trim solution passes tab whitespace hidden cases', function () {
+    $intern = userWithRole('intern');
+    $path = LearningPath::create(['name' => 'Trim Path', 'slug' => 'trim-path', 'is_active' => true]);
+    $level = Level::create([
+        'learning_path_id' => $path->id,
+        'number' => 1,
+        'title' => 'L1',
+        'estimated_minutes' => 30,
+        'difficulty' => 'beginner',
+    ]);
+
+    $challenge = CodingChallenge::create([
+        'level_id' => $level->id,
+        'title' => 'Normalize',
+        'description' => 'trim + upper',
+        'language' => ChallengeLanguage::Php,
+        'entry_point' => 'normalizeKeyFragment',
+        'starter_code' => LanguageRegistry::defaultStarter(ChallengeLanguage::Php, 'normalizeKeyFragment'),
+        'time_limit_ms' => 2000,
+        'memory_limit_mb' => 128,
+        'max_attempts' => 5,
+        'requires_mentor_review' => false,
+        'is_active' => true,
+    ]);
+
+    ChallengeTestCase::create([
+        'coding_challenge_id' => $challenge->id,
+        'label' => 'Spaces',
+        'input' => ['args' => ['  ab  ']],
+        'expected_output' => '"AB"',
+        'is_sample' => true,
+        'sort_order' => 1,
+    ]);
+
+    ChallengeTestCase::create([
+        'coding_challenge_id' => $challenge->id,
+        'label' => 'Tabs',
+        'input' => ['args' => ["  \t  "]],
+        'expected_output' => '""',
+        'is_sample' => false,
+        'sort_order' => 2,
+    ]);
+
+    Enrollment::create([
+        'user_id' => $intern->id,
+        'learning_path_id' => $path->id,
+        'status' => 'active',
+        'started_at' => now(),
+    ]);
+
+    $spaceOnly = <<<'PHP'
+<?php
+function normalizeKeyFragment($fragment) {
+    $start = 0;
+    $end = strlen($fragment) - 1;
+    while ($start <= $end && $fragment[$start] == ' ') { $start++; }
+    while ($end >= $start && $fragment[$end] == ' ') { $end--; }
+    $result = '';
+    for ($i = $start; $i <= $end; $i++) {
+        $char = $fragment[$i];
+        if ($char >= 'a' && $char <= 'z') {
+            $char = chr(ord($char) - 32);
+        }
+        $result .= $char;
+    }
+    return $result;
+}
+PHP;
+
+    $failed = app(SubmitChallenge::class)->execute($intern, $challenge, $spaceOnly);
+    expect($failed->status)->toBe(SubmissionStatus::Failed)
+        ->and($failed->tests_passed)->toBe(1);
+
+    $correct = <<<'PHP'
+function normalizeKeyFragment($fragment) {
+    return strtoupper(trim($fragment));
+}
+PHP;
+
+    $passed = app(SubmitChallenge::class)->execute($intern, $challenge, $correct);
+    expect($passed->status)->toBe(SubmissionStatus::Passed)
+        ->and($passed->tests_passed)->toBe(2);
+});
+
+test('intern submit response hides hidden test case details', function () {
+    ['intern' => $intern, 'challenge' => $challenge] = seedChallengeLevel();
+
+    $code = <<<'PHP'
+<?php
+function sumTwo($a, $b) {
+    return $a * $b;
+}
+PHP;
+
+    $this->actingAs($intern)
+        ->postJson(route('learn.challenges.submit', $challenge), ['code' => $code, 'source' => 'editor'])
+        ->assertOk()
+        ->assertJsonPath('submission.status', 'failed')
+        ->assertJsonPath('submission.results.1.test_case.label', 'Hidden test')
+        ->assertJsonMissingPath('submission.results.1.test_case.input')
+        ->assertJsonMissingPath('submission.results.1.actual_output')
+        ->assertJsonPath('submission.results.1.error_message', 'Hidden test failed.');
+});
+
 test('intern can view challenge workspace', function () {
     ['intern' => $intern, 'challenge' => $challenge] = seedChallengeLevel();
 

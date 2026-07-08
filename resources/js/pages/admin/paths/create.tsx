@@ -1,16 +1,16 @@
-import { PathForm } from '@/components/admin/path-form';
 import { PathPreviewCard } from '@/components/admin/path-curriculum';
-import { useConfirmDialog } from '@/components/confirm-dialog';
+import { PathForm } from '@/components/admin/path-form';
 import { Button } from '@/components/catalyst/button';
 import { Heading } from '@/components/catalyst/heading';
 import { Text } from '@/components/catalyst/text';
+import { useConfirmDialog } from '@/components/confirm-dialog';
+import { useValidatedForm } from '@/hooks/use-validated-form';
 import AppLayout from '@/layouts/app-layout';
-import { slugifyName } from '@/lib/path-icons';
 import { formHasFileUpload } from '@/lib/inertia-upload';
+import { slugifyName } from '@/lib/path-icons';
 import { type BreadcrumbItem } from '@/types';
 import { ArrowLeftIcon } from '@heroicons/react/20/solid';
 import { Head } from '@inertiajs/react';
-import { useValidatedForm } from '@/hooks/use-validated-form';
 import { FormEventHandler, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -103,7 +103,9 @@ export default function AdminPathsCreate() {
                     <div className="rounded-xl border border-zinc-950/10 bg-zinc-50 p-5 text-sm text-zinc-600 dark:border-white/10 dark:bg-zinc-800/50 dark:text-zinc-300">
                         <p className="font-semibold text-zinc-950 dark:text-white">After you create the path</p>
                         <ol className="mt-3 list-decimal space-y-2 pl-4">
-                            <li>Open the <strong>Curriculum</strong> tab</li>
+                            <li>
+                                Open the <strong>Curriculum</strong> tab
+                            </li>
                             <li>Add levels (or use seeded levels)</li>
                             <li>Edit each level: overview → materials → videos → quiz</li>
                             <li>Mark the correct answer on every quiz question</li>

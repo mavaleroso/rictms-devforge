@@ -103,7 +103,7 @@ const colors = {
   indigo:
     '[--checkbox-check:var(--color-white)] [--checkbox-checked-bg:var(--color-indigo-500)] [--checkbox-checked-border:var(--color-indigo-600)]/90',
   violet:
-    '[--checkbox-check:var(--color-white)] [--checkbox-checked-bg:var(--color-violet-500)] [--checkbox-checked-border:var(--color-violet-600)]/90',
+    '[--checkbox-check:var(--color-white)] [--checkbox-checked-bg:var(--color-brand-500)] [--checkbox-checked-border:var(--color-brand-600)]/90',
   purple:
     '[--checkbox-check:var(--color-white)] [--checkbox-checked-bg:var(--color-purple-500)] [--checkbox-checked-border:var(--color-purple-600)]/90',
   fuchsia:

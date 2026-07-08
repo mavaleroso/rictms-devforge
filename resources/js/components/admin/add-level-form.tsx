@@ -1,13 +1,13 @@
-import { FormField } from '@/components/form/form-field';
-import { useConfirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/catalyst/button';
 import { Description, Label } from '@/components/catalyst/fieldset';
+import { Subheading } from '@/components/catalyst/heading';
 import { Input } from '@/components/catalyst/input';
 import { Listbox, ListboxOption } from '@/components/catalyst/listbox';
-import { Subheading } from '@/components/catalyst/heading';
 import { Textarea } from '@/components/catalyst/textarea';
-import { type LevelDifficulty } from '@/types/learning';
+import { useConfirmDialog } from '@/components/confirm-dialog';
+import { FormField } from '@/components/form/form-field';
 import { useValidatedForm } from '@/hooks/use-validated-form';
+import { type LevelDifficulty } from '@/types/learning';
 import { FormEventHandler } from 'react';
 
 const DIFFICULTY_OPTIONS: { value: LevelDifficulty; label: string }[] = [

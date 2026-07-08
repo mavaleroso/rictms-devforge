@@ -14,15 +14,19 @@ class ChallengeSubmissionResultResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $isSample = $this->relationLoaded('testCase') && (bool) $this->testCase?->is_sample;
         $showDetails = $request->user()?->isAdmin()
             || $request->user()?->isMentor()
-            || ($this->relationLoaded('testCase') && $this->testCase?->is_sample);
+            || $isSample;
 
         return [
             'id' => $this->id,
             'passed' => $this->passed,
             'actual_output' => $this->when($showDetails, $this->actual_output),
-            'error_message' => $this->error_message,
+            // Generic message for hidden failures — do not leak expected/actual output.
+            'error_message' => $showDetails
+                ? $this->error_message
+                : ($this->passed ? null : 'Hidden test failed.'),
             'runtime_ms' => $this->runtime_ms,
             'test_case' => $this->whenLoaded('testCase', fn () => new ChallengeTestCaseResource($this->testCase)),
         ];

@@ -1,8 +1,7 @@
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
+import { Sidebar, SidebarBody, SidebarFooter, SidebarHeader, SidebarItem, SidebarSection } from '@/components/catalyst/sidebar';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { Sidebar, SidebarBody, SidebarFooter, SidebarHeader, SidebarItem, SidebarSection } from '@/components/catalyst/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import {
     AcademicCapIcon,
@@ -17,14 +16,6 @@ import {
     UsersIcon,
 } from '@heroicons/react/20/solid';
 import { usePage } from '@inertiajs/react';
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Documentation',
-        url: 'https://laravel.com/docs',
-        icon: BookOpenIcon,
-    },
-];
 
 function buildNavItems(roles: string[], capstoneUnlocked: boolean): NavItem[] {
     const items: NavItem[] = [
@@ -84,14 +75,13 @@ export function AppSidebar() {
             <SidebarHeader>
                 <SidebarSection>
                     <SidebarItem href="/dashboard">
-                        <AppLogo />
+                        <AppLogo variant="onDark" />
                     </SidebarItem>
                 </SidebarSection>
             </SidebarHeader>
 
             <SidebarBody>
                 <NavMain items={mainNavItems} />
-                <NavFooter items={footerNavItems} className="mt-auto" />
             </SidebarBody>
 
             <SidebarFooter>

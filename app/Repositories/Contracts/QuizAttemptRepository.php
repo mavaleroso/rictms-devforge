@@ -17,5 +17,8 @@ interface QuizAttemptRepository
 
     public function updateScore(QuizAttempt $attempt, int $score, bool $passed): QuizAttempt;
 
+    /** @return array<string, string> */
+    public function latestAnswersForUserAndQuiz(int $userId, int $quizId): array;
+
     public function bestScoreForUser(int $userId): int;
 }

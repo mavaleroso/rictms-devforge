@@ -211,9 +211,9 @@ export default function AdminUsersIndex({ stats }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
 
-            <section className="relative overflow-hidden rounded-2xl border border-zinc-950/10 bg-gradient-to-br from-zinc-50 via-white to-violet-50/50 p-6 shadow-sm sm:p-8 dark:border-white/10 dark:from-zinc-900 dark:via-zinc-900 dark:to-violet-950/30">
+            <section className="relative overflow-hidden rounded-2xl border border-zinc-950/10 bg-gradient-to-br from-zinc-50 via-white to-brand-50/50 p-6 shadow-sm sm:p-8 dark:border-white/10 dark:from-zinc-900 dark:via-zinc-900 dark:to-brand-950/30">
                 <div
-                    className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-violet-400/10 blur-3xl dark:bg-violet-500/10"
+                    className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-brand-400/10 blur-3xl dark:bg-brand-500/10"
                     aria-hidden
                 />
                 <div
@@ -223,7 +223,7 @@ export default function AdminUsersIndex({ stats }: Props) {
 
                 <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex items-start gap-4">
-                        <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-600/25">
+                        <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-600 to-indigo-600 text-white shadow-lg shadow-brand-600/25">
                             <UsersIcon className="size-7" />
                         </div>
                         <div>

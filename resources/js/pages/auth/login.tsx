@@ -37,10 +37,15 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     };
 
     return (
-        <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
+        <AuthLayout
+            variant="login"
+            aside="hero"
+            title="Welcome back"
+            description="Sign in to continue your learning paths, labs, and progress across programming, networking, DevOps, and cybersecurity."
+        >
             <Head title="Log in" />
 
-            <form className="grid gap-6" onSubmit={submit}>
+            <form className="grid gap-4" onSubmit={submit}>
                 <FormField error={errors.email}>
                     <Label>Email address</Label>
                     <Input
@@ -51,7 +56,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         autoComplete="email"
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
-                        placeholder="email@example.com"
+                        placeholder="you@company.com"
                     />
                 </FormField>
 
@@ -82,20 +87,22 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     <Label>Remember me</Label>
                 </CheckboxField>
 
-                <Button type="submit" className="w-full" tabIndex={4} disabled={processing}>
+                <Button type="submit" color="dark/zinc" className="w-full" tabIndex={4} disabled={processing}>
                     {processing && <Spinner className="size-4" />}
-                    Log in
+                    Sign in
                 </Button>
 
-                <Text className="text-center">
+                <Text className="text-center text-sm">
                     Don&apos;t have an account?{' '}
                     <TextLink href={route('register')} tabIndex={5}>
-                        Sign up
+                        Create free account
                     </TextLink>
                 </Text>
             </form>
 
-            {status && <p className="text-center text-sm font-medium text-green-600">{status}</p>}
+            {status && (
+                <p className="mt-4 text-center text-sm font-medium text-emerald-600 dark:text-emerald-400">{status}</p>
+            )}
         </AuthLayout>
     );
 }

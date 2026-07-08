@@ -14,14 +14,20 @@ interface QuizFormProps {
     disabled?: boolean;
 }
 
-export function QuizForm({ quiz, disabled = false }: QuizFormProps) {
-    const { confirm, ConfirmDialog } = useConfirmDialog();
-    const initialAnswers: Record<string, string> = {};
-    quiz.questions?.forEach((q) => {
-        initialAnswers[String(q.id)] = '';
+function buildInitialAnswers(quiz: Quiz): Record<string, string> {
+    const answers: Record<string, string> = {};
+
+    quiz.questions?.forEach((question) => {
+        const key = String(question.id);
+        answers[key] = quiz.last_answers?.[key] ?? '';
     });
 
-    const { data, setData, post, processing, errors } = useValidatedForm({ answers: initialAnswers });
+    return answers;
+}
+
+export function QuizForm({ quiz, disabled = false }: QuizFormProps) {
+    const { confirm, ConfirmDialog } = useConfirmDialog();
+    const { data, setData, post, processing, errors } = useValidatedForm({ answers: buildInitialAnswers(quiz) });
 
     const setAnswer = (questionId: number, value: string) => {
         setData('answers', { ...data.answers, [String(questionId)]: value });
@@ -57,7 +63,7 @@ export function QuizForm({ quiz, disabled = false }: QuizFormProps) {
                         key={question.id}
                         className="rounded-xl border border-zinc-950/10 bg-white p-5 dark:border-white/10 dark:bg-zinc-900"
                     >
-                        <p className="text-xs font-semibold tracking-wide text-violet-600 uppercase dark:text-violet-400">
+                        <p className="text-xs font-semibold tracking-wide text-brand-600 uppercase dark:text-brand-400">
                             Question {index + 1} of {questionCount}
                         </p>
                         <p className="mt-2 font-medium text-zinc-950 dark:text-white">

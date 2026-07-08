@@ -15,6 +15,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('paths', [LearningPathController::class, 'store'])->name('paths.store');
     Route::get('paths/{path}/edit', [LearningPathController::class, 'edit'])->name('paths.edit');
     Route::patch('paths/{path}', [LearningPathController::class, 'update'])->name('paths.update');
+    Route::delete('paths/{path}', [LearningPathController::class, 'destroy'])->name('paths.destroy');
 
     Route::post('paths/{path}/levels', [LevelController::class, 'store'])->name('levels.store');
     Route::get('paths/{path}/levels/{level}/edit', [LevelController::class, 'edit'])->name('levels.edit');

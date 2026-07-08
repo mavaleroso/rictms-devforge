@@ -153,7 +153,7 @@ export function ChallengeWorkspace({
             show({ title: 'Submit failed', message, variant: 'error' });
             setSubmitting(false);
         }
-    }, [challenge.id, githubForm, handleSubmissionResult, show, source]);
+    }, [challenge.id, code, githubForm, handleSubmissionResult, show, source]);
 
     return (
         <div className="flex h-[calc(100vh-8rem)] min-h-[32rem] flex-col overflow-hidden rounded-xl border border-zinc-950/10 bg-zinc-100 dark:border-white/10 dark:bg-zinc-900">
@@ -187,7 +187,7 @@ export function ChallengeWorkspace({
                         {challenge.language}
                     </span>
                     {evaluationDriver === 'docker' && (
-                        <span className="rounded bg-violet-500/10 px-2 py-0.5 text-[10px] font-medium text-violet-600">Docker CI</span>
+                        <span className="rounded bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium text-brand-600">Docker CI</span>
                     )}
                     <span className="text-[11px] text-zinc-500">{remaining} attempts left</span>
                 </div>

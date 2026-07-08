@@ -18,7 +18,7 @@ export function CertificateCard({ certificate, compact = false }: CertificateCar
 
     return (
         <div className="group relative overflow-hidden rounded-xl border border-zinc-950/10 bg-white shadow-sm transition hover:shadow-md dark:border-white/10 dark:bg-zinc-900">
-            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-600 to-violet-600" />
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-600 to-brand-600" />
             <div className={compact ? 'p-4' : 'p-5'}>
                 <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -63,7 +63,7 @@ export function CertificatePreview({ certificate }: CertificatePreviewProps) {
 
     return (
         <div className="relative overflow-hidden rounded-2xl border border-zinc-950/10 bg-gradient-to-br from-zinc-50 via-white to-blue-50/50 p-6 shadow-sm dark:border-white/10 dark:from-zinc-900 dark:via-zinc-900 dark:to-blue-950/20 sm:p-8">
-            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-600 to-violet-600" />
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-600 to-brand-600" />
             <p className="text-center text-[10px] font-semibold tracking-[0.2em] text-zinc-500 uppercase">DevForge Academy</p>
             <h2 className="mt-3 text-center text-xl font-semibold text-zinc-950 sm:text-2xl dark:text-white">
                 Certificate of Completion

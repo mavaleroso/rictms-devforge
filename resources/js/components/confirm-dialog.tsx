@@ -52,9 +52,9 @@ const toneConfig: Record<ConfirmTone, ToneConfig> = {
     default: {
         eyebrow: 'Please confirm',
         Icon: QuestionMarkCircleIcon,
-        headerBg: 'bg-gradient-to-b from-violet-500/[0.06] to-transparent dark:from-violet-400/[0.08]',
-        iconWrap: 'bg-violet-500/10 ring-1 ring-violet-500/20 dark:bg-violet-400/10 dark:ring-violet-400/25',
-        iconColor: 'text-violet-600 dark:text-violet-400',
+        headerBg: 'bg-gradient-to-b from-brand-500/[0.06] to-transparent dark:from-brand-400/[0.08]',
+        iconWrap: 'bg-brand-500/10 ring-1 ring-brand-500/20 dark:bg-brand-400/10 dark:ring-brand-400/25',
+        iconColor: 'text-brand-600 dark:text-brand-400',
         confirmButtonColor: 'dark/zinc',
     },
     success: {

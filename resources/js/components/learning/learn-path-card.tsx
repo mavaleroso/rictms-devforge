@@ -19,12 +19,12 @@ export function LearnPathCard({ path, enrolled }: LearnPathCardProps) {
         <Link
             href={route('learn.paths.show', path.id)}
             className={clsx(
-                'group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-950/10 bg-white transition',
-                'hover:-translate-y-0.5 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5',
-                'dark:border-white/10 dark:bg-zinc-900 dark:hover:border-violet-400/30',
+                'group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm transition',
+                'hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md hover:shadow-brand-500/10',
+                'dark:border-slate-800 dark:bg-slate-900 dark:hover:border-brand-600/40',
             )}
         >
-            <div className="relative aspect-video overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+            <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-brand-50 to-slate-100 dark:from-brand-950/40 dark:to-slate-900">
                 {path.cover_image_url ? (
                     <img
                         src={path.cover_image_url}
@@ -43,7 +43,7 @@ export function LearnPathCard({ path, enrolled }: LearnPathCardProps) {
                 )}
             </div>
             <div className="flex flex-1 flex-col p-4">
-                <h3 className="line-clamp-2 font-semibold text-zinc-950 group-hover:text-violet-700 dark:text-white dark:group-hover:text-violet-300">
+                <h3 className="line-clamp-2 font-semibold text-zinc-950 group-hover:text-brand-700 dark:text-white dark:group-hover:text-brand-300">
                     {path.name}
                 </h3>
                 <p className="mt-2 line-clamp-2 flex-1 text-sm text-zinc-500 dark:text-zinc-400">

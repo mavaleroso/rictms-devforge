@@ -46,7 +46,7 @@ export default function MentorReviewsShow({ submission: submissionProp }: Props)
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Review — ${submission.user?.name ?? 'Intern'}`} />
 
-            <Link href={route('mentor.reviews.index')} className="text-xs font-medium text-violet-600 dark:text-violet-400">
+            <Link href={route('mentor.reviews.index')} className="text-xs font-medium text-brand-600 dark:text-brand-400">
                 ← Back to queue
             </Link>
 

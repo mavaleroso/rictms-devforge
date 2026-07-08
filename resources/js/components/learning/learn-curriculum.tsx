@@ -91,19 +91,19 @@ export function LearnCurriculum({ pathId, levels, defaultOpenLevelId }: LearnCur
                                     <ul className="space-y-2 text-sm">
                                         {(level.materials_count ?? 0) > 0 && (
                                             <li className="flex items-center gap-2 text-zinc-600 dark:text-zinc-300">
-                                                <PlayCircleIcon className="size-4 text-violet-500" />
+                                                <PlayCircleIcon className="size-4 text-brand-500" />
                                                 Reading materials
                                             </li>
                                         )}
                                         {(level.videos_count ?? 0) > 0 && (
                                             <li className="flex items-center gap-2 text-zinc-600 dark:text-zinc-300">
-                                                <FilmIcon className="size-4 text-violet-500" />
+                                                <FilmIcon className="size-4 text-brand-500" />
                                                 Video lessons
                                             </li>
                                         )}
                                         {level.quiz && (
                                             <li className="flex items-center gap-2 text-zinc-600 dark:text-zinc-300">
-                                                <QuestionMarkCircleIcon className="size-4 text-violet-500" />
+                                                <QuestionMarkCircleIcon className="size-4 text-brand-500" />
                                                 Level quiz
                                             </li>
                                         )}
@@ -117,7 +117,7 @@ export function LearnCurriculum({ pathId, levels, defaultOpenLevelId }: LearnCur
                                         ) : (
                                             <a
                                                 href={href}
-                                                className="inline-flex items-center gap-1 text-sm font-medium text-violet-600 hover:text-violet-500 dark:text-violet-400"
+                                                className="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-500 dark:text-brand-400"
                                             >
                                                 <PlayCircleIcon className="size-4" />
                                                 {completed ? 'Review level' : status === 'in_progress' ? 'Continue level' : 'Start level'}

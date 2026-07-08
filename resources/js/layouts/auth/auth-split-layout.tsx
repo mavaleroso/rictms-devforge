@@ -1,45 +1,77 @@
-import AppLogoIcon from '@/components/app-logo-icon';
-import { type SharedData } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
+import { AnimatedGridBackground } from '@/components/marketing/animated-grid-background';
+import { AuthMarketingHeader, type AuthMarketingVariant } from '@/components/marketing/auth-marketing-header';
+import { HeroCover } from '@/components/marketing/hero-cover';
+import { LearningTrackGrid } from '@/components/marketing/learning-track-grid';
+import { Badge } from '@/components/catalyst/badge';
+import { accent, surfaces } from '@/lib/theme';
+import clsx from 'clsx';
+import type { ReactNode } from 'react';
 
-interface AuthLayoutProps {
-    children: React.ReactNode;
+interface AuthSplitLayoutProps {
+    children: ReactNode;
     title?: string;
     description?: string;
+    variant?: AuthMarketingVariant;
+    aside?: 'hero' | 'tracks';
 }
 
-export default function AuthSplitLayout({ children, title, description }: AuthLayoutProps) {
-    const { name, quote } = usePage<SharedData>().props;
-
+export default function AuthSplitLayout({
+    children,
+    title,
+    description,
+    variant = 'default',
+    aside = 'hero',
+}: AuthSplitLayoutProps) {
     return (
-        <div className="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
-            <div className="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r">
-                <div className="absolute inset-0 bg-zinc-900" />
-                <Link href={route('home')} className="relative z-20 flex items-center text-lg font-medium">
-                    <AppLogoIcon className="mr-2 size-8 fill-current text-white" />
-                    {name}
-                </Link>
-                {quote && (
-                    <div className="relative z-20 mt-auto">
-                        <blockquote className="space-y-2">
-                            <p className="text-lg">&ldquo;{quote.message}&rdquo;</p>
-                            <footer className="text-sm text-neutral-300">{quote.author}</footer>
-                        </blockquote>
+        <div className="relative isolate flex min-h-dvh flex-col text-slate-900 dark:text-slate-100">
+            <AnimatedGridBackground />
+            <AuthMarketingHeader variant={variant} />
+
+            <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 items-center px-4 py-8 sm:px-6 sm:py-10">
+                <div className="grid w-full items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-10">
+                    <div className="mx-auto w-full max-w-md lg:max-w-none">
+                        <Badge color="zinc" className={clsx('mb-4', accent.bgSoft, accent.textSoft)}>
+                            ICT skills academy
+                        </Badge>
+
+                        {(title || description) && (
+                            <div className="mb-5 space-y-2">
+                                {title && (
+                                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
+                                        {title}
+                                    </h1>
+                                )}
+                                {description && (
+                                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                        {description}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+
+                        <div className={clsx('p-5 sm:p-6', surfaces.card)}>{children}</div>
                     </div>
-                )}
-            </div>
-            <div className="w-full lg:p-8">
-                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                    <Link href={route('home')} className="relative z-20 flex items-center justify-center lg:hidden">
-                        <AppLogoIcon className="h-10 fill-current text-black sm:h-12" />
-                    </Link>
-                    <div className="flex flex-col items-start gap-2 text-left sm:items-center sm:text-center">
-                        <h1 className="text-xl font-medium">{title}</h1>
-                        <p className="text-muted-foreground text-sm text-balance">{description}</p>
+
+                    <div className="hidden lg:block">
+                        {aside === 'tracks' ? (
+                            <div className="space-y-5">
+                                <div className="max-w-md">
+                                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                                        Four disciplines. One platform.
+                                    </h2>
+                                    <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                        Programming, networking, DevOps, and cybersecurity—each with structured levels,
+                                        labs, and mentor support.
+                                    </p>
+                                </div>
+                                <LearningTrackGrid />
+                            </div>
+                        ) : (
+                            <HeroCover />
+                        )}
                     </div>
-                    {children}
                 </div>
-            </div>
+            </main>
         </div>
     );
 }

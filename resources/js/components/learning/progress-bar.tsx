@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { accent } from '@/lib/theme';
 
 interface ProgressBarProps {
     percentage: number;
@@ -10,8 +11,8 @@ export function ProgressBar({ percentage, label, variant = 'default' }: Progress
     const clamped = Math.min(100, Math.max(0, percentage));
     const fillClass =
         variant === 'accent'
-            ? 'bg-gradient-to-r from-violet-600 to-violet-400'
-            : 'bg-zinc-900 dark:bg-white';
+            ? accent.progress
+            : 'bg-slate-800 dark:bg-slate-200';
 
     return (
         <div>

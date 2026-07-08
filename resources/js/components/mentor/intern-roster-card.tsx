@@ -44,7 +44,7 @@ export function InternRosterCard({ enrollment }: InternRosterCardProps) {
                 <div className="min-w-0 flex-1">
                     <p className="truncate font-semibold text-zinc-950 dark:text-white">{displayName}</p>
                     <p className="truncate text-xs text-zinc-500">{user.email}</p>
-                    <p className="mt-1 truncate text-xs font-medium text-violet-600 dark:text-violet-400">
+                    <p className="mt-1 truncate text-xs font-medium text-brand-600 dark:text-brand-400">
                         {enrollment.learning_path?.name}
                     </p>
                 </div>

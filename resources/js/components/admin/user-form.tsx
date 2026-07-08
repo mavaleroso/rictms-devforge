@@ -199,12 +199,12 @@ export function UserForm({ form, onSubmit, submitLabel, mode, existingAvatarUrl,
                                             className={clsx(
                                                 'relative rounded-xl border p-4 text-left transition',
                                                 selected
-                                                    ? 'border-violet-500/50 bg-violet-500/[0.05] ring-2 ring-violet-500/25'
+                                                    ? 'border-brand-500/50 bg-brand-500/[0.05] ring-2 ring-brand-500/25'
                                                     : 'border-zinc-950/10 hover:border-zinc-950/20 hover:bg-zinc-50 dark:border-white/10 dark:hover:border-white/20 dark:hover:bg-zinc-800/40',
                                             )}
                                         >
                                             {selected && (
-                                                <span className="absolute top-3 right-3 flex size-5 items-center justify-center rounded-full bg-violet-600 text-white">
+                                                <span className="absolute top-3 right-3 flex size-5 items-center justify-center rounded-full bg-brand-600 text-white">
                                                     <CheckIcon className="size-3" />
                                                 </span>
                                             )}
@@ -212,7 +212,7 @@ export function UserForm({ form, onSubmit, submitLabel, mode, existingAvatarUrl,
                                                 className={clsx(
                                                     'flex size-9 items-center justify-center rounded-lg',
                                                     selected
-                                                        ? 'bg-violet-500/15 text-violet-600 dark:text-violet-400'
+                                                        ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400'
                                                         : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400',
                                                 )}
                                             >

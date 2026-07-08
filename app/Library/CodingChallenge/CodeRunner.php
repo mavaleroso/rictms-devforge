@@ -17,6 +17,7 @@ final class CodeRunner
     ): TestCaseResult {
         $definition = LanguageRegistry::get($language);
         $binary = RuntimeBinaryResolver::resolve($language);
+        $code = SolutionNormalizer::normalize($language, $code);
         $inputJson = json_encode($testCase->input, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 
         $tempDir = $this->createTempDirectory();
@@ -69,6 +70,13 @@ final class CodeRunner
 
             $actual = trim($process->getOutput());
             $passed = OutputComparator::equals($testCase->expected_output, $actual);
+            $errorMessage = null;
+
+            if (! $passed) {
+                $errorMessage = $actual === 'null'
+                    ? 'Function returned null — make sure your solution includes a return statement.'
+                    : 'Output does not match expected result.';
+            }
 
             return new TestCaseResult(
                 testCaseId: $testCase->id,
@@ -76,7 +84,7 @@ final class CodeRunner
                 passed: $passed,
                 expectedOutput: $testCase->expected_output,
                 actualOutput: $actual,
-                errorMessage: $passed ? null : 'Output does not match expected result.',
+                errorMessage: $errorMessage,
                 runtimeMs: $runtimeMs,
                 isSample: $testCase->is_sample,
             );

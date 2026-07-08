@@ -69,8 +69,8 @@ export function LearnCourseSidebar({
                     className={clsx(
                         'text-[11px] font-medium',
                         isPathOverviewActive(pathId, currentPath)
-                            ? 'text-violet-700 dark:text-violet-300'
-                            : 'text-violet-600 hover:text-violet-500 dark:text-violet-400',
+                            ? 'text-brand-700 dark:text-brand-300'
+                            : 'text-brand-600 hover:text-brand-500 dark:text-brand-400',
                     )}
                 >
                     ← Back to course
@@ -105,7 +105,7 @@ export function LearnCourseSidebar({
                 )}
             </div>
 
-            <nav aria-label="Course content" className="flex-1 overflow-y-auto p-1.5">
+            <nav aria-label="Course content" className="flex-1 overflow-y-auto p-1.5 pr-2">
                 <ul className="space-y-0.5">
                     {levels.map((level) => {
                         const status = levelStatus(level);
@@ -122,7 +122,7 @@ export function LearnCourseSidebar({
                                         className={clsx(
                                             'flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-sm transition',
                                             isCurrentLevel
-                                                ? 'bg-violet-50 ring-1 ring-violet-500/20 dark:bg-violet-950/40 dark:ring-violet-400/30'
+                                                ? 'bg-brand-50 ring-1 ring-brand-500/20 dark:bg-brand-950/40 dark:ring-brand-400/30'
                                                 : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/60',
                                         )}
                                     >
@@ -131,7 +131,7 @@ export function LearnCourseSidebar({
                                             <span
                                                 className={clsx(
                                                     'line-clamp-2 text-[13px] font-medium leading-snug',
-                                                    isCurrentLevel ? 'text-violet-700 dark:text-violet-200' : 'text-zinc-950 dark:text-white',
+                                                    isCurrentLevel ? 'text-brand-700 dark:text-brand-200' : 'text-zinc-950 dark:text-white',
                                                 )}
                                             >
                                                 {level.title}
@@ -145,7 +145,7 @@ export function LearnCourseSidebar({
                                                 )}
                                             </span>
                                         </span>
-                                        {isCurrentLevel && <PlayIcon className="size-3.5 shrink-0 text-violet-500" />}
+                                        {isCurrentLevel && <PlayIcon className="size-3.5 shrink-0 text-brand-500" />}
                                     </Link>
                                 ) : (
                                     <div className="flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-sm opacity-60">
@@ -159,7 +159,7 @@ export function LearnCourseSidebar({
                                 )}
 
                                 {isCurrentLevel && !locked && tasks.length > 0 && (
-                                    <div className="mt-1 mb-1.5 ml-3 border-l border-violet-500/20 pl-2 dark:border-violet-400/20">
+                                    <div className="mt-1 mb-1.5 ml-3 border-l border-brand-500/20 pl-2 dark:border-brand-400/20">
                                         <p className="px-2 py-1 text-[10px] font-semibold tracking-wide text-zinc-500 uppercase">
                                             Level {level.number} · {taskProgress.completed}/{taskProgress.total} tasks
                                         </p>
@@ -205,7 +205,7 @@ function TaskItem({ task, active }: { task: LearnTask; active: boolean }) {
                 className={clsx(
                     'flex items-center gap-2 rounded-md px-2 py-1.5 text-[12px] transition',
                     active
-                        ? 'bg-violet-100 font-medium text-violet-800 dark:bg-violet-900/50 dark:text-violet-200'
+                        ? 'bg-brand-100 font-medium text-brand-800 dark:bg-brand-900/50 dark:text-brand-200'
                         : 'text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-800/60',
                 )}
             >
@@ -238,7 +238,7 @@ function LevelIcon({ status, number }: { status: ReturnType<typeof levelStatus>;
     }
 
     return (
-        <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-violet-500/15 text-[11px] font-semibold text-violet-700 dark:text-violet-300">
+        <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-[11px] font-semibold text-brand-700 dark:text-brand-300">
             {number}
         </span>
     );

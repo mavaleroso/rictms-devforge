@@ -25,4 +25,6 @@ interface LearningPathRepository
     public function loadWithOrderedLevels(LearningPath $path): LearningPath;
 
     public function findById(int $id): LearningPath;
+
+    public function delete(LearningPath $path): void;
 }

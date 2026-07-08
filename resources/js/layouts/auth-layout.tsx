@@ -1,9 +1,22 @@
-import AuthLayoutTemplate from '@/layouts/auth/auth-simple-layout';
+import AuthSplitLayout from '@/layouts/auth/auth-split-layout';
+import type { AuthMarketingVariant } from '@/components/marketing/auth-marketing-header';
 
-export default function AuthLayout({ children, title, description, ...props }: { children: React.ReactNode; title: string; description: string }) {
+export default function AuthLayout({
+    children,
+    title,
+    description,
+    variant = 'default',
+    aside = 'hero',
+}: {
+    children: React.ReactNode;
+    title: string;
+    description: string;
+    variant?: AuthMarketingVariant;
+    aside?: 'hero' | 'tracks';
+}) {
     return (
-        <AuthLayoutTemplate title={title} description={description} {...props}>
+        <AuthSplitLayout title={title} description={description} variant={variant} aside={aside}>
             {children}
-        </AuthLayoutTemplate>
+        </AuthSplitLayout>
     );
 }

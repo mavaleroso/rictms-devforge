@@ -76,6 +76,7 @@ export function mapSubmissionToEvaluationResult(submission: ChallengeSubmission)
                 test_case_id: result.test_case?.id ?? result.id,
                 label: result.test_case?.label ?? null,
                 passed: result.passed,
+                expected_output: result.test_case?.expected_output ?? null,
                 actual_output: result.actual_output,
                 error_message: result.error_message,
                 runtime_ms: result.runtime_ms ?? 0,

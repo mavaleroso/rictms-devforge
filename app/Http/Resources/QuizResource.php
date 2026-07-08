@@ -21,6 +21,12 @@ class QuizResource extends JsonResource
             'attempts_used' => $this->when(isset($this->attempts_used), $this->attempts_used),
             'best_score' => $this->when(isset($this->best_score), $this->best_score),
             'passed' => $this->when(isset($this->passed), (bool) $this->passed),
+            'last_answers' => $this->when(
+                isset($this->last_answers),
+                fn () => (object) collect($this->last_answers ?? [])
+                    ->mapWithKeys(fn (string $answer, string|int $questionId) => [(string) $questionId => $answer])
+                    ->all(),
+            ),
         ];
     }
 }
