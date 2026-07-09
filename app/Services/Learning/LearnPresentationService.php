@@ -75,13 +75,17 @@ final class LearnPresentationService
             $level->quiz->passed = $stats['passed'];
         }
 
-        if ($level->codingChallenge && $level->codingChallenge->is_active) {
-            $stats = $this->challengeSubmissions->statsForUserAndChallenge($user->id, $level->codingChallenge->id);
-            $level->codingChallenge->attempts_used = $stats['attempts_used'];
-            $level->codingChallenge->tests_passed = $stats['tests_passed'];
-            $level->codingChallenge->tests_total = $stats['tests_total'];
-            $level->codingChallenge->passed = $stats['passed'];
-            $level->codingChallenge->status = $stats['status'];
+        foreach ($level->codingChallenges as $challenge) {
+            if (! $challenge->is_active) {
+                continue;
+            }
+
+            $stats = $this->challengeSubmissions->statsForUserAndChallenge($user->id, $challenge->id);
+            $challenge->attempts_used = $stats['attempts_used'];
+            $challenge->tests_passed = $stats['tests_passed'];
+            $challenge->tests_total = $stats['tests_total'];
+            $challenge->passed = $stats['passed'];
+            $challenge->status = $stats['status'];
         }
 
         $enrollment = $this->enrollments->findForUserAndPath($user, $path);

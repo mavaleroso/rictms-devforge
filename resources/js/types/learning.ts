@@ -36,7 +36,7 @@ export interface Level {
     materials?: LearningMaterial[];
     videos?: Video[];
     quiz?: Quiz | null;
-    coding_challenge?: CodingChallenge | null;
+    coding_challenges?: CodingChallenge[];
     progress_status?: ProgressStatus;
 }
 
@@ -56,6 +56,7 @@ export interface CodingChallenge {
     max_attempts: number;
     requires_mentor_review: boolean;
     is_active: boolean;
+    sort_order: number;
     test_cases?: ChallengeTestCase[];
     test_cases_count?: number;
     attempts_used?: number;
@@ -75,12 +76,19 @@ export interface ChallengeTestCase {
     sort_order: number;
 }
 
+export interface LearningMaterialFile {
+    id: number;
+    url: string;
+    original_name: string;
+    sort_order: number;
+}
+
 export interface LearningMaterial {
     id: number;
     type: MaterialType;
     title: string;
     content: string | null;
-    file_path: string | null;
+    files?: LearningMaterialFile[];
     sort_order: number;
     completed?: boolean;
 }
@@ -88,6 +96,7 @@ export interface LearningMaterial {
 export interface Video {
     id: number;
     title: string;
+    caption: string | null;
     provider: VideoProvider;
     url: string | null;
     file_path: string | null;

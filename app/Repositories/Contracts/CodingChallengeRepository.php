@@ -13,7 +13,11 @@ interface CodingChallengeRepository
 
     public function loadForAdmin(CodingChallenge $challenge): CodingChallenge;
 
-    public function updateOrCreateForLevel(Level $level, array $attributes): CodingChallenge;
+    public function createForLevel(Level $level, array $attributes): CodingChallenge;
+
+    public function update(CodingChallenge $challenge, array $attributes): void;
+
+    public function delete(CodingChallenge $challenge): void;
 
     /** @return Collection<int, ChallengeTestCase> */
     public function testCasesForChallenge(CodingChallenge $challenge, bool $sampleOnly = false): Collection;

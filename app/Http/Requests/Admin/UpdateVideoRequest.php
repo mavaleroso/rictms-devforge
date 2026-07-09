@@ -17,6 +17,7 @@ class UpdateVideoRequest extends FormRequest
     {
         return [
             'title' => ['sometimes', 'required', 'string', 'max:255'],
+            'caption' => ['nullable', 'string'],
             'provider' => ['sometimes', Rule::enum(VideoProvider::class)],
             'url' => ['nullable', 'string', 'max:500'],
             'file' => [

@@ -37,7 +37,7 @@ final class EloquentLevelRepository implements LevelRepository
 
     public function loadWithContent(Level $level): Level
     {
-        return $level->load(['materials', 'videos', 'quiz.questions.options', 'codingChallenge.testCases']);
+        return $level->load(['materials.files', 'videos', 'quiz.questions.options', 'codingChallenges.testCases']);
     }
 
     public function update(Level $level, array $attributes): void

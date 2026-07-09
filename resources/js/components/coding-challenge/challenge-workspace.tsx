@@ -155,6 +155,9 @@ export function ChallengeWorkspace({
         }
     }, [challenge.id, code, githubForm, handleSubmissionResult, show, source]);
 
+    const actionButtonClass =
+        '!inline-flex !h-8 !items-center !justify-center !px-3 !py-0 !text-xs !leading-none *:data-[slot=icon]:!my-0';
+
     return (
         <div className="flex h-[calc(100vh-8rem)] min-h-[32rem] flex-col overflow-hidden rounded-xl border border-zinc-950/10 bg-zinc-100 dark:border-white/10 dark:bg-zinc-900">
             <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-zinc-950/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-zinc-950">
@@ -193,12 +196,12 @@ export function ChallengeWorkspace({
                 </div>
                 <div className="flex items-center gap-2">
                     {source === 'editor' && (
-                        <Button type="button" outline className="!px-3 !py-1.5 !text-xs" onClick={handleRun} disabled={disabled || running || submitting}>
+                        <Button type="button" outline className={actionButtonClass} onClick={handleRun} disabled={disabled || running || submitting}>
                             <PlayIcon data-slot="icon" className="!size-3.5" />
                             Run
                         </Button>
                     )}
-                    <Button type="button" color="dark/zinc" className="!px-3 !py-1.5 !text-xs" onClick={handleSubmit} disabled={disabled || running || submitting}>
+                    <Button type="button" color="dark/zinc" className={actionButtonClass} onClick={handleSubmit} disabled={disabled || running || submitting}>
                         <PaperAirplaneIcon data-slot="icon" className="!size-3.5" />
                         {submitting && pollingId ? 'Evaluating…' : 'Submit'}
                     </Button>

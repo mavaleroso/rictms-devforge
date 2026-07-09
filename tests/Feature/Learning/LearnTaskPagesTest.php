@@ -4,10 +4,13 @@ use App\Enums\MaterialType;
 use App\Enums\VideoProvider;
 use App\Models\Enrollment;
 use App\Models\LearningMaterial;
+use App\Models\LearningMaterialFile;
 use App\Models\LearningPath;
 use App\Models\Level;
 use App\Models\LevelProgress;
 use App\Models\Video;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 test('intern can view material and video task pages', function () {
     $intern = userWithRole('intern');
@@ -64,6 +67,56 @@ test('intern can view material and video task pages', function () {
             ->component('learn/videos/show')
             ->where('currentTask', 'video-'.$video->id)
         );
+});
+
+test('intern can download material resource files', function () {
+    Storage::fake('public');
+
+    $intern = userWithRole('intern');
+    $path = LearningPath::create(['name' => 'Download Path', 'slug' => 'download-path', 'is_active' => true]);
+    $level = Level::create([
+        'learning_path_id' => $path->id,
+        'number' => 1,
+        'title' => 'L1',
+        'estimated_minutes' => 30,
+        'difficulty' => 'beginner',
+    ]);
+
+    $material = LearningMaterial::create([
+        'level_id' => $level->id,
+        'type' => MaterialType::Pdf,
+        'title' => 'Reference guide',
+        'content' => '<p>Download the PDF below.</p>',
+        'sort_order' => 1,
+    ]);
+
+    $upload = UploadedFile::fake()->create('reference.pdf', 256, 'application/pdf');
+    $storedPath = $upload->store('learning-materials', 'public');
+
+    $file = LearningMaterialFile::create([
+        'learning_material_id' => $material->id,
+        'file_path' => $storedPath,
+        'original_name' => 'reference.pdf',
+        'sort_order' => 1,
+    ]);
+
+    $enrollment = Enrollment::create([
+        'user_id' => $intern->id,
+        'learning_path_id' => $path->id,
+        'status' => 'active',
+        'started_at' => now(),
+    ]);
+
+    LevelProgress::create([
+        'enrollment_id' => $enrollment->id,
+        'level_id' => $level->id,
+        'status' => 'in_progress',
+    ]);
+
+    $this->actingAs($intern)
+        ->get(route('learn.material-files.download', $file))
+        ->assertOk()
+        ->assertDownload('reference.pdf');
 });
 
 test('level overview includes continue link to first incomplete task', function () {

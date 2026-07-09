@@ -16,7 +16,7 @@ class LearningMaterialResource extends JsonResource
             'type' => $this->type?->value,
             'title' => $this->title,
             'content' => $this->content,
-            'file_path' => $this->file_path,
+            'files' => LearningMaterialFileResource::collection($this->whenLoaded('files')),
             'sort_order' => $this->sort_order,
             'completed' => $this->when(isset($this->completed), (bool) $this->completed),
         ];

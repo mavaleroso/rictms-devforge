@@ -19,8 +19,23 @@ class UpdateLearningMaterialRequest extends FormRequest
             'type' => ['sometimes', Rule::enum(MaterialType::class)],
             'title' => ['sometimes', 'required', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
-            'file_path' => ['nullable', 'string', 'max:500'],
+            'files' => ['sometimes', 'array'],
+            'files.*' => [
+                'file',
+                'mimetypes:application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,image/gif,image/webp',
+                'max:25600',
+            ],
+            'remove_file_ids' => ['sometimes', 'array'],
+            'remove_file_ids.*' => ['integer'],
             'sort_order' => ['integer', 'min:0'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'files.*.mimetypes' => 'Resource files must be PDF, PowerPoint, Word, or an image.',
+            'files.*.max' => 'Each resource file may not be larger than 25 MB.',
         ];
     }
 }

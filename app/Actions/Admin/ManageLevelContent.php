@@ -16,14 +16,18 @@ final class ManageLevelContent
         private readonly LevelContentService $content,
     ) {}
 
-    public function storeMaterial(Level $level, array $attributes): LearningMaterial
+    public function storeMaterial(Level $level, array $attributes, array $files = []): LearningMaterial
     {
-        return $this->content->storeMaterial($level, $attributes);
+        return $this->content->storeMaterial($level, $attributes, $files);
     }
 
-    public function updateMaterial(LearningMaterial $material, array $attributes): void
-    {
-        $this->content->updateMaterial($material, $attributes);
+    public function updateMaterial(
+        LearningMaterial $material,
+        array $attributes,
+        array $files = [],
+        array $removeFileIds = [],
+    ): void {
+        $this->content->updateMaterial($material, $attributes, $files, $removeFileIds);
     }
 
     public function deleteMaterial(LearningMaterial $material): void

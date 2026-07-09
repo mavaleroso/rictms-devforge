@@ -42,10 +42,12 @@ export default function LearnQuizzesShow({ path: pathProp, level: levelProp, enr
                 </p>
                 <h1 className="mt-1.5 text-xl font-bold tracking-tight">{quiz.title}</h1>
                 <div className="mt-3 flex flex-wrap gap-2">
-                    <Badge className="bg-white/10 text-white ring-white/20">Pass {quiz.passing_score}%</Badge>
-                    <Badge className="bg-white/10 text-white ring-white/20">
+                    <span className="inline-flex items-center rounded-md bg-white/15 px-2 py-0.5 text-xs font-medium text-white ring-1 ring-white/25">
+                        Pass {quiz.passing_score}%
+                    </span>
+                    <span className="inline-flex items-center rounded-md bg-white/15 px-2 py-0.5 text-xs font-medium text-white ring-1 ring-white/25">
                         {attemptsRemaining} {attemptsRemaining === 1 ? 'attempt' : 'attempts'} left
-                    </Badge>
+                    </span>
                     {quiz.passed && (
                         <Badge color="green" className="gap-1">
                             <CheckCircleIcon className="size-3" />

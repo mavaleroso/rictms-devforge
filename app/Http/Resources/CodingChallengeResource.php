@@ -30,6 +30,7 @@ class CodingChallengeResource extends JsonResource
             'max_attempts' => $this->max_attempts,
             'requires_mentor_review' => $this->requires_mentor_review,
             'is_active' => $this->is_active,
+            'sort_order' => $this->sort_order,
             'test_cases_count' => $this->whenCounted('testCases'),
             'test_cases' => ChallengeTestCaseResource::collection($this->whenLoaded('testCases')),
             'attempts_used' => $this->when(isset($this->attempts_used), $this->attempts_used),

@@ -61,8 +61,10 @@ class LevelController extends Controller
             return route('learn.quizzes.show', $level->quiz);
         }
 
-        if ($level->codingChallenge?->is_active && ! $level->codingChallenge->passed) {
-            return route('learn.challenges.show', $level->codingChallenge);
+        foreach ($level->codingChallenges as $challenge) {
+            if ($challenge->is_active && ! $challenge->passed) {
+                return route('learn.challenges.show', $challenge);
+            }
         }
 
         return null;

@@ -18,6 +18,7 @@ Route::middleware(['auth', 'role:intern'])->prefix('learn')->name('learn.')->gro
 
     Route::get('paths/{path}/levels/{level}', [LevelController::class, 'show'])->name('levels.show');
     Route::get('materials/{material}', [MaterialController::class, 'show'])->name('materials.show');
+    Route::get('material-files/{file}', [MaterialController::class, 'downloadFile'])->name('material-files.download');
     Route::post('materials/{material}/complete', [LevelController::class, 'completeMaterial'])->name('materials.complete');
     Route::get('videos/{video}', [VideoController::class, 'show'])->name('videos.show');
     Route::post('videos/{video}/complete', [LevelController::class, 'completeVideo'])->name('videos.complete');

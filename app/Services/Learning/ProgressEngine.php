@@ -62,11 +62,13 @@ final class ProgressEngine
         }
 
         $challengePassed = true;
-        $level->loadMissing('codingChallenge');
-        $challenge = $level->codingChallenge;
+        $level->loadMissing('codingChallenges');
+        $activeChallenges = $level->codingChallenges->where('is_active', true);
 
-        if ($challenge && $challenge->is_active) {
-            $challengePassed = $this->challengeSubmissions->hasPassed($userId, $challenge->id);
+        if ($activeChallenges->isNotEmpty()) {
+            $challengePassed = $activeChallenges->every(
+                fn ($challenge) => $this->challengeSubmissions->hasPassed($userId, $challenge->id),
+            );
         }
 
         if (! ($materialsComplete && $videosComplete && $quizPassed && $challengePassed)) {

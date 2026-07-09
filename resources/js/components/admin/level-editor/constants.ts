@@ -30,7 +30,7 @@ export const TAB_META: Record<
     challenge: {
         label: 'Coding Challenge',
         shortLabel: 'Challenge',
-        description: 'Hands-on problem with editor, automated test cases, and optional mentor review.',
+        description: 'Hands-on problems with editor, automated test cases, and optional mentor review.',
     },
 };
 
@@ -52,7 +52,9 @@ export function tabProgress(level: Level): Record<LevelEditorTab, boolean> {
         materials: (level.materials?.length ?? level.materials_count ?? 0) > 0,
         videos: (level.videos?.length ?? level.videos_count ?? 0) > 0,
         quiz: (level.quiz?.questions?.length ?? level.quiz?.questions_count ?? 0) > 0,
-        challenge: (level.coding_challenge?.test_cases?.length ?? level.coding_challenge?.test_cases_count ?? 0) > 0,
+        challenge: (level.coding_challenges ?? []).some(
+            (challenge) => (challenge.test_cases?.length ?? challenge.test_cases_count ?? 0) > 0,
+        ),
     };
 }
 

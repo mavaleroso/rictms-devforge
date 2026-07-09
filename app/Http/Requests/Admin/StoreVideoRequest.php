@@ -17,6 +17,7 @@ class StoreVideoRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
+            'caption' => ['nullable', 'string'],
             'provider' => ['required', Rule::enum(VideoProvider::class)],
             'url' => [
                 Rule::requiredIf(fn () => $this->enum('provider', VideoProvider::class) === VideoProvider::Youtube),

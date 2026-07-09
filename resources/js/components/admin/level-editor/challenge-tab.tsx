@@ -1,32 +1,101 @@
 import { ChallengeTestCaseManager } from '@/components/admin/challenge-test-case-manager';
 import { StepChecklist, StepSidebarCard, LevelStepShell } from '@/components/admin/level-editor/level-step-shell';
-import { useConfirmDialog } from '@/components/confirm-dialog';
+import { useConfirmDialog, type ConfirmOptions } from '@/components/confirm-dialog';
 import { FormField } from '@/components/form/form-field';
+import { CodeEditor } from '@/components/form/code-editor';
+import { RichTextEditor } from '@/components/form/rich-text-editor';
 import { Badge } from '@/components/catalyst/badge';
 import { Button } from '@/components/catalyst/button';
+import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/components/catalyst/dialog';
 import { Description, Label } from '@/components/catalyst/fieldset';
 import { Input } from '@/components/catalyst/input';
 import { Listbox, ListboxOption } from '@/components/catalyst/listbox';
+import { Subheading } from '@/components/catalyst/heading';
 import { Textarea } from '@/components/catalyst/textarea';
 import { Switch, SwitchField } from '@/components/catalyst/switch';
-import { accent, surfaces } from '@/lib/theme';
-import { type Level } from '@/types/learning';
 import { useValidatedForm } from '@/hooks/use-validated-form';
+import { monacoLanguage } from '@/lib/coding-challenge-library';
+import { type ChallengeLanguage, type CodingChallenge, type Level } from '@/types/learning';
 import {
     CheckCircleIcon,
     ClockIcon,
     CodeBracketIcon,
     CpuChipIcon,
+    PencilSquareIcon,
+    PlusIcon,
     ShieldCheckIcon,
+    TrashIcon,
 } from '@heroicons/react/20/solid';
-import clsx from 'clsx';
-import { FormEventHandler } from 'react';
+import { router } from '@inertiajs/react';
+import { FormEventHandler, useState } from 'react';
 
 const LANGUAGES = [
     { value: 'php', label: 'PHP' },
     { value: 'javascript', label: 'JavaScript' },
     { value: 'python', label: 'Python' },
 ] as const;
+
+interface ChallengeFormData {
+    title: string;
+    description: string;
+    constraints: string;
+    language: ChallengeLanguage;
+    entry_point: string;
+    starter_code: string;
+    time_limit_ms: number;
+    memory_limit_mb: number;
+    max_attempts: number;
+    requires_mentor_review: boolean;
+    is_active: boolean;
+    sort_order: number;
+}
+
+function emptyForm(levelNumber: number, sortOrder: number): ChallengeFormData {
+    return {
+        title: `Level ${levelNumber} Challenge`,
+        description: '',
+        constraints: '',
+        language: 'php',
+        entry_point: 'solution',
+        starter_code: '',
+        time_limit_ms: 2000,
+        memory_limit_mb: 128,
+        max_attempts: 5,
+        requires_mentor_review: false,
+        is_active: true,
+        sort_order: sortOrder,
+    };
+}
+
+function formFromChallenge(challenge: CodingChallenge): ChallengeFormData {
+    return {
+        title: challenge.title,
+        description: challenge.description,
+        constraints: challenge.constraints ?? '',
+        language: challenge.language,
+        entry_point: challenge.entry_point,
+        starter_code: challenge.starter_code,
+        time_limit_ms: challenge.time_limit_ms,
+        memory_limit_mb: challenge.memory_limit_mb,
+        max_attempts: challenge.max_attempts,
+        requires_mentor_review: challenge.requires_mentor_review,
+        is_active: challenge.is_active,
+        sort_order: challenge.sort_order,
+    };
+}
+
+function descriptionPreview(description: string | null): string | null {
+    if (!description) {
+        return null;
+    }
+
+    const text = description
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    return text || null;
+}
 
 interface ChallengeTabProps {
     pathId: number;
@@ -35,43 +104,98 @@ interface ChallengeTabProps {
     curriculumHref: string;
 }
 
+function ChallengeCard({
+    challenge,
+    onEdit,
+    onDelete,
+}: {
+    challenge: CodingChallenge;
+    onEdit: () => void;
+    onDelete: () => void;
+}) {
+    const testCaseCount = challenge.test_cases?.length ?? challenge.test_cases_count ?? 0;
+    const sampleCount = challenge.test_cases?.filter((testCase) => testCase.is_sample).length ?? 0;
+    const languageLabel = LANGUAGES.find((lang) => lang.value === challenge.language)?.label ?? challenge.language;
+    const preview = descriptionPreview(challenge.description);
+
+    return (
+        <article className="flex gap-4 rounded-lg border border-zinc-950/10 p-4 dark:border-white/10">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
+                <CodeBracketIcon className="size-5 text-zinc-500" />
+            </div>
+            <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium text-zinc-950 dark:text-white">{challenge.title}</p>
+                    <Badge color="zinc">{languageLabel}</Badge>
+                    <Badge color="zinc">
+                        {testCaseCount} test {testCaseCount === 1 ? 'case' : 'cases'}
+                    </Badge>
+                    {sampleCount > 0 && <Badge color="blue">{sampleCount} sample</Badge>}
+                    {challenge.requires_mentor_review && (
+                        <Badge color="amber" className="gap-1">
+                            <ShieldCheckIcon className="size-3.5" />
+                            Mentor review
+                        </Badge>
+                    )}
+                    <Badge color={challenge.is_active ? 'lime' : 'zinc'}>{challenge.is_active ? 'Active' : 'Inactive'}</Badge>
+                </div>
+                {preview && <p className="mt-2 line-clamp-2 text-sm text-zinc-500 dark:text-zinc-400">{preview}</p>}
+                <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    Entry point: <code className="font-mono">{challenge.entry_point}()</code>
+                </p>
+            </div>
+            <div className="flex shrink-0 gap-1">
+                <Button type="button" plain onClick={onEdit} aria-label="Edit challenge">
+                    <PencilSquareIcon className="size-4" />
+                </Button>
+                <Button type="button" plain onClick={onDelete} aria-label="Delete challenge">
+                    <TrashIcon className="size-4" />
+                </Button>
+            </div>
+        </article>
+    );
+}
+
 export function ChallengeTab({ pathId, level, onPrev, curriculumHref }: ChallengeTabProps) {
     const { confirm, ConfirmDialog } = useConfirmDialog();
-    const challenge = level.coding_challenge;
-    const testCaseCount = challenge?.test_cases?.length ?? challenge?.test_cases_count ?? 0;
-    const sampleCount = challenge?.test_cases?.filter((testCase) => testCase.is_sample).length ?? 0;
+    const challenges = level.coding_challenges ?? [];
+    const nextSortOrder = challenges.length + 1;
+    const [dialogOpen, setDialogOpen] = useState(challenges.length === 0);
+    const [editing, setEditing] = useState<CodingChallenge | null>(null);
+    const configuredChallenges = challenges.filter((challenge) =>
+        Boolean(challenge.description?.replace(/<[^>]+>/g, '').trim() && challenge.entry_point?.trim()),
+    );
+    const challengesWithTests = challenges.filter(
+        (challenge) => (challenge.test_cases?.length ?? challenge.test_cases_count ?? 0) > 0,
+    );
 
-    const form = useValidatedForm({
-        title: challenge?.title ?? `Level ${level.number} Challenge`,
-        description: challenge?.description ?? '',
-        constraints: challenge?.constraints ?? '',
-        language: challenge?.language ?? 'php',
-        entry_point: challenge?.entry_point ?? 'solution',
-        starter_code: challenge?.starter_code ?? '',
-        time_limit_ms: challenge?.time_limit_ms ?? 2000,
-        memory_limit_mb: challenge?.memory_limit_mb ?? 128,
-        max_attempts: challenge?.max_attempts ?? 5,
-        requires_mentor_review: challenge?.requires_mentor_review ?? false,
-        is_active: challenge?.is_active ?? true,
-    });
+    const openCreate = () => {
+        setEditing(null);
+        setDialogOpen(true);
+    };
 
-    const saveSettings: FormEventHandler = async (e) => {
-        e.preventDefault();
+    const openEdit = (challenge: CodingChallenge) => {
+        setEditing(challenge);
+        setDialogOpen(true);
+    };
 
+    const closeDialog = () => {
+        setDialogOpen(false);
+        setEditing(null);
+    };
+
+    const deleteChallenge = async (challenge: CodingChallenge) => {
         const confirmed = await confirm({
-            title: 'Save challenge settings?',
-            description: 'Problem statement, limits, and grading rules will apply to intern submissions.',
-            confirmLabel: 'Save challenge',
+            title: 'Delete challenge?',
+            description: `"${challenge.title}" and its test cases will be permanently removed from this level.`,
+            confirmLabel: 'Delete',
+            variant: 'danger',
         });
 
         if (confirmed) {
-            form.patch(route('admin.challenge.update', [pathId, level.id]), {
-                successToast: { title: 'Challenge saved', message: 'Coding challenge settings updated.' },
-            });
+            router.delete(route('admin.challenges.destroy', challenge.id));
         }
     };
-
-    const languageLabel = LANGUAGES.find((lang) => lang.value === form.data.language)?.label ?? form.data.language;
 
     return (
         <LevelStepShell
@@ -81,62 +205,157 @@ export function ChallengeTab({ pathId, level, onPrev, curriculumHref }: Challeng
                 <>
                     <StepSidebarCard title="Workspace flow">
                         <p>
-                            Interns solve in a split view—problem on the left, Monaco editor on the right. Run checks sample
-                            cases; submit evaluates all cases including hidden ones.
+                            Interns solve each challenge in a split view—problem on the left, Monaco editor on the right. Run
+                            checks sample cases; submit evaluates all cases including hidden ones.
                         </p>
                     </StepSidebarCard>
                     <StepSidebarCard title="Checklist">
                         <StepChecklist
                             items={[
-                                { label: 'Problem statement configured', done: Boolean(form.data.description?.trim()) },
-                                { label: 'Entry point function set', done: Boolean(form.data.entry_point?.trim()) },
-                                { label: 'At least one test case', done: testCaseCount > 0 },
+                                { label: 'At least one challenge configured', done: configuredChallenges.length > 0 },
+                                { label: 'Each challenge has test cases', done: challengesWithTests.length === challenges.length && challenges.length > 0 },
                             ]}
                         />
                     </StepSidebarCard>
                     <StepSidebarCard title="Completion rule" variant="tip">
-                        Passing all tests (and mentor review when enabled) is required alongside materials, videos, and quiz
-                        to unlock the next level.
+                        All active challenges must pass (including mentor review when enabled) alongside materials, videos, and
+                        quiz to unlock the next level.
                     </StepSidebarCard>
                 </>
             }
         >
             <ConfirmDialog />
 
-            <div className="mb-4 flex flex-wrap items-center gap-2">
-                <Badge color="zinc" className={clsx('gap-1', accent.bgSoft, accent.textSoft)}>
-                    <CodeBracketIcon className="size-3.5" />
-                    {languageLabel}
-                </Badge>
-                <Badge color="zinc">
-                    {testCaseCount} test {testCaseCount === 1 ? 'case' : 'cases'}
-                </Badge>
-                {sampleCount > 0 && <Badge color="blue">{sampleCount} sample</Badge>}
-                {form.data.requires_mentor_review && (
-                    <Badge color="amber" className="gap-1">
-                        <ShieldCheckIcon className="size-3.5" />
-                        Mentor review
-                    </Badge>
-                )}
-                <Badge color={form.data.is_active ? 'lime' : 'zinc'}>{form.data.is_active ? 'Active' : 'Inactive'}</Badge>
-            </div>
-
-            <form onSubmit={saveSettings} className={clsx('overflow-hidden', surfaces.card)}>
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 px-4 py-3 dark:border-slate-800">
-                    <div>
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white">Challenge configuration</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Problem statement, runtime limits, and grading flags</p>
-                    </div>
-                    <Button type="submit" color="dark/zinc" disabled={form.processing} className="!text-xs">
-                        Save settings
+            <div className="space-y-6">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <Subheading level={3}>
+                        {challenges.length} {challenges.length === 1 ? 'challenge' : 'challenges'}
+                    </Subheading>
+                    <Button type="button" onClick={openCreate}>
+                        <PlusIcon data-slot="icon" />
+                        Add challenge
                     </Button>
                 </div>
 
-                <div className="divide-y divide-slate-200/80 dark:divide-slate-800">
-                    <section className="space-y-3 p-4">
-                        <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                            Problem
-                        </p>
+                {challenges.length === 0 ? (
+                    <div className="rounded-lg border border-dashed border-zinc-300 p-8 text-center dark:border-zinc-600">
+                        <CodeBracketIcon className="mx-auto size-8 text-zinc-400" />
+                        <p className="mt-3 text-sm text-zinc-500">No coding challenges yet. Add your first problem to get started.</p>
+                    </div>
+                ) : (
+                    <ul className="space-y-3">
+                        {challenges.map((challenge) => (
+                            <li key={challenge.id}>
+                                <ChallengeCard
+                                    challenge={challenge}
+                                    onEdit={() => openEdit(challenge)}
+                                    onDelete={() => deleteChallenge(challenge)}
+                                />
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+
+            <ChallengeDialog
+                key={editing?.id ?? 'new'}
+                open={dialogOpen}
+                onClose={closeDialog}
+                pathId={pathId}
+                levelId={level.id}
+                levelNumber={level.number}
+                challenge={editing}
+                initialData={editing ? formFromChallenge(editing) : emptyForm(level.number, nextSortOrder)}
+                confirm={confirm}
+            />
+
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-200/80 pt-4 dark:border-slate-800">
+                {onPrev ? (
+                    <Button type="button" plain onClick={onPrev} className="!text-sm">
+                        Previous step
+                    </Button>
+                ) : (
+                    <span />
+                )}
+                <Button href={curriculumHref} outline className="!text-sm">
+                    <CheckCircleIcon data-slot="icon" className="!size-4" />
+                    Back to curriculum
+                </Button>
+            </div>
+        </LevelStepShell>
+    );
+}
+
+interface ChallengeDialogProps {
+    open: boolean;
+    onClose: () => void;
+    pathId: number;
+    levelId: number;
+    levelNumber: number;
+    challenge: CodingChallenge | null;
+    initialData: ChallengeFormData;
+    confirm: (options: ConfirmOptions) => Promise<boolean>;
+}
+
+function ChallengeDialog({
+    open,
+    onClose,
+    pathId,
+    levelId,
+    levelNumber,
+    challenge,
+    initialData,
+    confirm,
+}: ChallengeDialogProps) {
+    const form = useValidatedForm(initialData);
+
+    const submit: FormEventHandler = async (e) => {
+        e.preventDefault();
+
+        const confirmed = await confirm(
+            challenge
+                ? {
+                      title: 'Save challenge changes?',
+                      description: `"${form.data.title || challenge.title}" will be updated for this level.`,
+                      confirmLabel: 'Save challenge',
+                  }
+                : {
+                      title: 'Add challenge?',
+                      description: `"${form.data.title || 'This challenge'}" will be added to the level curriculum.`,
+                      confirmLabel: 'Add challenge',
+                  },
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const options = {
+            onSuccess: onClose,
+            successToast: challenge
+                ? { title: 'Challenge saved', message: `"${form.data.title}" was updated.` }
+                : { title: 'Challenge added', message: `"${form.data.title}" was added to this level.` },
+        };
+
+        if (challenge) {
+            form.patch(route('admin.challenges.update', challenge.id), options);
+
+            return;
+        }
+
+        form.post(route('admin.challenges.store', [pathId, levelId]), options);
+    };
+
+    return (
+        <Dialog open={open} onClose={onClose} size="5xl">
+            <DialogTitle>{challenge ? 'Edit challenge' : 'Add challenge'}</DialogTitle>
+            <DialogDescription>
+                Configure the problem statement, starter template, runtime limits, and grading flags for level {levelNumber}.
+            </DialogDescription>
+            <DialogBody className="max-h-[70vh] overflow-y-auto">
+                <form id="challenge-form" onSubmit={submit} className="space-y-6">
+                    <section className="space-y-3">
+                        <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">Problem</p>
                         <div className="grid gap-3 sm:grid-cols-2">
                             <FormField error={form.errors.title} className="sm:col-span-2">
                                 <Label>Title</Label>
@@ -163,10 +382,11 @@ export function ChallengeTab({ pathId, level, onPrev, curriculumHref }: Challeng
                             </FormField>
                             <FormField error={form.errors.description} className="sm:col-span-2">
                                 <Label>Description</Label>
-                                <Textarea
-                                    rows={5}
+                                <Description>Problem statement shown to interns in the challenge workspace.</Description>
+                                <RichTextEditor
                                     value={form.data.description}
-                                    onChange={(e) => form.setData('description', e.target.value)}
+                                    onChange={(html) => form.setData('description', html)}
+                                    invalid={!!form.errors.description}
                                     placeholder="Describe inputs, output, and approach expectations…"
                                 />
                             </FormField>
@@ -183,23 +403,24 @@ export function ChallengeTab({ pathId, level, onPrev, curriculumHref }: Challeng
                         </div>
                     </section>
 
-                    <section className="space-y-3 p-4">
+                    <section className="space-y-3">
                         <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
                             Starter template
                         </p>
                         <FormField error={form.errors.starter_code}>
                             <Label>Starter code</Label>
                             <Description>Pre-filled in the intern editor before they begin.</Description>
-                            <Textarea
-                                rows={6}
+                            <CodeEditor
                                 value={form.data.starter_code}
-                                onChange={(e) => form.setData('starter_code', e.target.value)}
-                                className="font-mono text-xs leading-5"
+                                onChange={(code) => form.setData('starter_code', code)}
+                                language={monacoLanguage(form.data.language)}
+                                invalid={!!form.errors.starter_code}
+                                height={280}
                             />
                         </FormField>
                     </section>
 
-                    <section className="space-y-3 p-4">
+                    <section className="space-y-3">
                         <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
                             Runtime & attempts
                         </p>
@@ -236,7 +457,7 @@ export function ChallengeTab({ pathId, level, onPrev, curriculumHref }: Challeng
                             </FormField>
                         </div>
                         <div className="grid gap-3 sm:grid-cols-2">
-                            <div className={clsx('rounded-lg border border-slate-200/80 p-3 dark:border-slate-800', surfaces.cardMuted)}>
+                            <div className="rounded-lg border border-slate-200/80 p-3 dark:border-slate-800">
                                 <SwitchField>
                                     <Label>Mentor review</Label>
                                     <Description>Require mentor approval after all tests pass.</Description>
@@ -246,7 +467,7 @@ export function ChallengeTab({ pathId, level, onPrev, curriculumHref }: Challeng
                                     />
                                 </SwitchField>
                             </div>
-                            <div className={clsx('rounded-lg border border-slate-200/80 p-3 dark:border-slate-800', surfaces.cardMuted)}>
+                            <div className="rounded-lg border border-slate-200/80 p-3 dark:border-slate-800">
                                 <SwitchField>
                                     <Label>Active</Label>
                                     <Description>Inactive challenges are excluded from progression.</Description>
@@ -255,33 +476,27 @@ export function ChallengeTab({ pathId, level, onPrev, curriculumHref }: Challeng
                             </div>
                         </div>
                     </section>
-                </div>
-            </form>
+                </form>
 
-            {challenge ? (
-                <div className="mt-4">
-                    <ChallengeTestCaseManager challenge={challenge} />
-                </div>
-            ) : (
-                <div className={clsx('mt-4 rounded-lg border border-dashed border-slate-300 p-6 text-center dark:border-slate-700', surfaces.cardMuted)}>
-                    <CodeBracketIcon className="mx-auto size-7 text-slate-400" />
-                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Save challenge settings to add test cases.</p>
-                </div>
-            )}
-
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-200/80 pt-4 dark:border-slate-800">
-                {onPrev ? (
-                    <Button type="button" plain onClick={onPrev} className="!text-sm">
-                        Previous step
-                    </Button>
+                {challenge ? (
+                    <div className="mt-6 border-t border-slate-200/80 pt-6 dark:border-slate-800">
+                        <ChallengeTestCaseManager challenge={challenge} />
+                    </div>
                 ) : (
-                    <span />
+                    <div className="mt-6 rounded-lg border border-dashed border-slate-300 p-6 text-center dark:border-slate-700">
+                        <CodeBracketIcon className="mx-auto size-7 text-slate-400" />
+                        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Save the challenge first to add test cases.</p>
+                    </div>
                 )}
-                <Button href={curriculumHref} outline className="!text-sm">
-                    <CheckCircleIcon data-slot="icon" className="!size-4" />
-                    Back to curriculum
+            </DialogBody>
+            <DialogActions>
+                <Button plain onClick={onClose}>
+                    Cancel
                 </Button>
-            </div>
-        </LevelStepShell>
+                <Button type="submit" form="challenge-form" disabled={form.processing}>
+                    {challenge ? 'Save challenge' : 'Add challenge'}
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 }

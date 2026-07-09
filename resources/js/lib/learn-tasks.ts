@@ -62,14 +62,18 @@ export function buildLevelTasks(pathId: number, level: Level): LearnTask[] {
         });
     }
 
-    if (level.coding_challenge?.is_active) {
+    for (const challenge of level.coding_challenges ?? []) {
+        if (!challenge.is_active) {
+            continue;
+        }
+
         tasks.push({
-            key: `challenge-${level.coding_challenge.id}`,
+            key: `challenge-${challenge.id}`,
             type: 'challenge',
-            label: level.coding_challenge.title,
-            shortLabel: 'Challenge',
-            href: route('learn.challenges.show', level.coding_challenge.id),
-            completed: Boolean(level.coding_challenge.passed),
+            label: challenge.title,
+            shortLabel: truncate(challenge.title, 28),
+            href: route('learn.challenges.show', challenge.id),
+            completed: Boolean(challenge.passed),
             step: step++,
         });
     }

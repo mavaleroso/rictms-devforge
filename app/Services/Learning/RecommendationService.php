@@ -62,7 +62,7 @@ final class RecommendationService
         $materialDone = $grouped->get((new LearningMaterial)->getMorphClass(), collect());
         $videoDone = $grouped->get((new Video)->getMorphClass(), collect());
 
-        $level->loadMissing(['materials', 'videos', 'quiz', 'codingChallenge']);
+        $level->loadMissing(['materials', 'videos', 'quiz', 'codingChallenges']);
 
         foreach ($level->materials as $material) {
             if (! $materialDone->contains($material->id)) {
@@ -100,9 +100,11 @@ final class RecommendationService
             ];
         }
 
-        $challenge = $level->codingChallenge;
+        foreach ($level->codingChallenges as $challenge) {
+            if (! $challenge->is_active || $this->challengeSubmissions->hasPassed($user->id, $challenge->id)) {
+                continue;
+            }
 
-        if ($challenge?->is_active && ! $this->challengeSubmissions->hasPassed($user->id, $challenge->id)) {
             $latestStatus = $this->challengeSubmissions->statsForUserAndChallenge($user->id, $challenge->id)['status'];
             $reason = $latestStatus === SubmissionStatus::Failed->value
                 ? 'Retry coding challenge — last attempt failed'
@@ -115,6 +117,7 @@ final class RecommendationService
                 'href' => route('learn.challenges.show', $challenge->id),
                 'priority' => $latestStatus === SubmissionStatus::Failed->value ? 2 : 4,
             ];
+            break;
         }
 
         $progress = $enrollment->levelProgress->firstWhere('level_id', $level->id);

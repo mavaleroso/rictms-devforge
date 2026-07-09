@@ -33,11 +33,10 @@ export default function LearnMaterialsShow({ path: pathProp, level: levelProp, e
             enrollment={enrollment?.data ?? null}
             currentTask={currentTask}
         >
-            <div className="mb-3">
-                <p className="text-xs text-zinc-500">
+            <div className="mb-5">
+                <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
                     {path.name} · Level {level.number} · Reading
                 </p>
-                <h1 className="mt-1 text-lg font-semibold text-zinc-950 dark:text-white">{material.title}</h1>
             </div>
 
             <MaterialViewer material={material} />

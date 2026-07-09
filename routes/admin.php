@@ -34,7 +34,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::patch('questions/{question}', [LevelContentController::class, 'updateQuestion'])->name('questions.update');
     Route::delete('questions/{question}', [LevelContentController::class, 'destroyQuestion'])->name('questions.destroy');
 
-    Route::patch('paths/{path}/levels/{level}/challenge', [\App\Http\Controllers\Admin\ChallengeContentController::class, 'updateChallenge'])->name('challenge.update');
+    Route::post('paths/{path}/levels/{level}/challenges', [\App\Http\Controllers\Admin\ChallengeContentController::class, 'storeChallenge'])->name('challenges.store');
+    Route::patch('challenges/{challenge}', [\App\Http\Controllers\Admin\ChallengeContentController::class, 'updateChallenge'])->name('challenges.update');
+    Route::delete('challenges/{challenge}', [\App\Http\Controllers\Admin\ChallengeContentController::class, 'destroyChallenge'])->name('challenges.destroy');
     Route::post('challenges/{challenge}/test-cases', [\App\Http\Controllers\Admin\ChallengeContentController::class, 'storeTestCase'])->name('challenge-test-cases.store');
     Route::patch('challenge-test-cases/{testCase}', [\App\Http\Controllers\Admin\ChallengeContentController::class, 'updateTestCase'])->name('challenge-test-cases.update');
     Route::delete('challenge-test-cases/{testCase}', [\App\Http\Controllers\Admin\ChallengeContentController::class, 'destroyTestCase'])->name('challenge-test-cases.destroy');

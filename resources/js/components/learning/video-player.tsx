@@ -121,6 +121,13 @@ export function VideoPlayer({ video, canComplete = true, featured = false }: Vid
 
                 {!featured && <VideoEmbed video={video} featured={false} />}
 
+                {video.caption?.replace(/<[^>]+>/g, '').trim() && (
+                    <div
+                        className="prose prose-sm prose-zinc max-w-none border-t border-zinc-950/5 px-4 py-4 sm:px-5 dark:border-white/5 dark:prose-invert"
+                        dangerouslySetInnerHTML={{ __html: video.caption }}
+                    />
+                )}
+
                 {canComplete && !video.completed && (
                     <div className="border-t border-zinc-950/5 px-4 py-3 sm:px-5 dark:border-white/5">
                         <Button outline onClick={markWatched}>

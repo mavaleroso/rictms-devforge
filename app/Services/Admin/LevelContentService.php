@@ -24,18 +24,38 @@ final class LevelContentService
         private readonly QuizQuestionRepository $questions,
     ) {}
 
-    public function storeMaterial(Level $level, array $attributes): LearningMaterial
+    public function storeMaterial(Level $level, array $attributes, array $files = []): LearningMaterial
     {
-        return $this->materials->createForLevel($level, $attributes);
+        unset($attributes['file_path'], $attributes['remove_file'], $attributes['remove_file_ids'], $attributes['files']);
+
+        $material = $this->materials->createForLevel($level, $attributes);
+        $this->attachMaterialFiles($material, $files);
+
+        return $material;
     }
 
-    public function updateMaterial(LearningMaterial $material, array $attributes): void
-    {
+    public function updateMaterial(
+        LearningMaterial $material,
+        array $attributes,
+        array $files = [],
+        array $removeFileIds = [],
+    ): void {
+        unset($attributes['file_path'], $attributes['remove_file'], $attributes['remove_file_ids'], $attributes['files']);
+
+        $this->removeMaterialFiles($material, $removeFileIds);
+        $this->attachMaterialFiles($material, $files);
+
         $this->materials->update($material, $attributes);
     }
 
     public function deleteMaterial(LearningMaterial $material): void
     {
+        $material->load('files');
+
+        foreach ($material->files as $file) {
+            $this->deleteMaterialFile($file->file_path);
+        }
+
         $this->materials->delete($material);
     }
 
@@ -55,6 +75,15 @@ final class LevelContentService
 
     public function updateVideo(Video $video, array $attributes, ?UploadedFile $file = null): void
     {
+        if (isset($attributes['provider'])) {
+            $provider = VideoProvider::from($attributes['provider']);
+
+            if ($provider === VideoProvider::Youtube) {
+                $this->deleteVideoFile($video->file_path);
+                $attributes['file_path'] = null;
+            }
+        }
+
         if ($file) {
             $this->deleteVideoFile($video->file_path);
             $attributes['file_path'] = $this->storeVideoFile($video->level, $file);
@@ -99,6 +128,60 @@ final class LevelContentService
     }
 
     private function deleteVideoFile(?string $path): void
+    {
+        if (! $path) {
+            return;
+        }
+
+        Storage::disk('public')->delete($path);
+    }
+
+    private function storeMaterialFile(Level $level, UploadedFile $file): string
+    {
+        return $file->store("learning-paths/{$level->learning_path_id}/levels/{$level->id}/materials", 'public');
+    }
+
+    /** @param  array<int, UploadedFile>  $files */
+    private function attachMaterialFiles(LearningMaterial $material, array $files): void
+    {
+        if ($files === []) {
+            return;
+        }
+
+        $material->loadMissing('level');
+        $nextSortOrder = (int) $material->files()->max('sort_order');
+
+        foreach ($files as $uploadedFile) {
+            if (! $uploadedFile instanceof UploadedFile) {
+                continue;
+            }
+
+            $nextSortOrder++;
+
+            $material->files()->create([
+                'file_path' => $this->storeMaterialFile($material->level, $uploadedFile),
+                'original_name' => $uploadedFile->getClientOriginalName(),
+                'sort_order' => $nextSortOrder,
+            ]);
+        }
+    }
+
+    /** @param  array<int, int>  $removeFileIds */
+    private function removeMaterialFiles(LearningMaterial $material, array $removeFileIds): void
+    {
+        if ($removeFileIds === []) {
+            return;
+        }
+
+        $files = $material->files()->whereIn('id', $removeFileIds)->get();
+
+        foreach ($files as $file) {
+            $this->deleteMaterialFile($file->file_path);
+            $file->delete();
+        }
+    }
+
+    private function deleteMaterialFile(?string $path): void
     {
         if (! $path) {
             return;

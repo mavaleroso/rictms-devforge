@@ -28,6 +28,7 @@ class CodingChallenge extends Model
         'max_attempts',
         'requires_mentor_review',
         'is_active',
+        'sort_order',
     ];
 
     protected function casts(): array

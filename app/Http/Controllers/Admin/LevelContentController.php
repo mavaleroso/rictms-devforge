@@ -29,7 +29,11 @@ class LevelContentController extends Controller
     ): RedirectResponse {
         abort_unless($level->learning_path_id === $path->id, 404);
 
-        $manageLevelContent->storeMaterial($level, $request->validated());
+        $manageLevelContent->storeMaterial(
+            $level,
+            $request->safe()->except(['files', 'remove_file_ids']),
+            array_values($request->file('files', []) ?? []),
+        );
 
         return back();
     }
@@ -39,7 +43,12 @@ class LevelContentController extends Controller
         LearningMaterial $material,
         ManageLevelContent $manageLevelContent,
     ): RedirectResponse {
-        $manageLevelContent->updateMaterial($material, $request->validated());
+        $manageLevelContent->updateMaterial(
+            $material,
+            $request->safe()->except(['files', 'remove_file_ids']),
+            array_values($request->file('files', []) ?? []),
+            $request->validated('remove_file_ids', []),
+        );
 
         return back();
     }

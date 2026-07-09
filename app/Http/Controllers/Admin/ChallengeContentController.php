@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Actions\Admin\ManageChallengeContent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreChallengeTestCaseRequest;
+use App\Http\Requests\Admin\StoreCodingChallengeRequest;
 use App\Http\Requests\Admin\UpdateChallengeTestCaseRequest;
 use App\Http\Requests\Admin\UpdateCodingChallengeRequest;
 use App\Models\ChallengeTestCase;
@@ -15,15 +16,34 @@ use Illuminate\Http\RedirectResponse;
 
 class ChallengeContentController extends Controller
 {
-    public function updateChallenge(
-        UpdateCodingChallengeRequest $request,
+    public function storeChallenge(
+        StoreCodingChallengeRequest $request,
         LearningPath $path,
         Level $level,
         ManageChallengeContent $manageChallengeContent,
     ): RedirectResponse {
         abort_unless($level->learning_path_id === $path->id, 404);
 
-        $manageChallengeContent->updateChallenge($level, $request->validated());
+        $manageChallengeContent->storeChallenge($level, $request->validated());
+
+        return back();
+    }
+
+    public function updateChallenge(
+        UpdateCodingChallengeRequest $request,
+        CodingChallenge $challenge,
+        ManageChallengeContent $manageChallengeContent,
+    ): RedirectResponse {
+        $manageChallengeContent->updateChallenge($challenge, $request->validated());
+
+        return back();
+    }
+
+    public function destroyChallenge(CodingChallenge $challenge, ManageChallengeContent $manageChallengeContent): RedirectResponse
+    {
+        abort_unless(request()->user()?->isAdmin(), 403);
+
+        $manageChallengeContent->deleteChallenge($challenge);
 
         return back();
     }

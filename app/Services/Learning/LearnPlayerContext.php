@@ -34,7 +34,7 @@ final class LearnPlayerContext
     /** @return array<string, mixed> */
     public function forMaterial(LearningMaterial $material, User $user): array
     {
-        $material->loadMissing('level.learningPath');
+        $material->loadMissing('files', 'level.learningPath');
         $level = $material->level;
         $path = $level->learningPath;
 

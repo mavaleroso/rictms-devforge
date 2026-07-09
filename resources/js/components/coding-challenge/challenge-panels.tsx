@@ -10,6 +10,10 @@ interface ChallengeProblemPanelProps {
     levelNumber: number;
 }
 
+function hasHtmlMarkup(value: string): boolean {
+    return /<[a-z][\s\S]*>/i.test(value);
+}
+
 export function ChallengeProblemPanel({ challenge, pathName, levelNumber }: ChallengeProblemPanelProps) {
     const remaining = attemptsRemaining(challenge);
 
@@ -33,11 +37,16 @@ export function ChallengeProblemPanel({ challenge, pathName, levelNumber }: Chal
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
-                <div className="prose prose-sm prose-zinc max-w-none dark:prose-invert">
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
-                        {challenge.description}
+                {hasHtmlMarkup(challenge.description) ? (
+                    <div
+                        className="prose prose-sm prose-zinc max-w-none dark:prose-invert"
+                        dangerouslySetInnerHTML={{ __html: challenge.description }}
+                    />
+                ) : (
+                    <div className="prose prose-sm prose-zinc max-w-none whitespace-pre-wrap dark:prose-invert">
+                        <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">{challenge.description}</p>
                     </div>
-                </div>
+                )}
 
                 {challenge.examples.length > 0 && (
                     <section className="mt-5 space-y-3">

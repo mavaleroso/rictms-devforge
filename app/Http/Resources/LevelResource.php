@@ -29,7 +29,7 @@ class LevelResource extends JsonResource
             'materials' => LearningMaterialResource::collection($this->whenLoaded('materials')),
             'videos' => VideoResource::collection($this->whenLoaded('videos')),
             'quiz' => new QuizResource($this->whenLoaded('quiz')),
-            'coding_challenge' => new CodingChallengeResource($this->whenLoaded('codingChallenge')),
+            'coding_challenges' => CodingChallengeResource::collection($this->whenLoaded('codingChallenges')),
             'progress_status' => $this->when(isset($this->progress_status), $this->progress_status),
         ];
     }

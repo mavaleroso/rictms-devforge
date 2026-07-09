@@ -34,5 +34,15 @@ export function submitMultipartPatch<T extends FormDataType>(
 }
 
 export function formHasFileUpload(data: Record<string, FormDataConvertible>): boolean {
-    return Object.values(data).some((value) => value instanceof File);
+    return Object.values(data).some((value) => {
+        if (value instanceof File) {
+            return true;
+        }
+
+        if (Array.isArray(value)) {
+            return value.some((item) => item instanceof File);
+        }
+
+        return false;
+    });
 }

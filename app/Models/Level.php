@@ -52,9 +52,9 @@ class Level extends Model
         return $this->hasOne(Quiz::class);
     }
 
-    public function codingChallenge(): HasOne
+    public function codingChallenges(): HasMany
     {
-        return $this->hasOne(CodingChallenge::class);
+        return $this->hasMany(CodingChallenge::class)->orderBy('sort_order');
     }
 
     public function progressRecords(): HasMany

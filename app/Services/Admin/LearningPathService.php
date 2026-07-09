@@ -57,7 +57,7 @@ final class LearningPathService
                 'levels.materials',
                 'levels.videos',
                 'levels.quiz',
-                'levels.codingChallenge',
+                'levels.codingChallenges',
                 'enrollments',
             ]);
 
@@ -65,7 +65,7 @@ final class LearningPathService
             $materialIds = $path->levels->flatMap->materials->pluck('id');
             $videoIds = $path->levels->flatMap->videos->pluck('id');
             $quizIds = $path->levels->map(fn ($level) => $level->quiz?->id)->filter();
-            $challengeIds = $path->levels->map(fn ($level) => $level->codingChallenge?->id)->filter();
+            $challengeIds = $path->levels->flatMap->codingChallenges->pluck('id');
             $enrollmentIds = $path->enrollments->pluck('id');
 
             $this->deleteCertificatesForPath($path);

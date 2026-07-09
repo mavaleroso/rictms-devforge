@@ -24,12 +24,19 @@ final class EloquentCodingChallengeRepository implements CodingChallengeReposito
         return $challenge->load(['testCases', 'level.learningPath']);
     }
 
-    public function updateOrCreateForLevel(Level $level, array $attributes): CodingChallenge
+    public function createForLevel(Level $level, array $attributes): CodingChallenge
     {
-        return $level->codingChallenge()->updateOrCreate(
-            ['level_id' => $level->id],
-            $attributes,
-        );
+        return $level->codingChallenges()->create($attributes);
+    }
+
+    public function update(CodingChallenge $challenge, array $attributes): void
+    {
+        $challenge->update($attributes);
+    }
+
+    public function delete(CodingChallenge $challenge): void
+    {
+        $challenge->delete();
     }
 
     public function testCasesForChallenge(CodingChallenge $challenge, bool $sampleOnly = false): Collection

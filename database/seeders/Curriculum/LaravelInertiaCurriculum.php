@@ -240,7 +240,7 @@ final class LaravelInertiaCurriculum
                         $quiz->questions()->delete();
                         $quiz->delete();
                     }
-                    if ($challenge = $level->codingChallenge) {
+                    foreach ($level->codingChallenges as $challenge) {
                         $challenge->testCases()->delete();
                         $challenge->delete();
                     }
@@ -328,7 +328,7 @@ final class LaravelInertiaCurriculum
 
     private static function seedChallenge(Level $level, int $number): void
     {
-        if ($level->codingChallenge()->exists()) {
+        if ($level->codingChallenges()->exists()) {
             return;
         }
 

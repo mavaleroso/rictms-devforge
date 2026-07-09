@@ -13,9 +13,19 @@ final class ManageChallengeContent
         private readonly ChallengeContentService $content,
     ) {}
 
-    public function updateChallenge(Level $level, array $attributes): CodingChallenge
+    public function storeChallenge(Level $level, array $attributes): CodingChallenge
     {
-        return $this->content->updateChallenge($level, $attributes);
+        return $this->content->storeChallenge($level, $attributes);
+    }
+
+    public function updateChallenge(CodingChallenge $challenge, array $attributes): void
+    {
+        $this->content->updateChallenge($challenge, $attributes);
+    }
+
+    public function deleteChallenge(CodingChallenge $challenge): void
+    {
+        $this->content->deleteChallenge($challenge);
     }
 
     public function storeTestCase(CodingChallenge $challenge, array $attributes): ChallengeTestCase
