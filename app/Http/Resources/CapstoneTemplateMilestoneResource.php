@@ -16,6 +16,8 @@ class CapstoneTemplateMilestoneResource extends JsonResource
             'description' => $this->description,
             'sort_order' => $this->sort_order,
             'requires_mentor_signoff' => $this->requires_mentor_signoff,
+            'allows_parallel' => (bool) $this->allows_parallel,
+            'is_final_showcase' => (bool) $this->is_final_showcase,
         ];
     }
 }

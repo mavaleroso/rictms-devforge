@@ -18,6 +18,9 @@
 /storage/*.key
 /storage/pail
 /vendor
+/resources/challenge-templates/**/vendor
+/resources/challenge-templates/**/node_modules
+/resources/challenge-templates/**/public/hot
 auth.json
 Homestead.json
 Homestead.yaml

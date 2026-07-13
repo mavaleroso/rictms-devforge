@@ -16,16 +16,23 @@ class CapstoneProject extends Model
         'title',
         'description',
         'status',
+        'allow_parallel_milestones',
         'started_at',
+        'kickoff_approved_at',
+        'kickoff_reviewer_id',
         'completed_at',
+        'archived_at',
     ];
 
     protected function casts(): array
     {
         return [
             'status' => CapstoneProjectStatus::class,
+            'allow_parallel_milestones' => 'boolean',
             'started_at' => 'datetime',
+            'kickoff_approved_at' => 'datetime',
             'completed_at' => 'datetime',
+            'archived_at' => 'datetime',
         ];
     }
 
@@ -44,6 +51,11 @@ class CapstoneProject extends Model
         return $this->belongsTo(Level::class);
     }
 
+    public function kickoffReviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'kickoff_reviewer_id');
+    }
+
     public function milestones(): HasMany
     {
         return $this->hasMany(CapstoneProjectMilestone::class)->orderBy('sort_order');
@@ -57,5 +69,15 @@ class CapstoneProject extends Model
     public function journalEntries(): HasMany
     {
         return $this->hasMany(JournalEntry::class)->orderByDesc('entry_date');
+    }
+
+    public function needsKickoff(): bool
+    {
+        return $this->status === CapstoneProjectStatus::Draft && $this->kickoff_approved_at === null;
+    }
+
+    public function isActiveWork(): bool
+    {
+        return $this->status === CapstoneProjectStatus::Active;
     }
 }

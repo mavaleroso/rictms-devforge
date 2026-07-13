@@ -21,6 +21,7 @@ final class JournalService
             'content' => $data['content'],
             'mood' => $data['mood'] ?? null,
             'hours_spent' => $data['hours_spent'] ?? null,
+            'capstone_project_milestone_id' => $data['milestone_id'] ?? null,
         ]);
     }
 }

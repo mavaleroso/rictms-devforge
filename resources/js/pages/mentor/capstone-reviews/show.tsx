@@ -1,7 +1,8 @@
 import { Badge } from '@/components/catalyst/badge';
 import { MentorDecisionForm } from '@/components/mentor/mentor-decision-form';
-import { MILESTONE_STATUS_COLOR, MILESTONE_STATUS_LABEL } from '@/lib/capstone-labels';
-import type { CapstoneMilestone } from '@/types/capstone';
+import { ProgressBar } from '@/components/learning/progress-bar';
+import { MILESTONE_STATUS_COLOR, MILESTONE_STATUS_LABEL, MOOD_LABEL } from '@/lib/capstone-labels';
+import type { CapstoneMilestone, CapstoneMilestoneAttachment, CapstoneTask, JournalEntry } from '@/types/capstone';
 import AppLayout from '@/layouts/app-layout';
 import { useValidatedForm } from '@/hooks/use-validated-form';
 import { type BreadcrumbItem } from '@/types';
@@ -11,12 +12,26 @@ import { FormEventHandler } from 'react';
 
 interface Props {
     milestone: { data: CapstoneMilestone };
+    journals: { data: JournalEntry[] };
+    project_progress: { approved: number; total: number; percent: number };
 }
 
-export default function MentorCapstoneReviewsShow({ milestone: milestoneProp }: Props) {
+function listTasks(milestone: CapstoneMilestone): CapstoneTask[] {
+    if (!milestone.tasks) return [];
+    return Array.isArray(milestone.tasks) ? milestone.tasks : milestone.tasks.data;
+}
+
+function listAttachments(milestone: CapstoneMilestone): CapstoneMilestoneAttachment[] {
+    if (!milestone.attachments) return [];
+    return Array.isArray(milestone.attachments) ? milestone.attachments : milestone.attachments.data;
+}
+
+export default function MentorCapstoneReviewsShow({ milestone: milestoneProp, journals: journalsProp, project_progress }: Props) {
     const milestone = milestoneProp.data;
+    const journals = journalsProp.data;
     const internName = milestone.project?.enrollment?.user?.name ?? 'Intern';
-    const tasks = milestone.tasks ?? [];
+    const tasks = listTasks(milestone);
+    const attachments = listAttachments(milestone);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: '/dashboard' },
@@ -37,7 +52,7 @@ export default function MentorCapstoneReviewsShow({ milestone: milestoneProp }: 
             mentor_score: form.data.mentor_score ? Number(form.data.mentor_score) : null,
             successToast: {
                 title: 'Sign-off recorded',
-                message: 'The intern will see your feedback on their capstone overview.',
+                message: 'The intern will be notified with your feedback.',
             },
         });
     };
@@ -52,7 +67,9 @@ export default function MentorCapstoneReviewsShow({ milestone: milestoneProp }: 
 
             <header className="mt-3 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-zinc-950/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-900">
                 <div>
-                    <p className="text-[10px] font-semibold tracking-wide text-brand-600 uppercase">Milestone sign-off</p>
+                    <p className="text-[10px] font-semibold tracking-wide text-brand-600 uppercase">
+                        {milestone.is_final_showcase ? 'Final showcase' : 'Milestone sign-off'}
+                    </p>
                     <h1 className="mt-1 text-lg font-semibold text-zinc-950 dark:text-white">{milestone.title}</h1>
                     <p className="mt-1 text-xs text-zinc-500">
                         {internName} · {milestone.project?.title}
@@ -64,6 +81,16 @@ export default function MentorCapstoneReviewsShow({ milestone: milestoneProp }: 
                 <Badge color={MILESTONE_STATUS_COLOR[milestone.status]}>{MILESTONE_STATUS_LABEL[milestone.status]}</Badge>
             </header>
 
+            <div className="mt-4 rounded-xl border border-zinc-950/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-900">
+                <div className="mb-2 flex justify-between text-xs text-zinc-500">
+                    <span>Project progress</span>
+                    <span>
+                        {project_progress.approved}/{project_progress.total} milestones approved
+                    </span>
+                </div>
+                <ProgressBar percentage={project_progress.percent} variant="accent" />
+            </div>
+
             <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
                 <div className="space-y-4">
                     <section className="rounded-xl border border-zinc-950/10 bg-white p-5 dark:border-white/10 dark:bg-zinc-900">
@@ -73,11 +100,72 @@ export default function MentorCapstoneReviewsShow({ milestone: milestoneProp }: 
                         </p>
                     </section>
 
+                    <section className="rounded-xl border border-zinc-950/10 bg-white p-5 dark:border-white/10 dark:bg-zinc-900">
+                        <h2 className="text-sm font-semibold text-zinc-950 dark:text-white">Deliverables</h2>
+                        <dl className="mt-3 space-y-2 text-sm">
+                            {milestone.submission_notes && (
+                                <div>
+                                    <dt className="text-xs font-medium text-zinc-500">Notes</dt>
+                                    <dd className="whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">{milestone.submission_notes}</dd>
+                                </div>
+                            )}
+                            {milestone.resubmission_notes && (
+                                <div>
+                                    <dt className="text-xs font-medium text-zinc-500">Resubmission notes</dt>
+                                    <dd className="whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">{milestone.resubmission_notes}</dd>
+                                </div>
+                            )}
+                            {milestone.deliverable_url && (
+                                <div>
+                                    <dt className="text-xs font-medium text-zinc-500">Deliverable</dt>
+                                    <dd>
+                                        <a href={milestone.deliverable_url} target="_blank" rel="noreferrer" className="text-brand-600 break-all">
+                                            {milestone.deliverable_url}
+                                        </a>
+                                    </dd>
+                                </div>
+                            )}
+                            {milestone.repo_url && (
+                                <div>
+                                    <dt className="text-xs font-medium text-zinc-500">Repository</dt>
+                                    <dd>
+                                        <a href={milestone.repo_url} target="_blank" rel="noreferrer" className="text-brand-600 break-all">
+                                            {milestone.repo_url}
+                                        </a>
+                                    </dd>
+                                </div>
+                            )}
+                            {milestone.demo_url && (
+                                <div>
+                                    <dt className="text-xs font-medium text-zinc-500">Demo</dt>
+                                    <dd>
+                                        <a href={milestone.demo_url} target="_blank" rel="noreferrer" className="text-brand-600 break-all">
+                                            {milestone.demo_url}
+                                        </a>
+                                    </dd>
+                                </div>
+                            )}
+                            {!milestone.submission_notes && !milestone.deliverable_url && !milestone.repo_url && !milestone.demo_url && (
+                                <p className="text-xs text-zinc-500">No links or notes were provided with this submission.</p>
+                            )}
+                        </dl>
+                        {attachments.length > 0 && (
+                            <ul className="mt-3 space-y-1 text-sm">
+                                {attachments.map((file) => (
+                                    <li key={file.id}>
+                                        <a href={file.url} target="_blank" rel="noreferrer" className="text-brand-600">
+                                            {file.original_name}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </section>
+
                     {tasks.length > 0 && (
                         <section className="rounded-xl border border-zinc-950/10 bg-white dark:border-white/10 dark:bg-zinc-900">
                             <div className="border-b border-zinc-950/5 px-4 py-3 dark:border-white/5">
                                 <h2 className="text-sm font-semibold text-zinc-950 dark:text-white">Related board tasks</h2>
-                                <p className="text-xs text-zinc-500">Snapshot of tasks linked to this milestone</p>
                             </div>
                             <ul className="divide-y divide-zinc-950/5 dark:divide-white/5">
                                 {tasks.map((task) => (
@@ -89,6 +177,30 @@ export default function MentorCapstoneReviewsShow({ milestone: milestoneProp }: 
                             </ul>
                         </section>
                     )}
+
+                    <section className="rounded-xl border border-zinc-950/10 bg-white dark:border-white/10 dark:bg-zinc-900">
+                        <div className="border-b border-zinc-950/5 px-4 py-3 dark:border-white/5">
+                            <h2 className="text-sm font-semibold text-zinc-950 dark:text-white">Journal entries</h2>
+                            <p className="text-xs text-zinc-500">Recent logs from this intern’s capstone project</p>
+                        </div>
+                        {journals.length === 0 ? (
+                            <p className="px-4 py-6 text-xs text-zinc-500">No journal entries yet.</p>
+                        ) : (
+                            <ul className="divide-y divide-zinc-950/5 dark:divide-white/5">
+                                {journals.map((entry) => (
+                                    <li key={entry.id} className="px-4 py-3">
+                                        <div className="flex flex-wrap items-center gap-2 text-[11px] text-zinc-500">
+                                            <span>{entry.entry_date}</span>
+                                            {entry.mood && <Badge color="zinc">{MOOD_LABEL[entry.mood]}</Badge>}
+                                            {entry.milestone && <Badge color="blue">{entry.milestone.title}</Badge>}
+                                            {entry.hours_spent && <span>{entry.hours_spent}h</span>}
+                                        </div>
+                                        <p className="mt-1 whitespace-pre-wrap text-xs text-zinc-700 dark:text-zinc-300">{entry.content}</p>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </section>
 
                     <section className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50/50 p-4 dark:border-zinc-600 dark:bg-zinc-900/50">
                         <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">Review checklist</p>
@@ -111,7 +223,7 @@ export default function MentorCapstoneReviewsShow({ milestone: milestoneProp }: 
 
                 <MentorDecisionForm
                     title="Sign-off decision"
-                    subtitle="Approving unlocks the next milestone. Rejecting returns it to the intern with your notes."
+                    subtitle="Approving unlocks the next milestone. Rejecting returns it for revision with your notes."
                     decision={form.data.status}
                     onDecisionChange={(value) => form.setData('status', value)}
                     approveLabel="Approve milestone"

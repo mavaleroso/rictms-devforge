@@ -19,9 +19,10 @@ interface NotificationItem {
 
 interface NotificationBellProps {
     unreadCount?: number;
+    tone?: 'default' | 'onDark';
 }
 
-export function NotificationBell({ unreadCount = 0 }: NotificationBellProps) {
+export function NotificationBell({ unreadCount = 0, tone = 'default' }: NotificationBellProps) {
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState<NotificationItem[]>([]);
     const [count, setCount] = useState(unreadCount);
@@ -87,12 +88,22 @@ export function NotificationBell({ unreadCount = 0 }: NotificationBellProps) {
             <button
                 type="button"
                 onClick={() => setOpen((v) => !v)}
-                className="relative flex size-9 items-center justify-center rounded-lg text-zinc-500 transition hover:bg-zinc-950/5 hover:text-zinc-700 dark:hover:bg-white/5 dark:hover:text-zinc-300"
+                className={clsx(
+                    'relative flex size-8 items-center justify-center rounded-md transition',
+                    tone === 'onDark'
+                        ? 'text-brand-100 hover:bg-white/10 hover:text-white'
+                        : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200',
+                )}
                 aria-label="Notifications"
             >
                 <BellIcon className="size-5" />
                 {count > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-blue-600 text-[9px] font-bold text-white">
+                    <span
+                        className={clsx(
+                            'absolute top-0.5 right-0.5 flex size-4 items-center justify-center rounded-full text-[9px] font-semibold text-white',
+                            tone === 'onDark' ? 'bg-brand-400 text-brand-950' : 'bg-brand-700',
+                        )}
+                    >
                         {count > 9 ? '9+' : count}
                     </span>
                 )}

@@ -35,11 +35,22 @@ const LANGUAGES = [
     { value: 'python', label: 'Python' },
 ] as const;
 
+const ENVIRONMENTS = [
+    {
+        value: 'laravel_inertia_react',
+        label: 'Laravel + Inertia + React',
+        description: 'Full-stack DevForge stack used at every level.',
+    },
+] as const;
+
 interface ChallengeFormData {
     title: string;
     description: string;
     constraints: string;
     language: ChallengeLanguage;
+    environment: 'laravel_inertia_react';
+    workspace_mode: 'single_file' | 'project';
+    template_key: string;
     entry_point: string;
     starter_code: string;
     time_limit_ms: number;
@@ -56,6 +67,9 @@ function emptyForm(levelNumber: number, sortOrder: number): ChallengeFormData {
         description: '',
         constraints: '',
         language: 'php',
+        environment: 'laravel_inertia_react',
+        workspace_mode: 'single_file',
+        template_key: 'laravel-inertia-react-template',
         entry_point: 'solution',
         starter_code: '',
         time_limit_ms: 2000,
@@ -73,6 +87,9 @@ function formFromChallenge(challenge: CodingChallenge): ChallengeFormData {
         description: challenge.description,
         constraints: challenge.constraints ?? '',
         language: challenge.language,
+        environment: challenge.environment ?? 'laravel_inertia_react',
+        workspace_mode: challenge.workspace_mode ?? 'single_file',
+        template_key: challenge.template_key ?? 'laravel-inertia-react-template',
         entry_point: challenge.entry_point,
         starter_code: challenge.starter_code,
         time_limit_ms: challenge.time_limit_ms,
@@ -116,6 +133,10 @@ function ChallengeCard({
     const testCaseCount = challenge.test_cases?.length ?? challenge.test_cases_count ?? 0;
     const sampleCount = challenge.test_cases?.filter((testCase) => testCase.is_sample).length ?? 0;
     const languageLabel = LANGUAGES.find((lang) => lang.value === challenge.language)?.label ?? challenge.language;
+    const environmentLabel =
+        challenge.environment_label ??
+        ENVIRONMENTS.find((env) => env.value === challenge.environment)?.label ??
+        'Laravel + Inertia + React';
     const preview = descriptionPreview(challenge.description);
 
     return (
@@ -126,6 +147,7 @@ function ChallengeCard({
             <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                     <p className="font-medium text-zinc-950 dark:text-white">{challenge.title}</p>
+                    <Badge color="violet">{environmentLabel}</Badge>
                     <Badge color="zinc">{languageLabel}</Badge>
                     <Badge color="zinc">
                         {testCaseCount} test {testCaseCount === 1 ? 'case' : 'cases'}
@@ -216,6 +238,10 @@ export function ChallengeTab({ pathId, level, onPrev, curriculumHref }: Challeng
                                 { label: 'Each challenge has test cases', done: challengesWithTests.length === challenges.length && challenges.length > 0 },
                             ]}
                         />
+                    </StepSidebarCard>
+                    <StepSidebarCard title="Learning environment" variant="tip">
+                        Every challenge in this curriculum uses the Laravel + Inertia + React environment so interns practice
+                        the same stack at every level. Language selects the runner (PHP/JS/Python) inside that environment.
                     </StepSidebarCard>
                     <StepSidebarCard title="Completion rule" variant="tip">
                         All active challenges must pass (including mentor review when enabled) alongside materials, videos, and
@@ -370,6 +396,45 @@ function ChallengeDialog({
                                     className="font-mono text-sm"
                                 />
                             </FormField>
+                            <FormField error={form.errors.environment}>
+                                <Label>Environment</Label>
+                                <Listbox
+                                    value={form.data.environment}
+                                    onChange={(value) => form.setData('environment', value)}
+                                >
+                                    {ENVIRONMENTS.map((option) => (
+                                        <ListboxOption key={option.value} value={option.value}>
+                                            {option.label}
+                                        </ListboxOption>
+                                    ))}
+                                </Listbox>
+                                <Description>
+                                    {ENVIRONMENTS.find((env) => env.value === form.data.environment)?.description}
+                                </Description>
+                            </FormField>
+                            <FormField error={form.errors.workspace_mode}>
+                                <Label>Workspace</Label>
+                                <Listbox
+                                    value={form.data.workspace_mode}
+                                    onChange={(value) => form.setData('workspace_mode', value)}
+                                >
+                                    <ListboxOption value="single_file">Single file</ListboxOption>
+                                    <ListboxOption value="project">Project template</ListboxOption>
+                                </Listbox>
+                                <Description>
+                                    Project mode loads the installed Laravel + Inertia + React starter kit for file navigation tasks.
+                                </Description>
+                            </FormField>
+                            {form.data.workspace_mode === 'project' && (
+                                <FormField error={form.errors.template_key} className="sm:col-span-2">
+                                    <Label>Template</Label>
+                                    <Input
+                                        value={form.data.template_key}
+                                        onChange={(e) => form.setData('template_key', e.target.value)}
+                                        className="font-mono text-sm"
+                                    />
+                                </FormField>
+                            )}
                             <FormField error={form.errors.language}>
                                 <Label>Language</Label>
                                 <Listbox value={form.data.language} onChange={(value) => form.setData('language', value)}>

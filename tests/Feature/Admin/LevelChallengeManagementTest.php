@@ -57,7 +57,32 @@ test('admin can add multiple coding challenges to a level', function () {
     $challenges = CodingChallenge::query()->where('level_id', $level->id)->orderBy('sort_order')->get();
 
     expect($challenges)->toHaveCount(2)
-        ->and($challenges->pluck('title')->all())->toBe(['Warm-up challenge', 'Follow-up challenge']);
+        ->and($challenges->pluck('title')->all())->toBe(['Warm-up challenge', 'Follow-up challenge'])
+        ->and($challenges->every(fn ($c) => $c->environment === \App\Enums\ChallengeEnvironment::LaravelInertiaReact))->toBeTrue();
+});
+
+test('admin can create challenge in laravel inertia react environment', function () {
+    ['path' => $path, 'level' => $level] = createAdminLevelChallengeContext();
+    $admin = userWithRole('admin');
+
+    $this->actingAs($admin)
+        ->post(route('admin.challenges.store', [$path, $level]), [
+            'title' => 'Inertia props helper',
+            'description' => '<p>Normalize shared Inertia props.</p>',
+            'language' => ChallengeLanguage::Php->value,
+            'environment' => \App\Enums\ChallengeEnvironment::LaravelInertiaReact->value,
+            'entry_point' => 'normalizeProps',
+            'time_limit_ms' => 2000,
+            'memory_limit_mb' => 128,
+            'max_attempts' => 5,
+            'sort_order' => 1,
+        ])
+        ->assertRedirect();
+
+    $challenge = CodingChallenge::first();
+
+    expect($challenge->environment)->toBe(\App\Enums\ChallengeEnvironment::LaravelInertiaReact)
+        ->and($challenge->starter_code)->toContain('Laravel + Inertia + React');
 });
 
 test('admin can update and delete a coding challenge', function () {

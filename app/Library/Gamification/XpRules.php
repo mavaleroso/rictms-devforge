@@ -53,4 +53,14 @@ final class XpRules
     {
         return (int) config('gamification.xp.daily_streak', 10);
     }
+
+    public static function capstoneMilestone(): int
+    {
+        return (int) config('gamification.xp.capstone_milestone', 100);
+    }
+
+    public static function capstoneComplete(): int
+    {
+        return (int) config('gamification.xp.capstone_complete', 500);
+    }
 }

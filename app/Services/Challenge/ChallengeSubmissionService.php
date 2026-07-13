@@ -7,6 +7,7 @@ use App\Enums\SubmissionSource;
 use App\Enums\SubmissionStatus;
 use App\Enums\XpSourceType;
 use App\Jobs\EvaluateChallengeSubmission;
+use App\Library\CodingChallenge\ChallengeTemplateRepository;
 use App\Library\CodingChallenge\EvaluationResult;
 use App\Library\CodingChallenge\EvaluationRunnerFactory;
 use App\Library\CodingChallenge\ResubmissionPolicy;
@@ -38,14 +39,26 @@ final class ChallengeSubmissionService
         private readonly GamificationService $gamification,
         private readonly EvaluationRunnerFactory $runnerFactory,
         private readonly GitHubContentFetcher $github,
+        private readonly ChallengeTemplateRepository $templates,
     ) {}
 
-    public function runSampleTests(User $user, CodingChallenge $challenge, string $code): EvaluationResult
+    public function runSampleTests(User $user, CodingChallenge $challenge, string $code, ?array $files = null): EvaluationResult
     {
         $testCases = $this->challenges->testCasesForChallenge($challenge, sampleOnly: true);
         $driver = $this->resolveDriver();
 
-        return $this->evaluator->evaluate($challenge, $code, $testCases, sampleOnly: true, driver: $driver);
+        if ($challenge->isProjectWorkspace() && is_array($files) && $files !== []) {
+            $this->syncProjectTemplate($challenge, $files);
+        }
+
+        return $this->evaluator->evaluate(
+            $challenge,
+            $code,
+            $testCases,
+            sampleOnly: true,
+            driver: $driver,
+            files: $files,
+        );
     }
 
     /**
@@ -55,11 +68,13 @@ final class ChallengeSubmissionService
      *     github_repo?: string,
      *     github_ref?: string,
      *     github_path?: string,
+     *     files?: array<string, string>,
      * }  $meta
      */
     public function submit(User $user, CodingChallenge $challenge, string $code, array $meta = []): ChallengeSubmission
     {
         $source = SubmissionSource::tryFrom($meta['source'] ?? 'editor') ?? SubmissionSource::Editor;
+        $files = is_array($meta['files'] ?? null) ? $meta['files'] : null;
 
         if ($source === SubmissionSource::GitHub) {
             $fetched = $this->github->fetchFile(
@@ -90,13 +105,20 @@ final class ChallengeSubmissionService
             ]);
         }
 
-        $driver = $this->resolveDriver();
-
-        if ($this->runnerFactory->shouldQueue()) {
-            return $this->queueSubmission($user, $challenge, $code, $attemptsUsed, $source, $driver, $meta);
+        if ($challenge->isProjectWorkspace() && ($files === null || $files === [])) {
+            throw ValidationException::withMessages([
+                'files' => 'Project workspace submissions require a files map.',
+            ]);
         }
 
-        return $this->evaluateSync($user, $challenge, $code, $attemptsUsed, $source, $driver, $meta, $testCases);
+        $driver = $this->resolveDriver();
+
+        // Project assertions are sync-only (no Docker needed).
+        if ($challenge->isProjectWorkspace() || ! $this->runnerFactory->shouldQueue()) {
+            return $this->evaluateSync($user, $challenge, $code, $attemptsUsed, $source, $driver, $meta, $testCases, $files);
+        }
+
+        return $this->queueSubmission($user, $challenge, $code, $attemptsUsed, $source, $driver, $meta, $files);
     }
 
     public function evaluateQueuedSubmission(ChallengeSubmission $submission): ChallengeSubmission
@@ -105,7 +127,13 @@ final class ChallengeSubmissionService
         $testCases = $this->challenges->testCasesForChallenge($challenge, sampleOnly: false);
         $driver = EvaluationDriver::tryFrom($submission->evaluation_driver ?? 'local');
 
-        $evaluation = $this->evaluator->evaluate($challenge, $submission->code, $testCases, driver: $driver);
+        $evaluation = $this->evaluator->evaluate(
+            $challenge,
+            $submission->code ?? '',
+            $testCases,
+            driver: $driver,
+            files: $submission->files,
+        );
 
         return DB::transaction(function () use ($submission, $evaluation) {
             $this->submissions->updateEvaluation($submission, [
@@ -129,6 +157,7 @@ final class ChallengeSubmissionService
 
     /**
      * @param  array<string, mixed>  $meta
+     * @param  array<string, string>|null  $files
      */
     private function queueSubmission(
         User $user,
@@ -138,11 +167,13 @@ final class ChallengeSubmissionService
         SubmissionSource $source,
         EvaluationDriver $driver,
         array $meta,
+        ?array $files = null,
     ): ChallengeSubmission {
         $submission = $this->submissions->create([
             'user_id' => $user->id,
             'coding_challenge_id' => $challenge->id,
             'code' => $code,
+            'files' => $files,
             'language' => $challenge->language,
             'submission_source' => $source,
             'evaluation_driver' => $driver,
@@ -165,6 +196,7 @@ final class ChallengeSubmissionService
     /**
      * @param  array<string, mixed>  $meta
      * @param  \Illuminate\Support\Collection  $testCases
+     * @param  array<string, string>|null  $files
      */
     private function evaluateSync(
         User $user,
@@ -175,14 +207,20 @@ final class ChallengeSubmissionService
         EvaluationDriver $driver,
         array $meta,
         $testCases,
+        ?array $files = null,
     ): ChallengeSubmission {
-        return DB::transaction(function () use ($user, $challenge, $code, $attemptsUsed, $source, $driver, $meta, $testCases) {
-            $evaluation = $this->evaluator->evaluate($challenge, $code, $testCases, driver: $driver);
+        return DB::transaction(function () use ($user, $challenge, $code, $attemptsUsed, $source, $driver, $meta, $testCases, $files) {
+            if ($challenge->isProjectWorkspace() && is_array($files) && $files !== []) {
+                $this->syncProjectTemplate($challenge, $files);
+            }
+
+            $evaluation = $this->evaluator->evaluate($challenge, $code, $testCases, driver: $driver, files: $files);
 
             $submission = $this->submissions->create([
                 'user_id' => $user->id,
                 'coding_challenge_id' => $challenge->id,
-                'code' => $code,
+                'code' => $code !== '' ? $code : ($files ? reset($files) ?: '' : ''),
+                'files' => $files,
                 'language' => $challenge->language,
                 'submission_source' => $source,
                 'evaluation_driver' => $driver,
@@ -299,5 +337,27 @@ final class ChallengeSubmissionService
         }
 
         $this->progressEngine->evaluate($enrollment, $level);
+    }
+
+    /** @param  array<string, string>  $files */
+    private function syncProjectTemplate(CodingChallenge $challenge, array $files): void
+    {
+        if (app()->environment('testing')) {
+            return;
+        }
+
+        $templateKey = $challenge->template_key ?: config('coding-challenges.default_project_template');
+
+        if (! is_string($templateKey) || $templateKey === '') {
+            return;
+        }
+
+        try {
+            if ($this->templates->isProjectLayout($templateKey)) {
+                $this->templates->syncToDisk($templateKey, $files);
+            }
+        } catch (\Throwable) {
+            // Preview sync is best-effort; evaluation still uses the in-memory file map.
+        }
     }
 }

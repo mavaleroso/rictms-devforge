@@ -5,8 +5,8 @@ import { Text } from '@/components/catalyst/text';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { CapstoneTemplate } from '@/types/capstone';
-import { PencilSquareIcon, RocketLaunchIcon } from '@heroicons/react/20/solid';
-import { Head, Link } from '@inertiajs/react';
+import { PencilSquareIcon, PlusIcon, RocketLaunchIcon } from '@heroicons/react/20/solid';
+import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -23,8 +23,16 @@ export default function AdminCapstoneTemplatesIndex({ templates, stats }: Props)
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Capstone Templates" />
 
-            <Heading>Capstone templates</Heading>
-            <Text className="mt-2 max-w-2xl">Blueprint projects interns can choose when they reach Level 20.</Text>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <Heading>Capstone templates</Heading>
+                    <Text className="mt-2 max-w-2xl">Blueprint projects interns can choose when they reach Level 20.</Text>
+                </div>
+                <Button href={route('admin.capstone-templates.create')} className="shrink-0 self-start sm:self-auto">
+                    <PlusIcon data-slot="icon" />
+                    Create template
+                </Button>
+            </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 {[
@@ -40,31 +48,43 @@ export default function AdminCapstoneTemplatesIndex({ templates, stats }: Props)
             </div>
 
             <div className="mt-8 space-y-3">
-                {templates.data.map((template) => (
-                    <article
-                        key={template.id}
-                        className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-950/10 bg-white px-4 py-3 dark:border-white/10 dark:bg-zinc-900"
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className="flex size-9 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
-                                <RocketLaunchIcon className="size-4" />
-                            </span>
-                            <div>
-                                <p className="text-sm font-semibold text-zinc-950 dark:text-white">{template.name}</p>
-                                <p className="text-xs text-zinc-500">
-                                    {template.estimated_weeks} weeks · {template.milestones?.length ?? template.milestones_count ?? 0} milestones
-                                </p>
+                {templates.data.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-zinc-300 p-10 text-center dark:border-zinc-700">
+                        <Heading level={2}>No templates yet</Heading>
+                        <Text className="mt-2">Create a blueprint so Level 20 interns can start a capstone project.</Text>
+                        <Button className="mt-5" href={route('admin.capstone-templates.create')}>
+                            <PlusIcon data-slot="icon" />
+                            Create template
+                        </Button>
+                    </div>
+                ) : (
+                    templates.data.map((template) => (
+                        <article
+                            key={template.id}
+                            className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-950/10 bg-white px-4 py-3 dark:border-white/10 dark:bg-zinc-900"
+                        >
+                            <div className="flex items-center gap-3">
+                                <span className="flex size-9 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600">
+                                    <RocketLaunchIcon className="size-4" />
+                                </span>
+                                <div>
+                                    <p className="text-sm font-semibold text-zinc-950 dark:text-white">{template.name}</p>
+                                    <p className="text-xs text-zinc-500">
+                                        {template.estimated_weeks} weeks · {template.milestones?.length ?? template.milestones_count ?? 0}{' '}
+                                        milestones
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Badge color={template.is_active ? 'lime' : 'zinc'}>{template.is_active ? 'Active' : 'Inactive'}</Badge>
-                            <Button href={route('admin.capstone-templates.edit', template.id)} outline className="!text-xs">
-                                <PencilSquareIcon data-slot="icon" />
-                                Edit
-                            </Button>
-                        </div>
-                    </article>
-                ))}
+                            <div className="flex items-center gap-2">
+                                <Badge color={template.is_active ? 'lime' : 'zinc'}>{template.is_active ? 'Active' : 'Inactive'}</Badge>
+                                <Button href={route('admin.capstone-templates.edit', template.id)} outline className="!text-xs">
+                                    <PencilSquareIcon data-slot="icon" />
+                                    Edit
+                                </Button>
+                            </div>
+                        </article>
+                    ))
+                )}
             </div>
         </AppLayout>
     );

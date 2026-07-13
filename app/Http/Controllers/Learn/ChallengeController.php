@@ -49,6 +49,7 @@ class ChallengeController extends Controller
             'challenge' => new CodingChallengeResource($challenge),
             'submissions' => ChallengeSubmissionResource::collection($history),
             'languages' => $this->presentation->challengeLanguages(),
+            'environments' => $this->presentation->challengeEnvironments(),
             'currentTask' => 'challenge-'.$challenge->id,
             'github_connected' => $this->github->isConnected($request->user()),
             'evaluation_driver' => config('evaluation.driver', 'local'),
@@ -62,7 +63,8 @@ class ChallengeController extends Controller
         $result = $runChallengeTests->execute(
             $request->user(),
             $challenge,
-            $request->validated('code'),
+            $request->validated('code') ?? '',
+            $request->validated('files'),
         );
 
         return response()->json($result->toArray());
@@ -76,7 +78,7 @@ class ChallengeController extends Controller
             $request->user(),
             $challenge,
             $request->validated('code') ?? '',
-            $request->only(['source', 'github_owner', 'github_repo', 'github_ref', 'github_path']),
+            $request->safe()->only(['source', 'github_owner', 'github_repo', 'github_ref', 'github_path', 'files']),
         );
 
         return response()->json([

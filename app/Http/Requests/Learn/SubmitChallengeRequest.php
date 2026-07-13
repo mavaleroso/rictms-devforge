@@ -19,11 +19,24 @@ class SubmitChallengeRequest extends FormRequest
 
         return [
             'source' => ['sometimes', Rule::in(['editor', 'github'])],
-            'code' => [Rule::requiredIf($source === 'editor'), 'nullable', 'string', 'max:50000'],
+            'code' => ['nullable', 'string', 'max:50000'],
+            'files' => ['nullable', 'array'],
+            'files.*' => ['string', 'max:100000'],
             'github_owner' => [Rule::requiredIf($source === 'github'), 'nullable', 'string', 'max:100'],
             'github_repo' => [Rule::requiredIf($source === 'github'), 'nullable', 'string', 'max:100'],
             'github_ref' => ['nullable', 'string', 'max:100'],
             'github_path' => [Rule::requiredIf($source === 'github'), 'nullable', 'string', 'max:255'],
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $source = $this->input('source', 'editor');
+
+            if ($source === 'editor' && ! $this->filled('code') && ! $this->filled('files')) {
+                $validator->errors()->add('code', 'Provide code or project files to submit.');
+            }
+        });
     }
 }

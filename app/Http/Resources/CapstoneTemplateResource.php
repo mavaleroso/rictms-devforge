@@ -18,6 +18,8 @@ class CapstoneTemplateResource extends JsonResource
             'objectives' => $this->objectives,
             'estimated_weeks' => $this->estimated_weeks,
             'is_active' => $this->is_active,
+            'requires_kickoff' => (bool) $this->requires_kickoff,
+            'allow_parallel_milestones' => (bool) $this->allow_parallel_milestones,
             'milestones_count' => $this->whenCounted('milestones'),
             'tasks_count' => $this->whenCounted('tasks'),
             'milestones' => CapstoneTemplateMilestoneResource::collection($this->whenLoaded('milestones')),

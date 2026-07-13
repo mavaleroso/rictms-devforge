@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CertificateResource;
 use App\Models\Certificate;
+use App\Services\Analytics\CapstoneAnalyticsService;
 use App\Services\Analytics\CompletionAnalyticsService;
 use App\Services\Analytics\ReportExportService;
 use Illuminate\Http\Request;
@@ -17,6 +18,7 @@ class AnalyticsController extends Controller
 {
     public function __construct(
         private readonly CompletionAnalyticsService $analytics,
+        private readonly CapstoneAnalyticsService $capstoneAnalytics,
         private readonly ReportExportService $export,
     ) {}
 
@@ -28,6 +30,8 @@ class AnalyticsController extends Controller
             'stats' => $this->analytics->summary(),
             'trend' => $this->analytics->monthlyTrend(),
             'by_path' => $this->analytics->byPath(),
+            'capstone' => $this->capstoneAnalytics->summary(),
+            'capstone_by_template' => $this->capstoneAnalytics->byTemplate(),
         ]);
     }
 

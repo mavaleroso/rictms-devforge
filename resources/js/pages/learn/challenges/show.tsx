@@ -45,6 +45,7 @@ export default function LearnChallengesShow({
             level={level}
             enrollment={enrollment?.data ?? null}
             currentTask={currentTask}
+            flush
         >
             <ChallengeWorkspace
                 challenge={challenge}

@@ -16,10 +16,30 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Analytics', href: '/admin/analytics' },
 ];
 
+interface CapstoneAnalyticsSummary {
+    active_projects: number;
+    draft_projects: number;
+    completed_projects: number;
+    archived_projects?: number;
+    pending_reviews: number;
+    avg_mentor_score: number | null;
+    rejection_rate: number;
+    journal_hours_logged: number;
+}
+
+interface CapstoneByTemplate {
+    title: string;
+    total: number;
+    completed: number;
+    active: number;
+}
+
 interface Props {
     stats: AnalyticsSummary;
     trend: AnalyticsTrendPoint[];
     by_path: AnalyticsPathBreakdown[];
+    capstone?: CapstoneAnalyticsSummary;
+    capstone_by_template?: CapstoneByTemplate[];
 }
 
 function formatDate(value?: string | null): string {
@@ -77,7 +97,7 @@ function useCertificateColumns(): ColumnDef<Certificate, unknown>[] {
     );
 }
 
-export default function AdminAnalyticsIndex({ stats, trend, by_path }: Props) {
+export default function AdminAnalyticsIndex({ stats, trend, by_path, capstone, capstone_by_template }: Props) {
     const columns = useCertificateColumns();
 
     return (
@@ -138,6 +158,50 @@ export default function AdminAnalyticsIndex({ stats, trend, by_path }: Props) {
                     </div>
                 </div>
             </div>
+
+            {capstone && (
+                <section className="mt-6 grid gap-4 lg:grid-cols-3">
+                    <div className="rounded-xl border border-zinc-950/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-zinc-900 lg:col-span-2">
+                        <p className="text-xs font-semibold text-zinc-950 dark:text-white">Capstone</p>
+                        <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                            {[
+                                { label: 'Active', value: capstone.active_projects },
+                                { label: 'Draft', value: capstone.draft_projects },
+                                { label: 'Completed', value: capstone.completed_projects },
+                                { label: 'Pending reviews', value: capstone.pending_reviews },
+                                { label: 'Avg score', value: capstone.avg_mentor_score ?? '—' },
+                                { label: 'Rejection rate', value: `${capstone.rejection_rate}%` },
+                                { label: 'Journal hours', value: capstone.journal_hours_logged },
+                            ].map((item) => (
+                                <div key={item.label} className="rounded-lg border border-zinc-950/5 bg-zinc-50/80 px-3 py-2 dark:border-white/5 dark:bg-zinc-800/40">
+                                    <p className="text-[10px] font-semibold tracking-wide text-zinc-500 uppercase">{item.label}</p>
+                                    <p className="mt-1 text-lg font-bold tabular-nums text-zinc-950 dark:text-white">{item.value}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="rounded-xl border border-zinc-950/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-zinc-900">
+                        <p className="text-xs font-semibold text-zinc-950 dark:text-white">By template</p>
+                        <ul className="mt-4 space-y-3">
+                            {(capstone_by_template ?? []).length === 0 ? (
+                                <li className="text-xs text-zinc-500">No capstone projects yet.</li>
+                            ) : (
+                                (capstone_by_template ?? []).map((item) => (
+                                    <li key={item.title} className="flex items-start justify-between gap-3 border-b border-zinc-950/5 pb-3 last:border-0 last:pb-0 dark:border-white/5">
+                                        <div className="min-w-0">
+                                            <p className="truncate text-sm font-medium text-zinc-950 dark:text-white">{item.title}</p>
+                                            <p className="text-[11px] text-zinc-500">
+                                                {item.active} active · {item.completed} completed
+                                            </p>
+                                        </div>
+                                        <span className="shrink-0 text-sm font-semibold tabular-nums text-zinc-950 dark:text-white">{item.total}</span>
+                                    </li>
+                                ))
+                            )}
+                        </ul>
+                    </div>
+                </section>
+            )}
 
             <section className="mt-6">
                 <ServerDataTable<Certificate>

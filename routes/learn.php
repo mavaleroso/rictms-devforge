@@ -42,9 +42,11 @@ Route::middleware(['auth', 'role:intern'])->prefix('learn')->name('learn.')->gro
 
     Route::get('capstone', [CapstoneController::class, 'show'])->name('capstone.show');
     Route::post('capstone/start', [CapstoneController::class, 'start'])->name('capstone.start');
+    Route::post('capstone/archive', [CapstoneController::class, 'archive'])->name('capstone.archive');
     Route::get('capstone/board', [CapstoneController::class, 'board'])->name('capstone.board');
     Route::post('capstone/tasks', [CapstoneController::class, 'storeTask'])->name('capstone.tasks.store');
     Route::patch('capstone/tasks/{task}', [CapstoneController::class, 'updateTask'])->name('capstone.tasks.update');
+    Route::delete('capstone/tasks/{task}', [CapstoneController::class, 'destroyTask'])->name('capstone.tasks.destroy');
     Route::get('capstone/journal', [CapstoneController::class, 'journal'])->name('capstone.journal');
     Route::post('capstone/journal', [CapstoneController::class, 'storeJournal'])->name('capstone.journal.store');
     Route::post('capstone/milestones/{milestone}/submit', [CapstoneController::class, 'submitMilestone'])->name('capstone.milestones.submit');

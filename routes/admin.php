@@ -58,6 +58,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('analytics/export', [AnalyticsController::class, 'export'])->name('analytics.export');
 
     Route::get('capstone-templates', [CapstoneTemplateController::class, 'index'])->name('capstone-templates.index');
+    Route::get('capstone-templates/create', [CapstoneTemplateController::class, 'create'])->name('capstone-templates.create');
+    Route::post('capstone-templates', [CapstoneTemplateController::class, 'store'])->name('capstone-templates.store');
     Route::get('capstone-templates/{template}/edit', [CapstoneTemplateController::class, 'edit'])->name('capstone-templates.edit');
     Route::patch('capstone-templates/{template}', [CapstoneTemplateController::class, 'update'])->name('capstone-templates.update');
+    Route::post('capstone-templates/{template}/milestones', [CapstoneTemplateController::class, 'storeMilestone'])->name('capstone-templates.milestones.store');
+    Route::patch('capstone-template-milestones/{milestone}', [CapstoneTemplateController::class, 'updateMilestone'])->name('capstone-template-milestones.update');
+    Route::delete('capstone-template-milestones/{milestone}', [CapstoneTemplateController::class, 'destroyMilestone'])->name('capstone-template-milestones.destroy');
+    Route::post('capstone-templates/{template}/tasks', [CapstoneTemplateController::class, 'storeTask'])->name('capstone-templates.tasks.store');
+    Route::patch('capstone-template-tasks/{task}', [CapstoneTemplateController::class, 'updateTask'])->name('capstone-template-tasks.update');
+    Route::delete('capstone-template-tasks/{task}', [CapstoneTemplateController::class, 'destroyTask'])->name('capstone-template-tasks.destroy');
 });

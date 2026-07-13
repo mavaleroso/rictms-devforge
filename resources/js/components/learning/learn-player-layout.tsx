@@ -14,6 +14,7 @@ interface LearnPlayerLayoutProps {
     currentTask: string;
     children: ReactNode;
     fullWidth?: boolean;
+    flush?: boolean;
 }
 
 export function LearnPlayerLayout({
@@ -25,14 +26,25 @@ export function LearnPlayerLayout({
     currentTask,
     children,
     fullWidth = false,
+    flush = false,
 }: LearnPlayerLayoutProps) {
     const levels = path.levels ?? [];
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs} flush={flush}>
             <Head title={title} />
 
-            <div className={fullWidth ? 'space-y-4' : 'grid gap-6 xl:grid-cols-[minmax(0,1fr)_17.5rem]'}>
+            <div
+                className={
+                    flush
+                        ? fullWidth
+                            ? 'min-h-0 flex-1 p-3 sm:p-4'
+                            : 'grid min-h-0 flex-1 gap-4 p-3 sm:p-4 xl:grid-cols-[minmax(0,1fr)_17.5rem]'
+                        : fullWidth
+                          ? 'space-y-4'
+                          : 'grid gap-6 xl:grid-cols-[minmax(0,1fr)_17.5rem]'
+                }
+            >
                 <div className="min-w-0">{children}</div>
 
                 {levels.length > 0 && !fullWidth && (

@@ -12,4 +12,5 @@ Route::middleware(['auth', 'role:mentor'])->prefix('mentor')->name('mentor.')->g
     Route::get('capstone-reviews', [\App\Http\Controllers\Mentor\CapstoneReviewController::class, 'index'])->name('capstone-reviews.index');
     Route::get('capstone-reviews/{milestone}', [\App\Http\Controllers\Mentor\CapstoneReviewController::class, 'show'])->name('capstone-reviews.show');
     Route::patch('capstone-reviews/{milestone}', [\App\Http\Controllers\Mentor\CapstoneReviewController::class, 'update'])->name('capstone-reviews.update');
+    Route::post('capstone-kickoffs/{project}', [\App\Http\Controllers\Mentor\CapstoneReviewController::class, 'approveKickoff'])->name('capstone-kickoffs.approve');
 });

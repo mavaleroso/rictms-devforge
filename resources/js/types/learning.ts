@@ -41,6 +41,8 @@ export interface Level {
 }
 
 export type ChallengeLanguage = 'php' | 'javascript' | 'python';
+export type ChallengeEnvironment = 'laravel_inertia_react';
+export type ChallengeWorkspaceMode = 'single_file' | 'project';
 
 export interface CodingChallenge {
     id: number;
@@ -49,6 +51,15 @@ export interface CodingChallenge {
     constraints: string | null;
     examples: { input: string; output: string; explanation?: string }[];
     language: ChallengeLanguage;
+    environment?: ChallengeEnvironment;
+    environment_label?: string;
+    environment_description?: string;
+    environment_stack?: string[];
+    workspace_mode?: ChallengeWorkspaceMode;
+    template_key?: string | null;
+    preview_url?: string | null;
+    preview_path?: string | null;
+    target_files?: string[];
     entry_point: string;
     starter_code: string;
     time_limit_ms: number;

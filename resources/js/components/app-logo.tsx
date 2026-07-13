@@ -12,7 +12,7 @@ export default function AppLogo({ variant = 'default' }: AppLogoProps) {
         <span className="flex min-w-0 items-center gap-3">
             <span
                 className={clsx(
-                    'flex size-8 items-center justify-center rounded-lg shadow-sm',
+                    'flex size-8 items-center justify-center rounded-md shadow-sm',
                     onDark ? 'bg-white/10 ring-1 ring-white/15' : 'bg-brand-800',
                 )}
             >
@@ -20,7 +20,7 @@ export default function AppLogo({ variant = 'default' }: AppLogoProps) {
             </span>
             <span
                 className={clsx(
-                    'truncate text-sm font-semibold',
+                    'truncate text-[15px] font-semibold tracking-tight',
                     onDark ? 'text-white' : 'text-slate-900 dark:text-white',
                 )}
             >

@@ -1,0 +1,17 @@
+{
+    "key": "laravel-inertia-react/v1",
+    "name": "Blank Laravel + Inertia + React",
+    "description": "A minimal full-stack starter interns navigate and update: routes, thin controllers, Inertia pages, and React components.",
+    "stack": ["Laravel 12", "Inertia.js", "React", "Vite", "Tailwind"],
+    "entry_page": "resources/js/pages/welcome.tsx",
+    "files": [
+        { "path": "README.md", "language": "markdown", "editable": false },
+        { "path": "routes/web.php", "language": "php", "editable": true },
+        { "path": "app/Http/Controllers/WelcomeController.php", "language": "php", "editable": true },
+        { "path": "resources/js/app.tsx", "language": "typescript", "editable": false },
+        { "path": "resources/js/types/index.ts", "language": "typescript", "editable": true },
+        { "path": "resources/js/layouts/guest-layout.tsx", "language": "typescript", "editable": true },
+        { "path": "resources/js/components/ui/button.tsx", "language": "typescript", "editable": true },
+        { "path": "resources/js/pages/welcome.tsx", "language": "typescript", "editable": true }
+    ]
+}

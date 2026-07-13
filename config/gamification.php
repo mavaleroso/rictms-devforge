@@ -13,6 +13,8 @@ return [
         'level_base' => 200,
         'path_complete' => 1000,
         'daily_streak' => 10,
+        'capstone_milestone' => 100,
+        'capstone_complete' => 500,
     ],
 
     'difficulty_multipliers' => [
@@ -107,6 +109,24 @@ return [
             'category' => 'milestone',
             'xp_bonus' => 500,
             'sort_order' => 8,
+        ],
+        [
+            'slug' => 'capstone_builder',
+            'name' => 'Capstone Builder',
+            'description' => 'Get your first capstone milestone approved.',
+            'icon' => 'wrench',
+            'category' => 'milestone',
+            'xp_bonus' => 100,
+            'sort_order' => 11,
+        ],
+        [
+            'slug' => 'capstone_graduate',
+            'name' => 'Capstone Graduate',
+            'description' => 'Complete your capstone project.',
+            'icon' => 'flag',
+            'category' => 'milestone',
+            'xp_bonus' => 250,
+            'sort_order' => 12,
         ],
         [
             'slug' => 'xp_builder',

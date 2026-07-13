@@ -61,7 +61,13 @@ final class EloquentCapstoneProjectRepository implements CapstoneProjectReposito
         return CapstoneProjectMilestone::query()
             ->whereKey($milestone->id)
             ->whereHas('project.enrollment', fn ($q) => $q->where('mentor_id', $mentorId))
-            ->with(['project.enrollment.user', 'project.template', 'tasks'])
+            ->with([
+                'project.enrollment.user',
+                'project.template',
+                'project.milestones',
+                'tasks',
+                'attachments',
+            ])
             ->first();
     }
 

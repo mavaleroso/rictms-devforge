@@ -13,7 +13,7 @@ final class EloquentJournalEntryRepository implements JournalEntryRepository
     public function forProject(CapstoneProject $project, int $limit = 30): Collection
     {
         return $project->journalEntries()
-            ->with('user')
+            ->with(['user', 'milestone'])
             ->limit($limit)
             ->get();
     }

@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\ChallengeEnvironment;
 use App\Enums\ChallengeLanguage;
+use App\Enums\ChallengeWorkspaceMode;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +22,10 @@ class CodingChallenge extends Model
         'constraints',
         'examples',
         'language',
+        'environment',
+        'workspace_mode',
+        'template_key',
+        'target_files',
         'entry_point',
         'starter_code',
         'solution_code',
@@ -35,10 +41,18 @@ class CodingChallenge extends Model
     {
         return [
             'language' => ChallengeLanguage::class,
+            'environment' => ChallengeEnvironment::class,
+            'workspace_mode' => ChallengeWorkspaceMode::class,
+            'target_files' => 'array',
             'examples' => 'array',
             'requires_mentor_review' => 'boolean',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function isProjectWorkspace(): bool
+    {
+        return $this->workspace_mode === ChallengeWorkspaceMode::Project;
     }
 
     public function level(): BelongsTo

@@ -13,4 +13,6 @@ enum XpSourceType: string
     case PathComplete = 'path_complete';
     case DailyStreak = 'daily_streak';
     case BadgeBonus = 'badge_bonus';
+    case CapstoneMilestone = 'capstone_milestone';
+    case CapstoneComplete = 'capstone_complete';
 }

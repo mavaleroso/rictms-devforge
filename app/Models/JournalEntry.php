@@ -11,6 +11,7 @@ class JournalEntry extends Model
     protected $fillable = [
         'capstone_project_id',
         'user_id',
+        'capstone_project_milestone_id',
         'entry_date',
         'content',
         'mood',
@@ -34,5 +35,10 @@ class JournalEntry extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function milestone(): BelongsTo
+    {
+        return $this->belongsTo(CapstoneProjectMilestone::class, 'capstone_project_milestone_id');
     }
 }

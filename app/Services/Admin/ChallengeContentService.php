@@ -2,8 +2,10 @@
 
 namespace App\Services\Admin;
 
+use App\Enums\ChallengeEnvironment;
 use App\Enums\ChallengeLanguage;
-use App\Library\CodingChallenge\LanguageRegistry;
+use App\Enums\ChallengeWorkspaceMode;
+use App\Library\CodingChallenge\EnvironmentRegistry;
 use App\Models\ChallengeTestCase;
 use App\Models\CodingChallenge;
 use App\Models\Level;
@@ -19,14 +21,14 @@ final class ChallengeContentService
 
     public function storeChallenge(Level $level, array $attributes): CodingChallenge
     {
-        $attributes = $this->applyStarterCodeDefaults($attributes);
+        $attributes = $this->normalizeAttributes($attributes);
 
         return $this->challenges->createForLevel($level, $attributes);
     }
 
     public function updateChallenge(CodingChallenge $challenge, array $attributes): void
     {
-        $attributes = $this->applyStarterCodeDefaults($attributes);
+        $attributes = $this->normalizeAttributes($attributes, $challenge);
 
         $this->challenges->update($challenge, $attributes);
     }
@@ -51,17 +53,61 @@ final class ChallengeContentService
         $this->testCases->delete($testCase);
     }
 
-    /** @param  array<string, mixed>  $attributes */
-    private function applyStarterCodeDefaults(array $attributes): array
+    /**
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    private function normalizeAttributes(array $attributes, ?CodingChallenge $existing = null): array
     {
-        if (! isset($attributes['starter_code']) && isset($attributes['entry_point'], $attributes['language'])) {
-            $language = is_string($attributes['language'])
-                ? ChallengeLanguage::from($attributes['language'])
-                : $attributes['language'];
+        if (! isset($attributes['environment'])) {
+            $attributes['environment'] = $existing?->environment?->value
+                ?? ChallengeEnvironment::LaravelInertiaReact->value;
+        }
 
-            $attributes['starter_code'] = LanguageRegistry::defaultStarter(
+        if (! isset($attributes['workspace_mode'])) {
+            $attributes['workspace_mode'] = $existing?->workspace_mode?->value
+                ?? ChallengeWorkspaceMode::SingleFile->value;
+        }
+
+        $environment = is_string($attributes['environment'])
+            ? ChallengeEnvironment::from($attributes['environment'])
+            : $attributes['environment'];
+
+        $workspaceMode = is_string($attributes['workspace_mode'])
+            ? ChallengeWorkspaceMode::from($attributes['workspace_mode'])
+            : $attributes['workspace_mode'];
+
+        if ($workspaceMode === ChallengeWorkspaceMode::Project && empty($attributes['template_key'])) {
+            $attributes['template_key'] = $existing?->template_key ?? config('coding-challenges.default_project_template', 'laravel-inertia-react-template');
+        }
+
+        if (! isset($attributes['language'])) {
+            $attributes['language'] = $existing?->language?->value
+                ?? $environment->defaultLanguage()->value;
+        }
+
+        $language = is_string($attributes['language'])
+            ? ChallengeLanguage::from($attributes['language'])
+            : $attributes['language'];
+
+        $entryPoint = $attributes['entry_point']
+            ?? $existing?->entry_point
+            ?? 'solution';
+
+        $starterMissingOrBlank = ! isset($attributes['starter_code'])
+            || trim((string) $attributes['starter_code']) === '';
+
+        if ($starterMissingOrBlank && isset($attributes['entry_point'], $attributes['language'])) {
+            $attributes['starter_code'] = EnvironmentRegistry::defaultStarter(
+                $environment,
                 $language,
-                $attributes['entry_point'],
+                $entryPoint,
+            );
+        } elseif ($starterMissingOrBlank && $existing === null) {
+            $attributes['starter_code'] = EnvironmentRegistry::defaultStarter(
+                $environment,
+                $language,
+                $entryPoint,
             );
         }
 

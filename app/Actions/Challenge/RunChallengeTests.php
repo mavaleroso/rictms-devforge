@@ -14,8 +14,8 @@ final class RunChallengeTests
         private readonly ChallengeSubmissionService $submissions,
     ) {}
 
-    public function execute(User $user, CodingChallenge $challenge, string $code): EvaluationResult
+    public function execute(User $user, CodingChallenge $challenge, string $code, ?array $files = null): EvaluationResult
     {
-        return $this->submissions->runSampleTests($user, $challenge, $code);
+        return $this->submissions->runSampleTests($user, $challenge, $code, $files);
     }
 }

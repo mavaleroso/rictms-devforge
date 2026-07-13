@@ -2,11 +2,11 @@ import { Badge } from '@/components/catalyst/badge';
 import { Button } from '@/components/catalyst/button';
 import { MentorPageHero } from '@/components/mentor/mentor-page-hero';
 import { MILESTONE_STATUS_COLOR, MILESTONE_STATUS_LABEL } from '@/lib/capstone-labels';
-import type { CapstoneMilestone } from '@/types/capstone';
+import type { CapstoneMilestone, CapstoneProject } from '@/types/capstone';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { CheckCircleIcon, ClockIcon, RocketLaunchIcon } from '@heroicons/react/20/solid';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -15,11 +15,13 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface Props {
     milestones: { data: CapstoneMilestone[] };
-    stats: { pending: number; interns_waiting: number };
+    kickoffs: { data: CapstoneProject[] };
+    stats: { pending: number; kickoffs: number; interns_waiting: number };
 }
 
-export default function MentorCapstoneReviewsIndex({ milestones: milestonesProp, stats }: Props) {
+export default function MentorCapstoneReviewsIndex({ milestones: milestonesProp, kickoffs: kickoffsProp, stats }: Props) {
     const milestones = milestonesProp.data;
+    const kickoffs = kickoffsProp.data;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -28,21 +30,47 @@ export default function MentorCapstoneReviewsIndex({ milestones: milestonesProp,
             <MentorPageHero
                 icon={RocketLaunchIcon}
                 iconClassName="bg-brand-600"
-                title="Capstone milestone sign-offs"
-                description="Interns submit milestone deliverables for approval. Sign off when acceptance criteria are met, or return with revision notes."
+                title="Capstone reviews"
+                description="Approve kickoffs, then sign off milestone deliverables with feedback and scores."
                 stats={[
                     { label: 'Awaiting sign-off', value: stats.pending, accent: 'violet' },
+                    { label: 'Kickoffs', value: stats.kickoffs, accent: 'amber' },
                     { label: 'Interns waiting', value: stats.interns_waiting, accent: 'default' },
                 ]}
             />
+
+            {kickoffs.length > 0 && (
+                <section className="mt-6">
+                    <h2 className="text-sm font-semibold text-zinc-950 dark:text-white">Kickoff approvals</h2>
+                    <ul className="mt-3 space-y-2">
+                        {kickoffs.map((project) => (
+                            <li
+                                key={project.id}
+                                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200/80 bg-amber-50/50 px-4 py-3 dark:border-amber-500/20 dark:bg-amber-950/20"
+                            >
+                                <div>
+                                    <p className="text-sm font-semibold text-zinc-950 dark:text-white">{project.title}</p>
+                                    <p className="text-xs text-zinc-500">{project.enrollment?.user?.name ?? 'Intern'}</p>
+                                </div>
+                                <Button
+                                    className="!text-xs"
+                                    onClick={() => router.post(route('mentor.capstone-kickoffs.approve', project.id))}
+                                >
+                                    Approve kickoff
+                                </Button>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            )}
 
             {milestones.length === 0 ? (
                 <div className="mt-6 flex flex-col items-center rounded-xl border border-dashed border-zinc-300 px-6 py-14 text-center dark:border-zinc-600">
                     <span className="flex size-12 items-center justify-center rounded-full bg-lime-500/10 text-lime-600">
                         <CheckCircleIcon className="size-6" />
                     </span>
-                    <p className="mt-4 text-sm font-medium text-zinc-950 dark:text-white">All caught up</p>
-                    <p className="mt-1 text-xs text-zinc-500">No capstone milestones are waiting for your review.</p>
+                    <p className="mt-4 text-sm font-medium text-zinc-950 dark:text-white">No milestone reviews waiting</p>
+                    <p className="mt-1 text-xs text-zinc-500">Submitted milestones will appear here.</p>
                 </div>
             ) : (
                 <ul className="mt-6 space-y-3">

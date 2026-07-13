@@ -16,6 +16,11 @@ class JournalEntryResource extends JsonResource
             'content' => $this->content,
             'mood' => $this->mood?->value,
             'hours_spent' => $this->hours_spent,
+            'milestone_id' => $this->capstone_project_milestone_id,
+            'milestone' => $this->whenLoaded('milestone', fn () => $this->milestone ? [
+                'id' => $this->milestone->id,
+                'title' => $this->milestone->title,
+            ] : null),
             'user' => $this->whenLoaded('user', fn () => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,

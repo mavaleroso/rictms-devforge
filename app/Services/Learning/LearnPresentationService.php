@@ -15,6 +15,7 @@ use App\Repositories\Contracts\LearningPathRepository;
 use App\Repositories\Contracts\LevelProgressRepository;
 use App\Repositories\Contracts\LevelRepository;
 use App\Repositories\Contracts\QuizAttemptRepository;
+use App\Library\CodingChallenge\EnvironmentRegistry;
 use App\Library\CodingChallenge\LanguageRegistry;
 use App\Models\CodingChallenge;
 use App\Repositories\Contracts\ChallengeSubmissionRepository;
@@ -137,6 +138,11 @@ final class LearnPresentationService
         $challenge->passed = $stats['passed'];
         $challenge->status = $stats['status'];
 
+        if ($challenge->isProjectWorkspace() && $challenge->template_key) {
+            $challenge->workspace_files = app(\App\Library\CodingChallenge\ChallengeTemplateRepository::class)
+                ->workspaceFiles($challenge->template_key);
+        }
+
         return $challenge;
     }
 
@@ -148,5 +154,11 @@ final class LearnPresentationService
             'label' => $lang->label,
             'monaco_id' => $lang->monacoId,
         ], LanguageRegistry::all());
+    }
+
+    /** @return list<array{id: string, label: string, short_label: string, description: string, stack: list<string>, default_language: string}> */
+    public function challengeEnvironments(): array
+    {
+        return EnvironmentRegistry::all();
     }
 }

@@ -83,6 +83,10 @@ final class CapstoneBoardService
             $attributes['due_date'] = $data['due_date'];
         }
 
+        if (array_key_exists('milestone_id', $data)) {
+            $attributes['capstone_project_milestone_id'] = $data['milestone_id'];
+        }
+
         if ($attributes === []) {
             throw ValidationException::withMessages([
                 'task' => 'No changes provided.',
@@ -90,5 +94,10 @@ final class CapstoneBoardService
         }
 
         return $this->tasks->update($task, $attributes);
+    }
+
+    public function deleteTask(CapstoneTask $task): void
+    {
+        $this->tasks->delete($task);
     }
 }

@@ -20,8 +20,30 @@ export function ChallengeProblemPanel({ challenge, pathName, levelNumber }: Chal
     return (
         <div className="flex h-full flex-col overflow-hidden bg-white dark:bg-zinc-950">
             <div className="shrink-0 border-b border-zinc-950/8 px-4 py-3 dark:border-white/8">
+                <div className="mb-3 rounded-lg border border-brand-200/70 bg-brand-50/70 px-3 py-2 dark:border-brand-500/30 dark:bg-brand-950/30">
+                    <p className="text-[10px] font-semibold tracking-wide text-brand-700 uppercase dark:text-brand-300">
+                        Learning environment
+                    </p>
+                    <p className="mt-0.5 text-sm font-semibold text-brand-950 dark:text-brand-50">
+                        {challenge.environment_label ?? 'Laravel + Inertia + React'}
+                    </p>
+                    <p className="mt-1 text-[11px] leading-relaxed text-brand-800/80 dark:text-brand-200/80">
+                        {challenge.environment_description ??
+                            'Full-stack DevForge stack used at every level: Laravel 12, Inertia.js, React, and Catalyst UI.'}
+                    </p>
+                    {(challenge.environment_stack?.length ?? 0) > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                            {challenge.environment_stack?.map((item) => (
+                                <Badge key={item} color="zinc" className="!text-[10px]">
+                                    {item}
+                                </Badge>
+                            ))}
+                        </div>
+                    )}
+                </div>
                 <div className="flex flex-wrap items-center gap-2">
-                    <Badge color="violet">{challenge.language.toUpperCase()}</Badge>
+                    <Badge color="violet">{(challenge.environment_label ?? 'Laravel / Inertia / React').split(' + ').join(' / ')}</Badge>
+                    <Badge color="zinc">{challenge.language.toUpperCase()}</Badge>
                     {challenge.passed && (
                         <Badge color="lime" className="gap-1">
                             <CheckCircleIcon className="size-3" />

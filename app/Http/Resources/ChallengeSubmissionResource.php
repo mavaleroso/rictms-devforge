@@ -22,6 +22,7 @@ class ChallengeSubmissionResource extends JsonResource
             'status' => $this->status?->value,
             'language' => $this->language?->value,
             'code' => $this->when($canViewCode, $this->code),
+            'files' => $this->when($canViewCode, $this->files),
             'attempt_number' => $this->attempt_number,
             'tests_passed' => $this->tests_passed,
             'tests_total' => $this->tests_total,

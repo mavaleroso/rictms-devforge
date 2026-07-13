@@ -12,10 +12,12 @@ final class SubmissionEvaluator
 {
     public function __construct(
         private readonly EvaluationRunnerFactory $runnerFactory,
+        private readonly ProjectEvaluator $projectEvaluator,
     ) {}
 
     /**
      * @param  Collection<int, ChallengeTestCase>  $testCases
+     * @param  array<string, string>|null  $files
      */
     public function evaluate(
         CodingChallenge $challenge,
@@ -23,7 +25,17 @@ final class SubmissionEvaluator
         Collection $testCases,
         bool $sampleOnly = false,
         ?EvaluationDriver $driver = null,
+        ?array $files = null,
     ): EvaluationResult {
+        if ($challenge->isProjectWorkspace()) {
+            return $this->projectEvaluator->evaluate(
+                $challenge,
+                $files ?? [],
+                $testCases,
+                $sampleOnly,
+            );
+        }
+
         $runner = $this->runnerFactory->forDriver($driver);
         $cases = $sampleOnly
             ? $testCases->where('is_sample', true)->values()

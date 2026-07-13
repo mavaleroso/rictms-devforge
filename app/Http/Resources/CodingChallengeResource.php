@@ -23,6 +23,39 @@ class CodingChallengeResource extends JsonResource
             'constraints' => $this->constraints,
             'examples' => $this->examples ?? [],
             'language' => $this->language?->value,
+            'environment' => $this->environment?->value ?? \App\Enums\ChallengeEnvironment::LaravelInertiaReact->value,
+            'environment_label' => $this->environment?->label()
+                ?? \App\Enums\ChallengeEnvironment::LaravelInertiaReact->label(),
+            'environment_description' => $this->environment?->description()
+                ?? \App\Enums\ChallengeEnvironment::LaravelInertiaReact->description(),
+            'environment_stack' => $this->environment?->stack()
+                ?? \App\Enums\ChallengeEnvironment::LaravelInertiaReact->stack(),
+            'workspace_mode' => $this->workspace_mode?->value ?? \App\Enums\ChallengeWorkspaceMode::SingleFile->value,
+            'template_key' => $this->template_key,
+            'preview_url' => $this->when(
+                $this->isProjectWorkspace() && $this->template_key,
+                function () {
+                    try {
+                        return app(\App\Library\CodingChallenge\ChallengeTemplateRepository::class)
+                            ->previewUrl($this->template_key);
+                    } catch (\Throwable) {
+                        return null;
+                    }
+                },
+            ),
+            'preview_path' => $this->when(
+                $this->isProjectWorkspace() && $this->template_key,
+                function () {
+                    try {
+                        return app(\App\Library\CodingChallenge\ChallengeTemplateRepository::class)
+                            ->previewPath($this->template_key);
+                    } catch (\Throwable) {
+                        return '/';
+                    }
+                },
+            ),
+            'target_files' => $this->target_files ?? [],
+            'workspace_files' => $this->when(isset($this->workspace_files), $this->workspace_files),
             'entry_point' => $this->entry_point,
             'starter_code' => $this->starter_code,
             'time_limit_ms' => $this->time_limit_ms,

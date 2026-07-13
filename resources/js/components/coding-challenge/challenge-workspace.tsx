@@ -1,3 +1,4 @@
+import { ProjectChallengeWorkspace } from '@/components/coding-challenge/project-challenge-workspace';
 import { Button } from '@/components/catalyst/button';
 import { Input } from '@/components/catalyst/input';
 import { fetchJson, FetchJsonError } from '@/lib/fetch-json';
@@ -28,7 +29,22 @@ interface ChallengeWorkspaceProps {
     evaluationDriver?: string;
 }
 
-export function ChallengeWorkspace({
+export function ChallengeWorkspace(props: ChallengeWorkspaceProps) {
+    if (props.challenge.workspace_mode === 'project') {
+        return (
+            <ProjectChallengeWorkspace
+                challenge={props.challenge}
+                pathName={props.pathName}
+                levelNumber={props.levelNumber}
+                initialSubmissions={props.initialSubmissions}
+            />
+        );
+    }
+
+    return <SingleFileChallengeWorkspace {...props} />;
+}
+
+function SingleFileChallengeWorkspace({
     challenge,
     pathName,
     levelNumber,
@@ -186,6 +202,9 @@ export function ChallengeWorkspace({
                             GitHub
                         </button>
                     </div>
+                    <span className="rounded bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium text-brand-700 dark:text-brand-300">
+                        {challenge.environment_label ?? 'Laravel + Inertia + React'}
+                    </span>
                     <span className="rounded bg-zinc-100 px-2 py-0.5 font-mono text-[11px] text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                         {challenge.language}
                     </span>

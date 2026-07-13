@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ChallengeAssertionType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,8 @@ class ChallengeTestCase extends Model
     protected $fillable = [
         'coding_challenge_id',
         'label',
+        'assertion_type',
+        'target_path',
         'input',
         'expected_output',
         'explanation',
@@ -24,6 +27,7 @@ class ChallengeTestCase extends Model
     {
         return [
             'input' => 'array',
+            'assertion_type' => ChallengeAssertionType::class,
             'is_sample' => 'boolean',
         ];
     }

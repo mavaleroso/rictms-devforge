@@ -14,12 +14,16 @@ class CapstoneTemplateMilestone extends Model
         'description',
         'sort_order',
         'requires_mentor_signoff',
+        'allows_parallel',
+        'is_final_showcase',
     ];
 
     protected function casts(): array
     {
         return [
             'requires_mentor_signoff' => 'boolean',
+            'allows_parallel' => 'boolean',
+            'is_final_showcase' => 'boolean',
         ];
     }
 

@@ -8,7 +8,11 @@ use App\Enums\XpSourceType;
 use App\Library\Gamification\StreakCalculator;
 use App\Library\Gamification\TierRegistry;
 use App\Library\Gamification\XpRules;
+use App\Enums\CapstoneMilestoneStatus;
+use App\Enums\CapstoneProjectStatus;
 use App\Models\Badge;
+use App\Models\CapstoneProject;
+use App\Models\CapstoneProjectMilestone;
 use App\Models\ContentCompletion;
 use App\Models\Enrollment;
 use App\Models\User;
@@ -67,6 +71,8 @@ final class AchievementEvaluator
             'streak_month',
             'level_milestone',
             'path_graduate',
+            'capstone_builder',
+            'capstone_graduate',
             'xp_builder',
             'dedicated_learner',
             $profile && $profile->total_xp >= 1500 ? 'xp_specialist' : null,
@@ -83,6 +89,14 @@ final class AchievementEvaluator
             'streak_month' => ($this->profiles->findForUser($user)?->current_streak ?? 0) >= 30,
             'level_milestone' => $this->completedLevelCount($user) >= 5,
             'path_graduate' => $user->enrollments()->where('status', EnrollmentStatus::Completed)->exists(),
+            'capstone_builder' => CapstoneProjectMilestone::query()
+                ->where('status', CapstoneMilestoneStatus::Approved)
+                ->whereHas('project.enrollment', fn ($q) => $q->where('user_id', $user->id))
+                ->exists(),
+            'capstone_graduate' => CapstoneProject::query()
+                ->where('status', CapstoneProjectStatus::Completed)
+                ->whereHas('enrollment', fn ($q) => $q->where('user_id', $user->id))
+                ->exists(),
             'xp_builder' => ($this->profiles->findForUser($user)?->total_xp ?? 0) >= 500,
             'xp_specialist' => ($this->profiles->findForUser($user)?->total_xp ?? 0) >= 1500,
             'dedicated_learner' => ContentCompletion::query()->where('user_id', $user->id)->count() >= 10,

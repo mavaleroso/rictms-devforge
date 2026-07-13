@@ -8,6 +8,14 @@ export type SubmissionStatus =
     | 'rejected';
 
 export type ChallengeLanguage = 'php' | 'javascript' | 'python';
+export type ChallengeEnvironment = 'laravel_inertia_react';
+export type ChallengeWorkspaceMode = 'single_file' | 'project';
+export type ChallengeAssertionType =
+    | 'function_output'
+    | 'file_contains'
+    | 'file_regex'
+    | 'file_exists'
+    | 'file_equals';
 
 export interface ChallengeExample {
     input: string;
@@ -18,11 +26,20 @@ export interface ChallengeExample {
 export interface ChallengeTestCase {
     id: number;
     label: string | null;
+    assertion_type?: ChallengeAssertionType;
+    target_path?: string | null;
     input: { args: unknown[] };
     expected_output?: string;
     explanation?: string | null;
     is_sample: boolean;
     sort_order: number;
+}
+
+export interface WorkspaceFile {
+    path: string;
+    language: string;
+    editable: boolean;
+    content: string;
 }
 
 export interface CodingChallenge {
@@ -34,6 +51,16 @@ export interface CodingChallenge {
     constraints: string | null;
     examples: ChallengeExample[];
     language: ChallengeLanguage;
+    environment?: ChallengeEnvironment;
+    environment_label?: string;
+    environment_description?: string;
+    environment_stack?: string[];
+    workspace_mode?: ChallengeWorkspaceMode;
+    template_key?: string | null;
+    preview_url?: string | null;
+    preview_path?: string | null;
+    target_files?: string[];
+    workspace_files?: WorkspaceFile[];
     entry_point: string;
     starter_code: string;
     time_limit_ms: number;
@@ -80,6 +107,7 @@ export interface ChallengeSubmission {
     status: SubmissionStatus;
     language: ChallengeLanguage;
     code?: string;
+    files?: Record<string, string> | null;
     attempt_number: number;
     tests_passed: number;
     tests_total: number;

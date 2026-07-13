@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\ChallengeEnvironment;
 use App\Enums\ChallengeLanguage;
+use App\Enums\ChallengeWorkspaceMode;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,6 +27,11 @@ class StoreCodingChallengeRequest extends FormRequest
             'examples.*.output' => ['required', 'string'],
             'examples.*.explanation' => ['nullable', 'string'],
             'language' => ['required', Rule::enum(ChallengeLanguage::class)],
+            'environment' => ['required', Rule::enum(ChallengeEnvironment::class)],
+            'workspace_mode' => ['required', Rule::enum(ChallengeWorkspaceMode::class)],
+            'template_key' => ['nullable', 'string', 'max:100'],
+            'target_files' => ['nullable', 'array'],
+            'target_files.*' => ['string', 'max:255'],
             'entry_point' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z_][a-zA-Z0-9_]*$/'],
             'starter_code' => ['nullable', 'string', 'max:50000'],
             'time_limit_ms' => ['required', 'integer', 'min:500', 'max:30000'],
@@ -34,5 +41,20 @@ class StoreCodingChallengeRequest extends FormRequest
             'is_active' => ['boolean'],
             'sort_order' => ['integer', 'min:0'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if (! $this->filled('environment')) {
+            $this->merge([
+                'environment' => ChallengeEnvironment::LaravelInertiaReact->value,
+            ]);
+        }
+
+        if (! $this->filled('workspace_mode')) {
+            $this->merge([
+                'workspace_mode' => ChallengeWorkspaceMode::SingleFile->value,
+            ]);
+        }
     }
 }

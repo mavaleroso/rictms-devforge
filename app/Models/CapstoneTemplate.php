@@ -14,6 +14,8 @@ class CapstoneTemplate extends Model
         'objectives',
         'estimated_weeks',
         'is_active',
+        'requires_kickoff',
+        'allow_parallel_milestones',
         'sort_order',
     ];
 
@@ -21,6 +23,8 @@ class CapstoneTemplate extends Model
     {
         return [
             'is_active' => 'boolean',
+            'requires_kickoff' => 'boolean',
+            'allow_parallel_milestones' => 'boolean',
         ];
     }
 

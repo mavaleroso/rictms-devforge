@@ -2,10 +2,11 @@
 
 namespace Database\Seeders\Curriculum;
 
+use App\Enums\ChallengeEnvironment;
 use App\Enums\ChallengeLanguage;
 use App\Enums\LevelDifficulty;
 use App\Enums\VideoProvider;
-use App\Library\CodingChallenge\LanguageRegistry;
+use App\Library\CodingChallenge\EnvironmentRegistry;
 use App\Models\ChallengeTestCase;
 use App\Models\CodingChallenge;
 use App\Models\LearningMaterial;
@@ -251,6 +252,8 @@ final class LaravelInertiaCurriculum
                 self::seedQuiz($level, $number);
                 self::seedChallenge($level, $number);
             }
+
+            LaravelInertiaProjectChallenges::seedForLevels($levels);
         });
     }
 
@@ -328,12 +331,17 @@ final class LaravelInertiaCurriculum
 
     private static function seedChallenge(Level $level, int $number): void
     {
-        if ($level->codingChallenges()->exists()) {
-            return;
-        }
-
         $problem = LaravelInertiaChallenges::forLevel($number);
         $language = $problem['language'] ?? ChallengeLanguage::Php;
+        $environment = $problem['environment'] ?? ChallengeEnvironment::LaravelInertiaReact;
+
+        if ($level->codingChallenges()->exists()) {
+            $level->codingChallenges()->update([
+                'environment' => $environment,
+            ]);
+
+            return;
+        }
 
         $challenge = CodingChallenge::create([
             'level_id' => $level->id,
@@ -342,8 +350,13 @@ final class LaravelInertiaCurriculum
             'constraints' => $problem['constraints'],
             'examples' => $problem['examples'],
             'language' => $language,
+            'environment' => $environment,
             'entry_point' => $problem['entry_point'],
-            'starter_code' => LanguageRegistry::defaultStarter($language, $problem['entry_point']),
+            'starter_code' => EnvironmentRegistry::defaultStarter(
+                $environment,
+                $language,
+                $problem['entry_point'],
+            ),
             'time_limit_ms' => $problem['time_limit_ms'] ?? 2000,
             'memory_limit_mb' => $problem['memory_limit_mb'] ?? 128,
             'max_attempts' => $problem['max_attempts'] ?? 5,

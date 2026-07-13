@@ -19,6 +19,7 @@ class ChallengeSubmission extends Model
         'user_id',
         'coding_challenge_id',
         'code',
+        'files',
         'language',
         'submission_source',
         'evaluation_driver',
@@ -44,6 +45,7 @@ class ChallengeSubmission extends Model
         return [
             'status' => SubmissionStatus::class,
             'language' => ChallengeLanguage::class,
+            'files' => 'array',
             'submission_source' => SubmissionSource::class,
             'evaluation_driver' => EvaluationDriver::class,
             'reviewed_at' => 'datetime',
